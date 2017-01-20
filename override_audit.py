@@ -52,16 +52,22 @@ class oa_impl_list_plugins(sublime_plugin.TextCommand):
 
 class OverrideAuditListPluginsCommand(sublime_plugin.WindowCommand):
     def get_view(self, title, syntax):
-        for view in self.window.views ():
-            if view.name () == title:
-                view.set_read_only (False)
-                self.window.focus_view (view)
-                return view
+        view = None
+        for tmpView in self.window.views ():
+            if tmpView.name () == title:
+                view = tmpView
+                break
 
-        view = self.window.new_file ()
-        view.set_scratch (True)
-        view.set_name (title)
-        view.assign_syntax (syntax)
+        if view is None:
+            view = self.window.new_file ()
+            view.set_scratch (True)
+            view.set_name (title)
+            view.assign_syntax (syntax)
+        else:
+            view.set_read_only (False)
+            if self.window.active_view () != view:
+                self.window.focus_view (view)
+
         return view
 
     def run(self):
