@@ -51,7 +51,7 @@ class oa_impl_list_plugins(sublime_plugin.TextCommand):
 ###-----------------------------------------------------------------------------
 
 class OverrideAuditListPluginsCommand(sublime_plugin.WindowCommand):
-    def get_view(self, title):
+    def get_view(self, title, syntax):
         for view in self.window.views ():
             if view.name () == title:
                 view.set_read_only (False)
@@ -61,12 +61,13 @@ class OverrideAuditListPluginsCommand(sublime_plugin.WindowCommand):
         view = self.window.new_file ()
         view.set_scratch (True)
         view.set_name (title)
-        view.assign_syntax ("Packages/OverrideAudit/OverrideAudit-table.sublime-syntax")
+        view.assign_syntax (syntax)
         return view
 
     def run(self):
         title = "OverrideAudit: Package List"
-        view = self.get_view (title)
+        syntax = "Packages/OverrideAudit/OverrideAudit-table.sublime-syntax"
+        view = self.get_view (title, syntax)
         view.run_command ("oa_impl_list_plugins")
         view.set_read_only (True)
 
