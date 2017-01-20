@@ -5,27 +5,6 @@ from .lib.packages import *
 
 ###-----------------------------------------------------------------------------
 
-# For development only; runs tests for the current development path
-class OverideAuditTestCommand(sublime_plugin.WindowCommand):
-    def run (self):
-        # self.window.run_command ("plugin_dump")
-        self.window.run_command ("override_audit_list_plugins")
-
-###-----------------------------------------------------------------------------
-
-class PluginDumpCommand(sublime_plugin.WindowCommand):
-    def run(self):
-        print ("================================================================")
-        p_list = PackageList ()
-        print ("Total Packages Installed:", len (p_list))
-        print (p_list["Objective-C"])
-        if "Objective-Boobs" in p_list:
-            print (p_list["Objective-Boobs"])
-        for name, info in p_list:
-            print (name)
-
-###-----------------------------------------------------------------------------
-
 class oa_impl_list_plugins(sublime_plugin.TextCommand):
     def append(self, str):
         self.view.insert (self.__edit, self.view.size (), str)
