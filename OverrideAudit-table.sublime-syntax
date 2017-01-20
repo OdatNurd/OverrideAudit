@@ -1,0 +1,18 @@
+%YAML 1.2
+---
+# See http://www.sublimetext.com/docs/3/syntax.html
+name: OverrideAudit
+scope: text.oa.table
+hidden: true
+contexts:
+  main:
+    # Strings begin and end with quotes, and use backslashes as an escape
+    # character
+    - match: '(-{1,})|\|'
+      scope: string
+
+    - match: '\[ ]'
+      scope: comment
+
+    - match: '\[X]'
+      scope: storage
