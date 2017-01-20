@@ -6,35 +6,35 @@ from .lib.packages import *
 ###-----------------------------------------------------------------------------
 
 class oa_impl_list_plugins(sublime_plugin.TextCommand):
-    def append(self, str):
-        self.view.insert (self.__edit, self.view.size (), str)
-
     def insert_title(self, pkg_list):
-        caption = "Total Packages Installed: %d\n" % len (pkg_list)
-        self.append (caption)
-        self.append ("-" * (len (caption) - 1))
-        self.append ("\n\n")
+        caption = "Total Packages Installed: %d" % len (pkg_list)
+        self.result.extend ([
+            caption,
+            "-" * len (caption),
+            "\n"
+            ])
 
     def insert_header(self, pkg_list):
-        header = "| {:3} | {:3} | {:3} | {:<40} |\n".format ("Shp", "Ins", "Unp", "Package")
-        self.append ("-" * (len (header) - 1))
-        self.append ("\n")
-        self.append (header)
-        self.append ("-" * (len (header) - 1))
-        self.append ("\n")
-        return len (header) - 1
+        header = "| {:3} | {:3} | {:3} | {:<40} |".format ("Shp", "Ins", "Unp", "Package")
+        hLen = len (header)
+        self.result.extend ([
+            "-" * hLen,
+            header,
+            "-" * hLen,
+            ])
+        return hLen
 
     def insert_record(self, pkg_info):
-        line = "| [{:1}] | [{:1}] | [{:1}] | {:<40} |\n".format (
+        self.result.append (
+            "| [{:1}] | [{:1}] | [{:1}] | {:<40} |".format (
             "X" if pkg_info.shipped_path is not None else " ",
             "X" if pkg_info.installed_path is not None else " ",
             "X" if pkg_info.unpacked_path is not None else " ",
             pkg_info.name)
-        self.append (line)
+            )
 
     def insert_footer(self, pkg_list, length):
-        self.append ("-" * length)
-        self.append ("\n")
+        self.result.append ("-" * length)
 
     def generate_list(self, pkg_list):
         self.insert_title (pkg_list)
@@ -44,9 +44,10 @@ class oa_impl_list_plugins(sublime_plugin.TextCommand):
         self.insert_footer (pkg_list, l)
 
     def run(self, edit):
-        self.__edit = edit
-        self.view.erase (edit, sublime.Region (0, self.view.size ()))
+        self.result = []
         self.generate_list (PackageList ())
+        self.view.erase (edit, sublime.Region (0, self.view.size ()))
+        self.view.run_command ("insert", {"characters": "\n".join (self.result)})
 
 ###-----------------------------------------------------------------------------
 
