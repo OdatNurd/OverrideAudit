@@ -82,6 +82,7 @@ class OverrideAuditListPluginsCommand(sublime_plugin.WindowCommand):
         view = self.window.new_file ()
         view.set_scratch (True)
         view.set_name (title)
+        view.assign_syntax ("Packages/OverrideAudit/OverrideAudit-table.sublime-syntax")
         return view
 
     def run(self):
