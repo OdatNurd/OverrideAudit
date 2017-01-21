@@ -20,6 +20,11 @@ class OverrideAuditListPluginsCommand(sublime_plugin.WindowCommand):
             view.assign_syntax (syntax)
         else:
             view.set_read_only (False)
+
+            view.sel ().clear ()
+            view.sel ().add (sublime.Region (0, view.size ()))
+            view.run_command ("left_delete")
+
             if self.window.active_view () != view:
                 self.window.focus_view (view)
 
@@ -42,8 +47,10 @@ class OverrideAuditListPluginsCommand(sublime_plugin.WindowCommand):
                 "X" if pkg_info.unpacked_path is not None else " ",
                 pkg_name)
                 )
+        result.append (h_sep)
 
         view.run_command ("insert", {"characters": "\n".join (result)})
+        view.run_command ("move_to", {"to": "bof", "extend": False})
         view.set_read_only (True)
 
     def run(self):
