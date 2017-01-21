@@ -60,7 +60,8 @@ class PackageList():
 
     # Iterate packages in load order
     def __iter__(self):
-        yield "Default", self.list["Default"]
+        if "Default" in self.list:
+            yield "Default", self.list["Default"]
 
         for pkg in sorted (self.list):
             if pkg in ["User", "Default"]:
