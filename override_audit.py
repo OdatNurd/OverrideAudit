@@ -6,7 +6,7 @@ from .lib.output_view import output_to_view
 
 ###-----------------------------------------------------------------------------
 
-class OverrideAuditListPluginsCommand(sublime_plugin.WindowCommand):
+class OverrideAuditListPackagesCommand(sublime_plugin.WindowCommand):
     def run(self):
         pkg_list = PackageList ()
 

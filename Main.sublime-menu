@@ -7,7 +7,7 @@
                 "caption": "Override Audit",
                 "children":
                 [
-                    { "caption": "Package List", "command": "override_audit_list_plugins"},
+                    { "caption": "Package List", "command": "override_audit_list_packages"},
                     { "caption": "-" }
                 ]
             }

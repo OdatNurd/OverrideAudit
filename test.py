@@ -12,7 +12,7 @@ class OverideAuditTestCommand(sublime_plugin.WindowCommand):
     """
     def run (self):
         # self.window.run_command ("override_audit_package_list_test")
-        self.window.run_command ("override_audit_list_plugins")
+        self.window.run_command ("override_audit_list_packages")
 
 ###-----------------------------------------------------------------------------
 

@@ -1,6 +1,6 @@
 [
     {
-        "caption": "OverrideAudit: List Installed Plugins",
-        "command": "override_audit_list_plugins"
+        "caption": "OverrideAudit: List Installed Packages",
+        "command": "override_audit_list_packages"
     }
 ]
