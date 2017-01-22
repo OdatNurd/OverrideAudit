@@ -8,6 +8,7 @@ from .lib.output_view import output_to_view
 
 class OverrideAuditListPackagesCommand(sublime_plugin.WindowCommand):
     def run(self):
+        settings = sublime.load_settings ("OverrideAudit.sublime-settings")
         pkg_list = PackageList ()
 
         caption = "Total Packages Installed: {}".format (len (pkg_list))
@@ -29,6 +30,8 @@ class OverrideAuditListPackagesCommand(sublime_plugin.WindowCommand):
         output_to_view (self.window,
                         "OverrideAudit: Package List",
                         result,
+                        reuse=settings.get ("reuse_views", True),
+                        clear=settings.get ("clear_existing", True),
                         syntax="Packages/OverrideAudit/syntax/OverrideAudit-table.sublime-syntax")
 
 ###-----------------------------------------------------------------------------

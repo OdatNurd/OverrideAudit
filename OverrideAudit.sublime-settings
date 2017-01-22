@@ -1,3 +1,12 @@
 {
+    // Some OverrideAudit commands generate output to a view. When this option
+    // is enabled, the command will reuse the view it created the last time it
+    // was run (if it is still available) instead of creating a new one each
+    // time.
+    "reuse_views": true,
 
+    // When "reuse_views" is enabled, this controls if the view that is being
+    // reused should be cleared before the new output is generated. When this is
+    // turned off, the new content is appended to the view instead.
+    "clear_existing": true
 }
