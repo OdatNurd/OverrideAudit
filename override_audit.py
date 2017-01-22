@@ -29,6 +29,6 @@ class OverrideAuditListPackagesCommand(sublime_plugin.WindowCommand):
         output_to_view (self.window,
                         "OverrideAudit: Package List",
                         result,
-                        syntax="Packages/OverrideAudit/OverrideAudit-table.sublime-syntax")
+                        syntax="Packages/OverrideAudit/syntax/OverrideAudit-table.sublime-syntax")
 
 ###-----------------------------------------------------------------------------
