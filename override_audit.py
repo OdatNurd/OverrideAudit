@@ -12,7 +12,7 @@ class OverrideAuditListPackagesCommand(sublime_plugin.WindowCommand):
         pkg_list = PackageList ()
 
         caption = "Total Packages Installed: {}".format (len (pkg_list))
-        c_sep = "-" * len (caption)
+        c_sep = "=" * len (caption)
         header = "| {:3} | {:3} | {:3} | {:<40} |".format ("Shp", "Ins", "Unp", "Package")
         h_sep = "-" * len (header)
 

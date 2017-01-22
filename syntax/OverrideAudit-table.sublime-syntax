@@ -5,11 +5,65 @@ scope: text.oa.table
 hidden: true
 contexts:
   main:
-    - match: '(-{1,})|\|'
-      scope: string
+    # The title of the report (if present) is a complete line of text that
+    # starts with either an uppercase letter or an equals sign and runs for the
+    # length of the line.
+    - match: '^[A-Z=].*$'
+      scope: entity.name
+
+    # A line of dashes starts a table body
+    - match: '^-*$'
+      scope: entity.name
+      push: table_body
+
+  table_body:
+    # Handle dashes lines the same as the one that started the table.
+    - match: '^-+$'
+      scope: meta.table.separator entity.name
+
+    # A vertical pipe starts a table row of some sort.
+    - match: '^\|'
+      scope: entity.name
+      push: table_row
+
+  table_row:
+    - meta_scope: meta.table.row
+
+    # Vertical pipes are still good
+    - match: '\|'
+      scope: entity.name
+
+    - match: '$'
+      pop: true
+
+    # Matching a token that indicates this package is installed or not turns
+    # this into a package row instead of a title row (default)
+    - match: '\[X]'
+      scope: storage
+      push: package_row
 
     - match: '\[ ]'
       scope: comment
+      push: package_row
+
+    - match: '[\w-]'
+      scope: entity.name
+
+  # Handled as above, except text is different
+  package_row:
+    - meta_scope: meta.table.row.package
+    - match: '\|'
+      scope: entity.name
 
     - match: '\[X]'
       scope: storage
+
+    - match: '\[ ]'
+      scope: comment
+      push: package_row
+
+    - match: '[\w-]'
+      scope: text
+
+    - match: '$'
+      pop: true
