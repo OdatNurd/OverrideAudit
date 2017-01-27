@@ -45,9 +45,12 @@ class PackageList():
         self.list = dict()
 
         exec_dir = os.path.dirname(sublime.executable_path())
-        self.__get_package_list(os.path.join(exec_dir, "Packages"), shipped=True)
-        self.__get_package_list(sublime.installed_packages_path ())
-        self.__get_package_list(sublime.packages_path (), packed=False)
+        self._shipped = self.__get_package_list(os.path.join(exec_dir, "Packages"), shipped=True)
+        self._installed = self.__get_package_list(sublime.installed_packages_path ())
+        self._unpacked = self.__get_package_list(sublime.packages_path (), packed=False)
+
+    def package_counts(self):
+        return (self._shipped, self._installed, self._unpacked)
 
     def __len__(self):
         return len(self.list)
@@ -93,14 +96,19 @@ class PackageList():
         pkg.unpacked_path = os.path.join(path, name)
 
     def __get_package_list(self, location, packed=True, shipped=False):
+        count = 0
         # Follow symlinks since we're stopping after one level anyway
         for (path, dirs, files) in os.walk(location, followlinks=True):
             if packed:
                 for name in [f for f in files if f.endswith(".sublime-package")]:
                     self.__packed_package(path, name, shipped)
+                    count += 1
             else:
                 for name in dirs:
                     self.__unpacked_package(path, name, shipped)
+                    count += 1
             break
+
+        return count
 
 ###-----------------------------------------------------------------------------
