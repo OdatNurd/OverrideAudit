@@ -24,6 +24,10 @@ class PackageInfo():
         self.installed_mtime = None
         self.unpacked_path = None
 
+        settings = sublime.load_settings ("Preferences.sublime-settings")
+        ignored_list = settings.get ("ignored_packages", [])
+        self.disabled = True if name in ignored_list else False
+
     def __repr__(self):
         return "[name={0}, shipped={1}, installed={2}, unpacked={3}]".format(
             self.name ,
@@ -43,6 +47,7 @@ class PackageList():
     """
     def __init__(self):
         self.list = dict()
+        self._disabled = 0
 
         exec_dir = os.path.dirname(sublime.executable_path())
         self._shipped = self.__get_package_list(os.path.join(exec_dir, "Packages"), shipped=True)
@@ -50,7 +55,7 @@ class PackageList():
         self._unpacked = self.__get_package_list(sublime.packages_path (), packed=False)
 
     def package_counts(self):
-        return (self._shipped, self._installed, self._unpacked)
+        return (self._shipped, self._installed, self._unpacked, self._disabled)
 
     def __len__(self):
         return len(self.list)
@@ -77,6 +82,8 @@ class PackageList():
     def __get_pkg(self, name):
         if name not in self.list:
             self.list[name] = PackageInfo(name)
+            if self.list[name].disabled:
+                self._disabled += 1
 
         return self.list[name]
 
