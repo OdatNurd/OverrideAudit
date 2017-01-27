@@ -8,24 +8,33 @@ from .lib.output_view import output_to_view
 
 class OverrideAuditListPackagesCommand(sublime_plugin.WindowCommand):
     def run(self):
-        settings = sublime.load_settings("OverrideAudit.sublime-settings")
         pkg_list = PackageList()
+        pkg_counts = pkg_list.package_counts()
 
-        caption = "Total Packages Installed: {}".format(len(pkg_list))
-        c_sep = "=" * len(caption)
-        header = "| {:3} | {:3} | {:3} | {:<40} |".format("Shp", "Ins", "Unp", "Package")
-        h_sep = "-" * len(header)
+        settings = sublime.load_settings("OverrideAudit.sublime-settings")
 
-        result = [caption, c_sep, "", h_sep, header, h_sep]
+        title = "Packages: {}".format(len(pkg_list))
+        t_sep = "=" * len(title)
+
+        stats = ("Shipped:   {:<6} (Shipped with Sublime)\n"
+                 "Installed: {:<6} (Installed as sublime-package files)\n"
+                 "Unpacked:  {:<6} (Unpacked in Packages\\ directory)\n"
+                 "Disabled:  {:<6} (Currently in ignored_packages)\n").format(*pkg_counts)
+
+        row = "| {:3} | {:3} | {:3} | {:<40} |".format("", "", "", "")
+        r_sep = "-" * len(row)
+
+        result = [title, t_sep, "", stats, r_sep]
         for pkg_name, pkg_info in pkg_list:
+            if pkg_info.disabled:
+                pkg_name = "[{}]".format (pkg_name)
             result.append (
                 "| [{:1}] | [{:1}] | [{:1}] | {:<40} |".format(
-                "X" if pkg_info.shipped_path is not None else " ",
-                "X" if pkg_info.installed_path is not None else " ",
-                "X" if pkg_info.unpacked_path is not None else " ",
-                pkg_name)
-                )
-        result.extend([h_sep, ""])
+                "S" if pkg_info.shipped_path is not None else " ",
+                "I" if pkg_info.installed_path is not None else " ",
+                "U" if pkg_info.unpacked_path is not None else " ",
+                pkg_name))
+        result.extend([r_sep, ""])
 
         output_to_view(self.window,
                        "OverrideAudit: Package List",
