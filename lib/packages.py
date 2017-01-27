@@ -18,6 +18,7 @@ class PackageInfo():
     """
     def __init__(self, name):
         self.name = name
+        self.is_dependency = False
         self.shipped_path = None
         self.shipped_mtime = None
         self.installed_path = None
@@ -48,6 +49,7 @@ class PackageList():
     def __init__(self):
         self.list = dict()
         self._disabled = 0
+        self._dependencies = 0
 
         exec_dir = os.path.dirname(sublime.executable_path())
         self._shipped = self.__get_package_list(os.path.join(exec_dir, "Packages"), shipped=True)
@@ -55,7 +57,8 @@ class PackageList():
         self._unpacked = self.__get_package_list(sublime.packages_path (), packed=False)
 
     def package_counts(self):
-        return (self._shipped, self._installed, self._unpacked, self._disabled)
+        return (self._shipped, self._installed, self._unpacked,
+            self._disabled, self._dependencies)
 
     def __len__(self):
         return len(self.list)
@@ -101,6 +104,11 @@ class PackageList():
     def __unpacked_package(self, path, name, shipped):
         pkg = self.__get_pkg(name)
         pkg.unpacked_path = os.path.join(path, name)
+
+        metadata = os.path.join(pkg.unpacked_path, "dependency-metadata.json")
+        if os.path.isfile (metadata):
+            pkg.is_dependency = True
+            self._dependencies += 1
 
     def __get_package_list(self, location, packed=True, shipped=False):
         count = 0
