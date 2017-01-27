@@ -21,7 +21,7 @@ class OverrideAuditListPackagesCommand(sublime_plugin.WindowCommand):
                  "Unpacked:  {:<6} (Unpacked in Packages\\ directory)\n"
                  "Disabled:  {:<6} (Currently in ignored_packages)\n").format(*pkg_counts)
 
-        row = "| {:3} | {:3} | {:3} | {:<40} |".format("", "", "", "")
+        row = "| {:<40} | {:3} | {:3} | {:<3} |".format("", "", "", "")
         r_sep = "-" * len(row)
 
         result = [title, t_sep, "", stats, r_sep]
@@ -31,11 +31,11 @@ class OverrideAuditListPackagesCommand(sublime_plugin.WindowCommand):
             elif pkg_info.is_dependency:
                 pkg_name = "<{}>".format (pkg_name)
             result.append (
-                "| [{:1}] | [{:1}] | [{:1}] | {:<40} |".format(
+                "| {:<40} | [{:1}] | [{:1}] | [{:1}] |".format(
+                pkg_name,
                 "S" if pkg_info.shipped_path is not None else " ",
                 "I" if pkg_info.installed_path is not None else " ",
-                "U" if pkg_info.unpacked_path is not None else " ",
-                pkg_name))
+                "U" if pkg_info.unpacked_path is not None else " "))
         result.extend([r_sep, ""])
 
         output_to_view(self.window,

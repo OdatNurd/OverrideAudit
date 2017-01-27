@@ -1,65 +1,59 @@
 %YAML 1.2
 ---
 name: OverrideAudit
-scope: text.oa.table
+scope: text.override-audit
 hidden: true
+variables:
+  pkg_name: '[^<>:"/\\|?*\[\] ][^<>:"/\\|?*\[\]]*?'
+  no_pkg: '\[ ]'
+  shipped_pkg: '\[S]'
+  installed_pkg: '\[I]'
+  unpacked_pkg: '\[U]'
 contexts:
   main:
-    # The title of the report (if present) is a complete line of text that
-    # starts with either an uppercase letter or an equals sign and runs for the
-    # length of the line.
-    - match: '^[A-Z=].*$'
-      scope: entity.name
+    - match: '^\| '
+      push: package_row
 
-    # A line of dashes starts a table body
-    - match: '^-*$'
-      scope: entity.name
-      push: table_body
+  package_row:
+    - meta_scope: meta.package
 
-  table_body:
-    # Handle dashes lines the same as the one that started the table.
-    - match: '^-+$'
-      scope: entity.name
+    # Disabled packages
+    - match: '(\[)({{pkg_name}})[\]>]?(\])\s+\|'
+      captures:
+        1: comment
+        2: entity.package.name.disabled meta.toc-list comment
+        3: comment
+      push: boxen
 
-    # A vertical pipe starts a table row of some sort.
-    - match: '^\|'
-      scope: entity.name
-      push: table_row
+    # Packages that are dependencies
+    - match: '(<)({{pkg_name}})[\]>]?(>)\s+\|'
+      captures:
+        1: storage.modifier
+        2: entity.package.name.dependency meta.toc-list storage.modifier
+        3: storage.modifier
+      push: boxen
 
-  table_row:
-    # Vertical pipes are still good
-    - match: '\|'
-      scope: entity.name
+    # Normal packages
+    - match: '({{pkg_name}})\s+\|'
+      captures:
+        1: entity.package.name.enabled meta.toc-list entity.name
+      push: boxen
 
     - match: '$'
       pop: true
 
-    # Matching a token that indicates this package is installed or not turns
-    # this into a package row instead of a title row (default)
-    - match: '\[X]'
-      scope: storage
-      push: package_row
-
-    - match: '\[ ]'
-      scope: comment
-      push: package_row
-
-    - match: '[\w-]'
-      scope: entity.name
-
-  # Handled as above, except text is different
-  package_row:
-    - match: '\|'
-      scope: entity.name
-
-    - match: '\[X]'
-      scope: storage
-
-    - match: '\[ ]'
+  boxen:
+    - match: '{{no_pkg}}'
       scope: comment
 
-    - match: '[\w-]'
-      scope: text
+    - match: '{{shipped_pkg}}'
+      scope: storage.type entity.package.shipped
+
+    - match: '{{installed_pkg}}'
+      scope: storage.type entity.package.installed
+
+    - match: '{{unpacked_pkg}}'
+      scope: storage.type entity.package.unpacked
 
     - match: '$'
       pop: true
