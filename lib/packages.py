@@ -27,7 +27,7 @@ class PackageInfo():
 
         settings = sublime.load_settings ("Preferences.sublime-settings")
         ignored_list = settings.get ("ignored_packages", [])
-        self.disabled = True if name in ignored_list else False
+        self.is_disabled = True if name in ignored_list else False
 
     def __repr__(self):
         return "[name={0}, shipped={1}, installed={2}, unpacked={3}]".format(
@@ -85,7 +85,7 @@ class PackageList():
     def __get_pkg(self, name):
         if name not in self.list:
             self.list[name] = PackageInfo(name)
-            if self.list[name].disabled:
+            if self.list[name].is_disabled:
                 self._disabled += 1
 
         return self.list[name]

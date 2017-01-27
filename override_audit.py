@@ -26,7 +26,7 @@ class OverrideAuditListPackagesCommand(sublime_plugin.WindowCommand):
 
         result = [title, t_sep, "", stats, r_sep]
         for pkg_name, pkg_info in pkg_list:
-            if pkg_info.disabled:
+            if pkg_info.is_disabled:
                 pkg_name = "[{}]".format (pkg_name)
             elif pkg_info.is_dependency:
                 pkg_name = "<{}>".format (pkg_name)
