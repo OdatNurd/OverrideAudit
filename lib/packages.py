@@ -4,6 +4,18 @@ import string
 
 ###-----------------------------------------------------------------------------
 
+# TODO: The PackageInfo() class should take an extra parameter that lets you
+# give it the name of a package and it will try to find its paths. This is a
+# little complicated by the fact that packages can be installed in subfolders of
+# the InstalledPackages path.
+#
+# Probably a little refactoring of the code here might be nice? I'm not sure at
+# the moment what the nicest way to go about that would be, but it seems like
+# for some upcoming commands you might want to just create a PackageInfo() for
+# a named package and see what happens rather than always grab the list.
+
+###-----------------------------------------------------------------------------
+
 class PackageInfo():
     """
     Holds meta information on an installed Sublime Text Package
@@ -112,7 +124,8 @@ class PackageList():
 
     def __get_package_list(self, location, packed=True, shipped=False):
         count = 0
-        # Follow symlinks since we're stopping after one level anyway
+        # Follow symlinks since we're stopping after one level anyway. Maybe an
+        # issue if someone goes crazy in the installed packages directory?
         for (path, dirs, files) in os.walk(location, followlinks=True):
             if packed:
                 for name in [f for f in files if f.endswith(".sublime-package")]:
@@ -122,7 +135,9 @@ class PackageList():
                 for name in dirs:
                     self.__unpacked_package(path, name, shipped)
                     count += 1
-            break
+
+            if shipped or not packed:
+                break
 
         return count
 
