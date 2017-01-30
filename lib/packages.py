@@ -7,13 +7,18 @@ import zipfile
 
 # TODO: The PackageInfo() class should take an extra parameter that lets you
 # give it the name of a package and it will try to find its paths. This is a
-# little complicated by the fact that packages can be installed in subfolders of
-# the InstalledPackages path.
+# little complicated by the fact that packages can be installed in sub folders
+# of the InstalledPackages path.
 #
 # Probably a little refactoring of the code here might be nice? I'm not sure at
 # the moment what the nicest way to go about that would be, but it seems like
 # for some upcoming commands you might want to just create a PackageInfo() for
 # a named package and see what happens rather than always grab the list.
+#
+# TODO: The PackageInfo.override_files() method does not memoize the list of
+# overridden files, so every invocation calculates it again. I don't know how
+# important that might be at this juncture, since it seems like the real cost
+# savings is in not having to fetch the list of files each time.
 
 ###-----------------------------------------------------------------------------
 
@@ -110,16 +115,34 @@ class PackageInfo():
     def has_possible_overrides(self, simple=True):
         """
         Does simple tests to determine if this package may **possibly** have
-        overrides or not. It may return false positives since it does not actualy
-        check if overrides exist or not.
+        overrides or not. It may return false positives since it does not
+        actually check if overrides exist or not.
 
-        simple overrides are unpacked files overriding files in a packed package,
-        while non-simple overrides are when an installed sublime-package is doing
-        a complete override on a shipped package of the same name
+        simple overrides are unpacked files overriding files in a packed
+        package, while non-simple overrides are when an installed
+        sublime-package is doing a complete override on a shipped package of the
+        same name
         """
         if simple:
             return bool(self.package_file() and self.is_unpacked())
         return bool(self.installed_path and self.shipped_path)
+
+    def override_files(self, simple=True):
+        """
+        Get the list of overridden files for this package and the given override
+        type; the list may be empty.
+        """
+        if not self.has_possible_overrides(simple):
+            return []
+
+        if not simple:
+            base_list = self.installed_contents()
+            over_list = self.shipped_contents()
+        else:
+            base_list = self.package_contents()
+            over_list = self.unpacked_contents()
+
+        return [entry for entry in base_list if entry in over_list]
 
 ###-----------------------------------------------------------------------------
 
