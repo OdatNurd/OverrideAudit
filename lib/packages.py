@@ -27,6 +27,10 @@ class PackageInfo():
 
     Stored paths are fully qualified names of either the sublime-package file or
     the directory where the unpacked package resides.
+
+    If there is a sublime-package file in InstalledPackages that is the same
+    name as a shipped package, Sublime will ignore the shipped package in favor
+    of the installed version.
     """
     def __init__(self, name):
         settings = sublime.load_settings ("Preferences.sublime-settings")
@@ -49,6 +53,12 @@ class PackageInfo():
             self.shipped_path,
             self.installed_path,
             self.unpacked_path)
+
+    def package_file(self):
+        return self.installed_path or self.shipped_path
+
+    def is_unpacked(self):
+        return True if self.unpacked_path is not None else False
 
 ###-----------------------------------------------------------------------------
 
