@@ -107,6 +107,20 @@ class PackageInfo():
     def unpacked_contents(self):
         return self.__get_pkg_contents(self.unpacked_path)
 
+    def has_possible_overrides(self, simple=True):
+        """
+        Does simple tests to determine if this package may **possibly** have
+        overrides or not. It may return false positives since it does not actualy
+        check if overrides exist or not.
+
+        simple overrides are unpacked files overriding files in a packed package,
+        while non-simple overrides are when an installed sublime-package is doing
+        a complete override on a shipped package of the same name
+        """
+        if simple:
+            return bool(self.package_file() and self.is_unpacked())
+        return bool(self.installed_path and self.shipped_path)
+
 ###-----------------------------------------------------------------------------
 
 class PackageList():
