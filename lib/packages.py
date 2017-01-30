@@ -1,6 +1,7 @@
 import sublime
 import os
 import string
+import zipfile
 
 ###-----------------------------------------------------------------------------
 
@@ -47,6 +48,8 @@ class PackageInfo():
         self.installed_mtime = None
         self.unpacked_path = None
 
+        self.content = dict()
+
     def __repr__(self):
         return "[name={0}, shipped={1}, installed={2}, unpacked={3}]".format(
             self.name ,
@@ -54,11 +57,55 @@ class PackageInfo():
             self.installed_path,
             self.unpacked_path)
 
+    def __get_sublime_pkg_contents(self,pkg_filename):
+        if not zipfile.is_zipfile(pkg_filename):
+            raise zipfile.BadZipFile("Invalid sublime-package file '{}'".format(name))
+
+        pName = os.path.basename(pkg_filename)
+        with zipfile.ZipFile(pkg_filename) as zFile:
+            return [os.path.normcase(entry.filename) for entry in zFile.infolist()]
+
+    def __get_pkg_dir_contents(self,pkg_path):
+        results=[]
+        for (path, dirs, files) in os.walk(pkg_path, followlinks=True):
+            rPath = os.path.relpath(path, pkg_path) if path != pkg_path else ""
+            for name in files:
+                results.append(os.path.normcase(os.path.join(rPath, name)))
+
+        return results
+
+    def __get_pkg_contents(self,filename):
+        result = None
+        if filename is not None:
+            if filename in self.content:
+                return self.content[filename]
+
+            if os.path.isdir(filename):
+                result = self.__get_pkg_dir_contents(filename)
+            else:
+                result = self.__get_sublime_pkg_contents(filename)
+
+            self.content[filename] = result
+
+        return result
+
     def package_file(self):
         return self.installed_path or self.shipped_path
 
     def is_unpacked(self):
         return True if self.unpacked_path is not None else False
+
+    def package_contents(self):
+        return self.__get_pkg_contents(self.package_file())
+
+    def shipped_contents(self):
+        return self.__get_pkg_contents(self.shipped_path)
+
+    def installed_contents(self):
+        return self.__get_pkg_contents(self.installed_path)
+
+    def unpacked_contents(self):
+        return self.__get_pkg_contents(self.unpacked_path)
 
 ###-----------------------------------------------------------------------------
 
