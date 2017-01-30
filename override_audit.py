@@ -54,23 +54,21 @@ class OverrideAuditListPackageOverridesCommand(sublime_plugin.WindowCommand):
         pkg_counts = pkg_list.package_counts()
 
         settings = sublime.load_settings("OverrideAudit.sublime-settings")
+        ignored = settings.get ("ignore_overrides_in", [])
 
         result = []
         for pkg_name, pkg_info in pkg_list:
-
-            # Get overrides; leave if none. This is fairly low cost except for a
             # bunch of empty list creations since the override code does not try
             # to collect the package contents if there can't be any possible
             # overide of the type given.
             normal_overrides = pkg_info.override_files(simple=True)
             shipped_overrides = pkg_info.override_files(simple=False)
-            if not normal_overrides and not shipped_overrides:
+            if pkg_name in ignored or (not normal_overrides and not shipped_overrides):
                continue
 
             # Decorate name; seems like a dependency will never be overridden
             # so probably not needed. Also, possibly add option to ignore
-            # disabled packages? Also, there should be an option for packages
-            # to exclude from the list too.
+            # disabled packages?
             if pkg_info.is_disabled:
                 pkg_name = "[{}]".format (pkg_name)
             elif pkg_info.is_dependency:

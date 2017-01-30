@@ -8,5 +8,9 @@
     // When "reuse_views" is enabled, this controls if the view that is being
     // reused should be cleared before the new output is generated. When this is
     // turned off, the new content is appended to the view instead.
-    "clear_existing": true
+    "clear_existing": true,
+
+    // A list of packages whose overrides should be ignored when it comes to
+    // displaying them.
+    "ignore_overrides_in": []
 }

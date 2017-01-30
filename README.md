@@ -121,13 +121,18 @@ operations. When this option is enabled (the default), OA will try to find the
 view created last time and reuse it for the new command. When disabled, a new
 view is created every time.
 
-### `clear_existing`: *true/False ###
+### `clear_existing`: *true/false ###
 
-WHen `reuse_views` is enabled (the default), this controls whether a reused
+When `reuse_views` is enabled (the default), this controls whether a reused
 view is cleared of its contents prior to executing the command or if the new
 output is appended to the end of the existing view.
 
 Some OverrideAudit commands may ignore this setting.
+
+### `ignore_overrides_in`: [] ###
+
+This is an optional list of package names which should be excluded from commands
+that show/calculate override information.
 
 <!--
 #### `oa_startup_check`: *true/false ###
