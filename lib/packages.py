@@ -29,17 +29,19 @@ class PackageInfo():
     the directory where the unpacked package resides.
     """
     def __init__(self, name):
+        settings = sublime.load_settings ("Preferences.sublime-settings")
+        ignored_list = settings.get ("ignored_packages", [])
+
         self.name = name
+
         self.is_dependency = False
+        self.is_disabled = True if name in ignored_list else False
+
         self.shipped_path = None
         self.shipped_mtime = None
         self.installed_path = None
         self.installed_mtime = None
         self.unpacked_path = None
-
-        settings = sublime.load_settings ("Preferences.sublime-settings")
-        ignored_list = settings.get ("ignored_packages", [])
-        self.is_disabled = True if name in ignored_list else False
 
     def __repr__(self):
         return "[name={0}, shipped={1}, installed={2}, unpacked={3}]".format(
