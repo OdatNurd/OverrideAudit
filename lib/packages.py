@@ -2,6 +2,7 @@ import sublime
 import os
 import string
 import zipfile
+from collections import MutableSet, OrderedDict
 
 ###-----------------------------------------------------------------------------
 
@@ -19,6 +20,63 @@ import zipfile
 # overridden files, so every invocation calculates it again. I don't know how
 # important that might be at this juncture, since it seems like the real cost
 # savings is in not having to fetch the list of files each time.
+#
+# TODO: The PackageFileSet() class assumes that Linux is case sensitive for
+# filenames and MacOS and Windows are not. In theory sublime or the user folder
+# may conceivably be placed on a case-insensitive file system, or a Mac user
+# could enable case sensitivity on their file system. For completeness this
+# would need to detect if the file system at each of the three package locations
+# is case sensitive or not.
+#
+# That has issues of it's own; creating files requiring appropriate permissions
+# in each folder and what to do if some but not all such locations are case
+# sensitive being just two of them. Probably the best option is to proceed as
+# the code now stands and provide a configuration option to alter the default
+# assumptions so users have the final say.
+
+###-----------------------------------------------------------------------------
+
+# This assumes that Linux is always using a case sensitive file system and MacOS
+# is not (by default, HFS is case-insensitive). In order to detect this with
+# certainty, a file would have to be created inside of each potential package
+# location to check.
+_wrap = (lambda value: value) if sublime.platform() == "linux" else (lambda value: value.lower())
+
+class PackageFileSet(MutableSet):
+    """
+    This is an implementation of a set that is meant to store the names of
+    the contents of package files. The values in the set are case sensitive if
+    the platform itself is case sensitive.
+
+    The insertion order of the data in the set is maintained so that as long as
+    files are added in package order, they will be iterated in package order.
+    """
+    def __init__(self, iterable=None):
+        self._content = OrderedDict()
+        if iterable is not None:
+            self |= iterable
+
+    def __repr__(self):
+        return '{}'.format(list(self._content.values()))
+
+    def __contains__(self,value):
+        return _wrap(value) in self._content
+
+    def __iter__(self):
+        return iter(self._content.values ())
+
+    def __len__(self):
+        return len(self._content)
+
+    def add(self, value):
+        if value not in self:
+            self._content[_wrap(value)] = value
+
+    def discard(self, value):
+        try:
+            del self._content[_wrap(value)]
+        except KeyError:
+            pass
 
 ###-----------------------------------------------------------------------------
 
@@ -68,14 +126,14 @@ class PackageInfo():
 
         pName = os.path.basename(pkg_filename)
         with zipfile.ZipFile(pkg_filename) as zFile:
-            return [os.path.normcase(entry.filename) for entry in zFile.infolist()]
+            return PackageFileSet([entry.filename for entry in zFile.infolist()])
 
     def __get_pkg_dir_contents(self,pkg_path):
-        results=[]
+        results=PackageFileSet()
         for (path, dirs, files) in os.walk(pkg_path, followlinks=True):
             rPath = os.path.relpath(path, pkg_path) if path != pkg_path else ""
             for name in files:
-                results.append(os.path.normcase(os.path.join(rPath, name)))
+                results.add(os.path.join(rPath, name))
 
         return results
 
@@ -133,7 +191,7 @@ class PackageInfo():
         type; the list may be empty.
         """
         if not self.has_possible_overrides(simple):
-            return []
+            return PackageFileSet()
 
         if not simple:
             base_list = self.installed_contents()
@@ -142,7 +200,7 @@ class PackageInfo():
             base_list = self.package_contents()
             over_list = self.unpacked_contents()
 
-        return [entry for entry in base_list if entry in over_list]
+        return base_list & over_list
 
 ###-----------------------------------------------------------------------------
 
