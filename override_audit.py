@@ -6,6 +6,27 @@ from .lib.output_view import output_to_view
 
 ###-----------------------------------------------------------------------------
 
+class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
+    def run(self, package, file):
+        pkg_list = PackageList()
+        settings = sublime.load_settings("OverrideAudit.sublime-settings")
+
+        if package not in pkg_list:
+            print("No '%s' package found; cannot diff '%s'" % (package, file))
+            return
+
+        pkg_info = pkg_list[package]
+        diff_info = pkg_info.override_diff(file, settings.get("diff_context_lines", 3))
+        if diff_info is not None:
+            output_to_view(self.window,
+               "Override of %s" % os.path.join(package, file),
+               diff_info,
+               reuse=settings.get("reuse_views", True),
+               clear=settings.get("clear_existing", True),
+               syntax="Packages/Diff/Diff.sublime-syntax")
+
+###-----------------------------------------------------------------------------
+
 class OverrideAuditListPackagesCommand(sublime_plugin.WindowCommand):
     def run(self):
         pkg_list = PackageList()
@@ -93,6 +114,5 @@ class OverrideAuditListPackageOverridesCommand(sublime_plugin.WindowCommand):
         output_to_view(self.window,
                        "OverrideAudit: Package Override List",
                        result,
-                       settings={"auto_indent": False},
                        reuse=settings.get("reuse_views", True),
                        clear=settings.get("clear_existing", True))
