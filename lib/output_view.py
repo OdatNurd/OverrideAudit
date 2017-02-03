@@ -33,16 +33,6 @@ def clear_view(view):
     view.sel().add(sublime.Region(0, view.size ()))
     view.run_command("left_delete")
 
-def append_text(view, text):
-    """
-    Append the string provided to the end of the given view. This modifies the
-    selection to be single selection and leaves the cursor at the end of the
-    newly appended text.
-    """
-    view.sel().clear()
-    view.sel().add(sublime.Region (view.size(), view.size()))
-    view.run_command("insert", {"characters": text})
-
 def _save_state(view):
     """
     Save ths current size, selection and viewport position for the provided
@@ -120,7 +110,7 @@ def output_to_view(window,
             view.settings().set(setting, settings[setting])
 
     state = _save_state(view)
-    append_text(view, content)
+    view.run_command("append", {"characters": content})
     _restore_state(view, state)
 
     view.set_read_only(True)
