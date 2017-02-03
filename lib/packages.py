@@ -1,7 +1,12 @@
 import sublime
+import io
 import os
 import string
 import zipfile
+import codecs
+from datetime import datetime
+import time
+import difflib
 from collections import MutableSet, OrderedDict
 
 ###-----------------------------------------------------------------------------
@@ -152,6 +157,33 @@ class PackageInfo():
 
         return result
 
+    def _get_packed_pkg_file_contents(self, override_file):
+        try:
+            with zipfile.ZipFile(self.package_file()) as zip:
+                info = zip.getinfo(override_file)
+                handle = codecs.EncodedFile(zip.open(info, mode="rU"), "utf-8")
+                content = io.TextIOWrapper(handle).readlines()
+
+                source = "Installed Packages" if self.installed_path is not None else "Shipped Packages"
+                source = os.path.join(source, self.name, override_file)
+
+                return (content, source, datetime(*info.date_time).ctime())
+        except (KeyError, UnicodeDecodeError, FileNotFoundError):
+            return None
+
+    def _get_unpacked_override_contents(self, override_file):
+        name = os.path.join(self.unpacked_path, override_file)
+        try:
+            with open(name, "r", encoding="utf=8") as handle:
+                content = handle.readlines()
+
+            mtime = os.stat(name).st_mtime
+            source = os.path.join("Packages", self.name, override_file)
+
+            return (content, source, time.ctime(mtime))
+        except (UnicodeDecodeError, FileNotFoundError):
+            return None
+
     def package_file(self):
         return self.installed_path or self.shipped_path
 
@@ -201,6 +233,27 @@ class PackageInfo():
             over_list = self.unpacked_contents()
 
         return base_list & over_list
+
+    def override_diff(self, override_file, context_lines):
+        """
+        Calculate and return a unified diff of the override file provided. In
+        the diff, the first file is the packed version of the file being used
+        by sublime and the second is the unpacked override file
+        """
+        packed = self._get_packed_pkg_file_contents(override_file)
+        unpacked = self._get_unpacked_override_contents(override_file)
+
+        if not packed or not unpacked:
+            print("Unable to diff %s" % os.path.join(self.name, override_file))
+            return None
+
+        diff = difflib.unified_diff(packed[0], unpacked[0],
+                                    packed[1], unpacked[1],
+                                    packed[2], unpacked[2],
+                                    context_lines)
+
+        result = u"".join(line for line in diff)
+        return "No differences found" if result == "" else result
 
 ###-----------------------------------------------------------------------------
 
