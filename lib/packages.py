@@ -162,7 +162,7 @@ class PackageInfo():
             with zipfile.ZipFile(self.package_file()) as zip:
                 info = zip.getinfo(override_file)
                 handle = codecs.EncodedFile(zip.open(info, mode="rU"), "utf-8")
-                content = io.TextIOWrapper(handle).readlines()
+                content = io.TextIOWrapper(handle, encoding="utf-8").readlines()
 
                 source = "Installed Packages" if self.installed_path is not None else "Shipped Packages"
                 source = os.path.join(source, self.name, override_file)
