@@ -134,6 +134,12 @@ Some OverrideAudit commands may ignore this setting.
 This is an optional list of package names which should be excluded from commands
 that show/calculate override information.
 
+### `diff_context_lines`: *3 ###
+
+When displaying a diff for an override, this specifies how many unchanged lines
+before and after each difference are displayed to provide better context for
+the changes.
+
 <!--
 #### `oa_startup_check`: *true/false ###
 

@@ -12,5 +12,9 @@
 
     // A list of packages whose overrides should be ignored when it comes to
     // displaying them.
-    "ignore_overrides_in": []
+    "ignore_overrides_in": [],
+
+    // The number of lines of context to show before and after each different
+    // in the diff view.
+    "diff_context_lines": 3
 }
