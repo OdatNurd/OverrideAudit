@@ -117,6 +117,7 @@ class PackageInfo():
         self.unpacked_path = None
 
         self.content = dict()
+        self.overrides = dict()
 
     def __repr__(self):
         return "[name={0}, shipped={1}, installed={2}, unpacked={3}]".format(
@@ -225,6 +226,9 @@ class PackageInfo():
         if not self.has_possible_overrides(simple):
             return PackageFileSet()
 
+        if simple in self.overrides:
+            return self.overrides[simple]
+
         if not simple:
             base_list = self.installed_contents()
             over_list = self.shipped_contents()
@@ -232,7 +236,8 @@ class PackageInfo():
             base_list = self.package_contents()
             over_list = self.unpacked_contents()
 
-        return base_list & over_list
+        self.overrides[simple] = base_list & over_list
+        return self.overrides[simple]
 
     def override_diff(self, override_file, context_lines):
         """
