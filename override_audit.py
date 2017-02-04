@@ -54,7 +54,10 @@ class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
                 if file is None:
                     self._show_override_list(pkg_info)
                 else:
-                    self._perform_diff(pkg_info, file)
+                    if pkg_info.has_possible_overrides():
+                        self._perform_diff(pkg_info, file)
+                    else:
+                        print("Package '%s' has no overrides to diff" % package)
             else:
                 print("Unable to diff; no such package '%s'" % package)
 
