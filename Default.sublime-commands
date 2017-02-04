@@ -6,5 +6,9 @@
     {
         "caption": "OverrideAudit: List Package Overrides",
         "command": "override_audit_list_package_overrides"
+    },
+    {
+        "caption": "OverrideAudit: Diff Package Overrides",
+        "command": "override_audit_diff_override"
     }
 ]

@@ -9,6 +9,7 @@
                 [
                     { "caption": "Package List", "command": "override_audit_list_packages"},
                     { "caption": "Override List", "command": "override_audit_list_package_overrides"},
+                    { "caption": "Diff Overrides", "command": "override_audit_diff_override"},
 
 
                     { "caption": "-" }
