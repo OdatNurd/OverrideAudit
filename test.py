@@ -14,7 +14,7 @@ class OverideAuditTestCommand(sublime_plugin.WindowCommand):
         # self.window.run_command ("override_audit_package_list_test")
         # self.window.run_command ("override_audit_list_packages")
         # self.window.run_command ("override_audit_list_package_overrides")
-        self.window.run_command ("override_audit_diff_override", {"package": "Lua", "file": "Lua.sublime-syntax"})
+        self.window.run_command ("override_audit_diff_override")
 
 ###-----------------------------------------------------------------------------
 
