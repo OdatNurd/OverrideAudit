@@ -1,127 +1,111 @@
 OverrideAudit
 =============
 
-OverrideAudit is a plugin that helps you detect and work with overrides you
-have created for installed packages, allowing you to determine when your
-override is out of date and needs to be updated.
+---
 
-Additional tools are provided to allow you to perform other tasks, such as to
-detect what overrides you have in place, compare your override to the
-underlying package file, temporarily enable and disable your override and more.
+**NOTE:** This package is still under active development, so things are still
+in a state of flux and not all features are currently present. I endeavor not
+to push any breaking changes but it is entirely possible that commands or their
+operation may slightly change out from under you.
+
+Suggestions/improvements are also quite welcomed!
 
 ---
 
-**NOTE:** This package is still under development and not at all ready for
-prime time, including not being suitable for any particular purpose.
+OverrideAudit is a plugin for Sublime Text 3 which helps you detect and work
+with your package overrides. This allows you to easily see a list of files that
+you are overriding, see what changes you have made, and provide warnings to you
+when the file you are overriding has been changed.
 
 ---
 
-<!--
-Installation
-============
+## Installation ##
 
-Package Control
----------------
+### Package Control ###
 
 The best way to install the plugin is via PackageControl, as this will take
 care of ensuring that the plugin is kept up to date without your having to do
 anything at all.
 
+OverrideAudit is currently not listed in Package Control because it's not
+officially released yet. In order to install via Package Control, open the
+Command Palette and select the command `Package Control: Add Repository` and
+then paste in the URL to this repository (https://github.com/OdatNurd/OverrideAudit).
+
+Once this is done, you will be able to install the package via the command
+palette using the command `Package Control: Install Package` and searching for
+`OverrideAudit`.
+
+<!--
 To install via Package Control, open the Command Palette and select the command
 `Package Control: Install Package` and search for `OverrideAudit`.
+-->
 
-Manual Installation
--------------------
+### Manual Installation ###
 
 In order to manually install the package, clone the repository into your
 Sublime Text `Packages` directory. You can locate this directory by choosing
 `Preferences > Browse Packages...` from the menu.
 
 Manual installation is not recommended for most users, as in this case you are
-responsible for manually keeping everything up to date.
--->
+responsible for manually keeping everything up to date. You should only use
+manual installation if you have a very compelling reason to do so and are
+familiar enough with the process to know how to do it properly.
 
-Terminology
------------
+---
 
-The following terms are used throughout the remainder of this document:
+## Usage ##
 
-### Packed Package ###
+OverrideAudit commands can be executed via the Command Palette or via the menu,
+using options under the `Tools > OverrideAudit` sub-menu. The available commands
+are:
 
-This refers to a package which has been distributed as a `sublime-package` file
-(a `zip` file with a different extension). The packages that ship with Sublime
-Text to provide core functionality are distributed in this format, and this is
-the format that PackageControl usually uses to install a package.
+### `OverrideAudit: List Installed Packages` ###
 
-### Unpacked Package ###
+This will display a list of all packages currently installed in Sublime Text,
+in a table format. The table lists the packages in roughly the order that they
+will be loaded by Sublime at startup.
 
-This refers to a directory which exists inside of the Sublime Text `Packages`
-directory that contains the contents of the package. As some packages contain
-files which cannot be used while packed inside of a `sublime-package` file
-(e.g. a shared library of some sort), PackageControl may sometimes install a
-package in this manner.
+For each package, an indication is made as to whether this package is
+`[S]`hipped, `[I]`nstalled or `[U]`npacked. Additionally, a package that is
+currently disabled is displayed in `[Square Brackets]` while a package that
+represents a dependency for an installed package is displayed in `<Angle
+Brackets>`.
 
-Packages that you manually installed via a source control operation such as
-`git` are also unpacked files.
+### `OverrideAudit: List Package Overrides` ###
 
-### Shipped Package ###
+This will display a list of all packages that have any overrides, listing all
+of the files that are overridden.
 
-A shipped package is a package that is distributed with Sublime Text directly
-and which provides the core functionality of the application. These packages
-are installed as Packed packages and are stored in an OS specific location that
-is not directly exposed to you.
+The list of overrides prefixes each package with a shorter version of the flags
+that indicate it's type (*Shipped*, *Installed* or *Unpacked*) and lists both
+*Simple* as well as *Complete* overrides.
 
-### Installed Package ###
+### `OverrideAudit: Diff Package Overrides` ###
 
-For the purposes of OverrideAudit, an Installed Package is any installed
-package that is contained inside of a `sublime-package` file that is **not** a
-Shipped Package.
+This will display a quick panel that lists all packages with at least one
+*Simple* override, and allows you to compare the differences between the base
+file and your override to see what is different between the two.
 
-This means that either PackageControl installed the package for you (and did
-not unpack it), or you manually installed the package yourself as a
-`sublime-package` file.
+The diff output is displayed as a Unified Diff.
 
-Installed Packages are stored in a folder named `InstalledPackages` that is one
-directory level above the `Packages` directory, and can be reached by selecting
-`Preferences > Browse Packages...` from the menu and going up a level in the
-directory hierarchy.
+---
 
-<!--
-Usage
------
+## Configuration ##
 
-All of the functionality of OverrideAudit is exposed via commands in the
-Command Palette. It is also possible to configure OverrideAudit to run some
-checks for you automatically as a "set it and forget it" mechanism to help you
-keep up to date (see Configuration below).
+The following configuration options are available for OverrideAudit. You can
+see the default settings as well as your own custom settings under the
+`Preferences > Package Settings > Override Audit` menu entries. On MacOS, the
+`Preferences` menu is under `Sublime Text` in the menu.
 
-### OverrideAudit: Check expired overrides ###
-
-This command will run a check to see if you have any expired overrides, and
-warn you with a dialog popup if you do.
-
-An expired override is an override either on a single file within a package or
-on a package as a whole in which the file/package you are overriding is newer
-than your override file.
-
-This is an indication that the underlying package has changed and your override
-is now out of date. Although this is technically safe, an override of this type
-is potentially masking fixes or augmentations to the underlying package that
-you will not see. -->
-
-Configuration
--------------
-
-The following configuration options are available for OverrideAudit:
-
-### `reuse_views`: *true/false ###
+### `reuse_views`: true/false (Default: true)###
 
 OverrideAudit generally creates an output view to show you the results of
 operations. When this option is enabled (the default), OA will try to find the
 view created last time and reuse it for the new command. When disabled, a new
 view is created every time.
 
-### `clear_existing`: *true/false ###
+### `clear_existing`: true/false (Default: true) ###
 
 When `reuse_views` is enabled (the default), this controls whether a reused
 view is cleared of its contents prior to executing the command or if the new
@@ -129,39 +113,130 @@ output is appended to the end of the existing view.
 
 Some OverrideAudit commands may ignore this setting.
 
-### `ignore_overrides_in`: [] ###
+### `ignore_overrides_in`: Array (Default: []) ###
 
 This is an optional list of package names which should be excluded from commands
-that show/calculate override information.
+that show/calculate override information. The format of this option is the same
+as the `ignored_packages` Sublime setting.
 
-### `diff_context_lines`: *3 ###
+This does not affect packages displayed in the general package list; it only
+hides packages from lists that exclusively show packages with overrides.
+
+### `diff_context_lines`: Number (Default: 3) ###
 
 When displaying a diff for an override, this specifies how many unchanged lines
 before and after each difference are displayed to provide better context for
 the changes.
 
-<!--
-#### `oa_startup_check`: *true/false ###
+---
 
-When enabled (the default), OverrideAudit will perform a check for out of date
-overrides whenever Sublime text starts.
+## Terminology ##
 
-#### `oa_scheduled_check`: true/*false ###
+The following terms are used in the documentation, and are described here for
+those not familiar with how Sublime Text 3 works with and uses packages.
 
-When enabled, OverrideAudit will perform a check for out of date overrides once
-per hour while Sublime Text is running. This is handy if you often have a long
-running Sublime Text session.
+### Packed Package ###
 
-This option is disabled by default.
+A *Packed* package is a package that is contained in a `sublime-package` file.
+This is actually just a `zip` file with a different extension. The name of the
+package file provides the name of the package itself.
 
-#### `os_upgrade_check`: *true/false ###
+This is a convenient way to install a package because all of the files and
+resources that make up the package are contained in a single file.
 
-When enabled (the default), OverrideAudit will perform a check for out of date
-overrides whenever Sublime Text starts after an upgrade/downgrade (the build
-number of sublime text changes).
+> The package file `Python.sublime-package` is a packed package that provides
+> the contents of the `Python` package, which provides support for writing
+> Python programs in Sublime Text.
 
-This operates as `oa_startup_check` does, except that even if that option is
-disabled, the check will still be performed.
+### Unpacked Package ###
 
-This allows you to ensure that no matter what, you are notified of out of date
-overrides after an upgrade to Sublime Text. -->
+An *Unpacked* package is a package that is stored as files in a subdirectory of
+the the Sublime Text `Packages` directory, which is accessible from within
+Sublime by selecting `Preferences > Browse Packages...` from the menu. The name
+of the package comes from the name of the directory the package is stored in.
+
+> The contents of the directory `Packages\User` are considered to be the
+> contents of a package named `User`
+
+### Shipped Package ###
+
+A *Shipped* Package is a *Packed* package that ships with Sublime Text itself.
+These packages provide the core functionality of Sublime Text itself, and are
+stored in a special location alongside the Sublime executable.This makes them
+common to all users of Sublime on the same computer.
+
+> The shipped package `Default.sublime-package` provides the set of default key
+> bindings, settings, menu entries and so on that all other plugins modify.
+
+### Installed Package ###
+
+An *Installed Package* is a *Packed* package that is stored in the `Installed
+Packages` directory, which is one directory level above the `Packages`
+directory used to store *Unpacked* packages.
+
+Please note that this does not mean that an *Unpacked* package is in some way
+***not*** installed; the terminology is purely meant to make a distinction
+between packages that are installed in a specific format and location.
+
+> `Package Control` is installed as an **Installed Package**, and many packages
+> that it installs are also installed in this manner.
+
+### Override ###
+
+An *Override* is a file or files which override similarly named files contained
+in a package. When an override is in effect, Sublime will ignore the original
+packaged version of the file and use the override file in its place.
+
+This can be used to modify package behaviour to your liking, but is dangerous in
+that if the packaged version of the file is modified by the package author, the
+override will continue to mask those changes and improvements.
+
+Detecting when this is happening is one of the core features of OverrideAudit.
+
+### Simple Override ###
+
+A *Simple* override is the most common type of override, in which a package is
+partially unpacked and then modified. This means that there is a directory in
+the Sublime `Packages` directory named the same as an existing *Shipped* or
+*Installed* package which contains files of the same names as those within the
+`sublime-package` file.
+
+> The file `Packages\Python\Python.sublime-build` is a simple override which
+> causes Sublime to ignore the *Shipped* version of the file from the `Python`
+> package, allowing you to modify how Python is built.
+
+### Complete Override ###
+
+A *Complete* override is less common than a *Simple* override. This variety of
+override occurs when a *Packed* package with the same name as a *Shipped*
+package is installed into the `Installed Packages` folder. When this happens,
+Sublime will ignore the shipped version of the package and use the other version
+instead, as if it was the package that was shipped with Sublime.
+
+> The File `Installed Packages\Python.sublime-package` is a complete override of
+> the *Shipped* `Python` package. As far as Sublime is concerned, this is the
+> `Python` package that provides all functionality for this language.
+
+---
+
+## License ##
+
+Copyright 2017 Terence Martin
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of
+this software and associated documentation files (the "Software"), to deal in
+the Software without restriction, including without limitation the rights to
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
+of the Software, and to permit persons to whom the Software is furnished to do
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
