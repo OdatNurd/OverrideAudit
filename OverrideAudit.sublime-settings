@@ -14,6 +14,13 @@
     // displaying them.
     "ignore_overrides_in": [],
 
+    // What to do when an override diff indicates that the override is identical
+    // to the underlying file. Possible values for this setting are "ignore" to
+    // do nothing, "diff" to open a view and indicate that there are no changes
+    // or "open" to open the override as a regular file, allowing you to view or
+    // modify it.
+    "diff_unchanged": "diff",
+
     // The number of lines of context to show before and after each different
     // in the diff view.
     "diff_context_lines": 3

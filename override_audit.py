@@ -1,6 +1,8 @@
 import sublime
 import sublime_plugin
 
+import os
+
 from .lib.packages import *
 from .lib.output_view import output_to_view
 
@@ -9,15 +11,29 @@ from .lib.output_view import output_to_view
 class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
     def _perform_diff(self, pkg_info, file):
         settings = sublime.load_settings("OverrideAudit.sublime-settings")
+        action = settings.get("diff_unchanged", "diff")
+
         diff_info = pkg_info.override_diff(file, settings.get("diff_context_lines", 3))
 
-        if diff_info is not None:
-            output_to_view(self.window,
-               "Override of %s" % os.path.join(pkg_info.name, file),
-               diff_info,
-               reuse=settings.get("reuse_views", True),
-               clear=settings.get("clear_existing", True),
-               syntax="Packages/Diff/Diff.sublime-syntax")
+        if diff_info is None:
+            return
+
+        if diff_info == "":
+            sublime.status_message("No changes detected in override")
+
+            if action == "open":
+                full_filename = os.path.join(sublime.packages_path(), pkg_info.name, file)
+                self.window.open_file(full_filename)
+                return
+            elif action == "ignore":
+                return
+
+        output_to_view(self.window,
+           "Override of %s" % os.path.join(pkg_info.name, file),
+           "No differences found" if diff_info == "" else diff_info,
+           reuse=settings.get("reuse_views", True),
+           clear=settings.get("clear_existing", True),
+           syntax="Packages/Diff/Diff.sublime-syntax")
 
     def _file_pick(self, pkg_info, override_list, index):
         if index >= 0:

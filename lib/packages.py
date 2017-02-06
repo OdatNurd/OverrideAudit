@@ -258,7 +258,7 @@ class PackageInfo():
                                     context_lines)
 
         result = u"".join(line for line in diff)
-        return "No differences found" if result == "" else result
+        return result
 
 ###-----------------------------------------------------------------------------
 
