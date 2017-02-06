@@ -52,9 +52,13 @@ class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
             self._show_override_list(pkg_list[pkg_override_list[index]])
 
     def _show_pkg_list(self, pkg_list):
-        items = [name for name,pkg in pkg_list if len(pkg.override_files()) > 0]
+        settings = sublime.load_settings("OverrideAudit.sublime-settings")
+        ignored = settings.get("ignore_overrides_in", [])
+
+        items = [name for name,pkg in pkg_list if len(pkg.override_files()) > 0
+                                                  and name not in ignored]
         if not items:
-            print("No packages have overrides")
+            print("No unignored packages have overrides")
         self.window.show_quick_panel(
                 items=items,
                 on_select=lambda i: self._pkg_pick(pkg_list, items, i))
