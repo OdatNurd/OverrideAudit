@@ -131,23 +131,16 @@ class OverrideAuditListPackageOverridesCommand(sublime_plugin.WindowCommand):
 
         result = []
         for pkg_name, pkg_info in pkg_list:
-            # bunch of empty list creations since the override code does not try
-            # to collect the package contents if there can't be any possible
-            # overide of the type given.
             normal_overrides = pkg_info.override_files(simple=True)
             shipped_overrides = pkg_info.override_files(simple=False)
             if pkg_name in ignored or (not normal_overrides and not shipped_overrides):
                continue
 
-            # Decorate name; seems like a dependency will never be overridden
-            # so probably not needed. Also, possibly add option to ignore
-            # disabled packages?
             if pkg_info.is_disabled:
                 pkg_name = "[{}]".format (pkg_name)
             elif pkg_info.is_dependency:
                 pkg_name = "<{}>".format (pkg_name)
 
-            # Truncated package name and info for debug purposes
             result.append (
                 "[{}{}{}] {}".format(
                 "S" if pkg_info.shipped_path is not None else " ",
@@ -155,13 +148,21 @@ class OverrideAuditListPackageOverridesCommand(sublime_plugin.WindowCommand):
                 "U" if pkg_info.unpacked_path is not None else " ",
                 pkg_name))
 
+            # Technically this makes no sense at some level because sublime is
+            # ignoring the shipped version entirely, so the list of files can be
+            # radically different. However this still seems useful at some
+            # level. Possibly add an option to exclude these or change the text
+            # to be more expressive?
             if shipped_overrides:
-                result.append("  `- Overrides for Installed<->Shipped")
+                result.append("  `- Complete Overrides")
                 result.extend(["    `- {}".format(item) for item in shipped_overrides])
 
             if normal_overrides:
-                result.append("  `- Unpacked Overrides")
+                result.append("  `- Simple Overrides")
                 result.extend(["    `- {}".format(item) for item in normal_overrides])
+
+        if len(result) == 0:
+            result.append("No packages with overrides found")
 
         output_to_view(self.window,
                        "OverrideAudit: Package Override List",
