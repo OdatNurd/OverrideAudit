@@ -21,11 +21,6 @@ from collections import MutableSet, OrderedDict
 # for some upcoming commands you might want to just create a PackageInfo() for
 # a named package and see what happens rather than always grab the list.
 #
-# TODO: The PackageInfo.override_files() method does not memoize the list of
-# overridden files, so every invocation calculates it again. I don't know how
-# important that might be at this juncture, since it seems like the real cost
-# savings is in not having to fetch the list of files each time.
-#
 # TODO: The PackageFileSet() class assumes that Linux is case sensitive for
 # filenames and MacOS and Windows are not. In theory sublime or the user folder
 # may conceivably be placed on a case-insensitive file system, or a Mac user
@@ -236,7 +231,7 @@ class PackageInfo():
             base_list = self.package_contents()
             over_list = self.unpacked_contents()
 
-        self.overrides[simple] = base_list & over_list
+        self.overrides[simple] = over_list & base_list
         return self.overrides[simple]
 
     def override_diff(self, override_file, context_lines):
