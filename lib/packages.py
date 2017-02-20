@@ -170,7 +170,7 @@ class PackageInfo():
     def _get_unpacked_override_contents(self, override_file):
         name = os.path.join(self.unpacked_path, override_file)
         try:
-            with open(name, "r", encoding="utf=8") as handle:
+            with open(name, "r", encoding="utf-8") as handle:
                 content = handle.readlines()
 
             mtime = datetime.fromtimestamp(os.stat(name).st_mtime)
