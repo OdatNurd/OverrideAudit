@@ -29,11 +29,11 @@ class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
                 return
 
         output_to_view(self.window,
-           "Override of %s" % os.path.join(pkg_info.name, file),
-           "No differences found" if diff_info == "" else diff_info,
-           reuse=settings.get("reuse_views", True),
-           clear=settings.get("clear_existing", True),
-           syntax="Packages/Diff/Diff.sublime-syntax")
+                       "Override of %s" % os.path.join(pkg_info.name, file),
+                       "No differences found" if diff_info == "" else diff_info,
+                       reuse=settings.get("reuse_views", True),
+                       clear=settings.get("clear_existing", True),
+                       syntax="Packages/Diff/Diff.sublime-syntax")
 
     def _file_pick(self, pkg_info, override_list, index):
         if index >= 0:
@@ -55,7 +55,7 @@ class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
         settings = sublime.load_settings("OverrideAudit.sublime-settings")
         ignored = settings.get("ignore_overrides_in", [])
 
-        items = [name for name,pkg in pkg_list if len(pkg.override_files()) > 0
+        items = [name for name, pkg in pkg_list if len(pkg.override_files()) > 0
                                                   and name not in ignored]
         if not items:
             print("No unignored packages have overrides")
