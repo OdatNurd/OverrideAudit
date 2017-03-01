@@ -120,7 +120,7 @@ class OverrideAuditListPackagesCommand(sublime_plugin.WindowCommand):
                        result,
                        reuse=settings.get("reuse_views", True),
                        clear=settings.get("clear_existing", True),
-                       syntax="Packages/OverrideAudit/syntax/OverrideAudit-table.sublime-syntax")
+                       syntax="Packages/OverrideAudit/syntax/OverrideAudit-pkgList.sublime-syntax")
 
 ###-----------------------------------------------------------------------------
 
