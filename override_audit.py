@@ -140,10 +140,8 @@ class OverrideAuditListPackageOverridesCommand(sublime_plugin.WindowCommand):
             if pkg_name in ignored or (not normal_overrides and not shipped_overrides):
                continue
 
-            if pkg_info.is_disabled:
-                pkg_name = "[{}]".format (pkg_name)
-            elif pkg_info.is_dependency:
-                pkg_name = "<{}>".format (pkg_name)
+            if shipped_overrides:
+                pkg_name = pkg_name + " <Complete Override>"
 
             result.append (
                 "[{}{}{}] {}".format(
@@ -152,18 +150,9 @@ class OverrideAuditListPackageOverridesCommand(sublime_plugin.WindowCommand):
                 "U" if pkg_info.unpacked_path is not None else " ",
                 pkg_name))
 
-            # Technically this makes no sense at some level because sublime is
-            # ignoring the shipped version entirely, so the list of files can be
-            # radically different. However this still seems useful at some
-            # level. Possibly add an option to exclude these or change the text
-            # to be more expressive?
-            if shipped_overrides:
-                result.append("  `- Complete Overrides")
-                result.extend(["    `- {}".format(item) for item in shipped_overrides])
-
             if normal_overrides:
-                result.append("  `- Simple Overrides")
-                result.extend(["    `- {}".format(item) for item in normal_overrides])
+                result.extend(["  `- {}".format(item) for item in normal_overrides])
+                result.append("")
 
         if len(result) == 0:
             result.append("No packages with overrides found")
@@ -172,4 +161,5 @@ class OverrideAuditListPackageOverridesCommand(sublime_plugin.WindowCommand):
                        "OverrideAudit: Package Override List",
                        result,
                        reuse=settings.get("reuse_views", True),
-                       clear=settings.get("clear_existing", True))
+                       clear=settings.get("clear_existing", True),
+                       syntax="Packages/OverrideAudit/syntax/OverrideAudit-overrideList.sublime-syntax")

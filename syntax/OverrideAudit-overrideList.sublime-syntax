@@ -1,0 +1,24 @@
+%YAML 1.2
+---
+name: OverrideAudit
+scope: text.override-audit
+hidden: true
+variables:
+  pkg_name: '[^<>:"/\\|?*\[\] ][^<>:"/\\|?*\[\]]*?'
+contexts:
+  main:
+    - match: '(\[[SIU ]{3}]) ({{pkg_name}})[ \n](<[\w\s]+>\n)?'
+      captures:
+        1: storage.modifier
+        2: entity.package.name.enabled meta.toc-list entity.name
+        3: comment
+      push: package_row
+
+  package_row:
+    - meta_scope: meta.override
+    - match: '^\s*(`-) (.*)$'
+      captures:
+        1: punctuation.override.begin
+        2: entity.package.override
+    - match: ^$
+      pop: true
