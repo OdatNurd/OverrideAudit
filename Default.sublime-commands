@@ -1,7 +1,7 @@
 [
     {
-        "caption": "OverrideAudit: List Installed Packages",
-        "command": "override_audit_list_packages"
+        "caption": "OverrideAudit: Package Report",
+        "command": "override_audit_package_report"
     },
     {
         "caption": "OverrideAudit: List Package Overrides",

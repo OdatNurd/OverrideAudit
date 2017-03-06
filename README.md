@@ -60,7 +60,7 @@ OverrideAudit commands can be executed via the Command Palette or via the menu,
 using options under the `Tools > OverrideAudit` sub-menu. The available commands
 are:
 
-### `OverrideAudit: List Installed Packages` ###
+### `OverrideAudit: Package Report` ###
 
 This will display a list of all packages currently installed in Sublime Text,
 in a table format. The table lists the packages in roughly the order that they

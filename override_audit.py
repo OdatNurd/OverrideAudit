@@ -83,20 +83,22 @@ class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
 
 ###-----------------------------------------------------------------------------
 
-class OverrideAuditListPackagesCommand(sublime_plugin.WindowCommand):
+class OverrideAuditPackageReportCommand(sublime_plugin.WindowCommand):
     def run(self):
         pkg_list = PackageList()
         pkg_counts = pkg_list.package_counts()
 
         settings = sublime.load_settings("OverrideAudit.sublime-settings")
 
-        title = "Packages: {} ({} dependencies)".format(len(pkg_list), pkg_counts[4])
+        title = "{} Total Packages".format(len(pkg_list))
         t_sep = "=" * len(title)
 
-        stats = ("Shipped:   {:<3} (Shipped with Sublime)\n"
-                 "Installed: {:<3} (Installed as sublime-package files)\n"
-                 "Unpacked:  {:<3} (Unpacked in Packages\\ directory)\n"
-                 "Disabled:  {:<3} (Currently in ignored_packages)\n").format(*pkg_counts)
+        fmt = '{{:>{}}}'.format(len(str(max(pkg_counts))))
+        stats = ("{0} [S]hipped with Sublime\n"
+                 "{0} [I]nstalled (user) sublime-package files\n"
+                 "{0} [U]npacked in Packages\\ directory\n"
+                 "{0} Currently in ignored_packages\n"
+                 "{0} Installed dependencies\n").format(fmt).format(*pkg_counts)
 
         row = "| {:<40} | {:3} | {:3} | {:<3} |".format("", "", "", "")
         r_sep = "-" * len(row)
