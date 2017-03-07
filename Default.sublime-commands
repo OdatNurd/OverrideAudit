@@ -4,8 +4,8 @@
         "command": "override_audit_package_report"
     },
     {
-        "caption": "OverrideAudit: List Package Overrides",
-        "command": "override_audit_list_package_overrides"
+        "caption": "OverrideAudit: Override Report",
+        "command": "override_audit_override_report"
     },
     {
         "caption": "OverrideAudit: Diff Package Override",

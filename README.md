@@ -72,14 +72,17 @@ currently disabled is displayed in `[Square Brackets]` while a package that
 represents a dependency for an installed package is displayed in `<Angle
 Brackets>`.
 
-### `OverrideAudit: List Package Overrides` ###
+### `OverrideAudit: Override Report` ###
 
-This will display a list of all packages that have any overrides, listing all
-of the files that are overridden.
+This will display a list of all packages for which there are overrides of any
+type, *simple* or *complete*. For each such package, a condensed version of the
+indicators from the Package Report are displayed, indicating whether the package
+in question is `[S]`hipped, `[I]`nstalled or `[U]`npacked.
 
-The list of overrides prefixes each package with a shorter version of the flags
-that indicate it's type (*Shipped*, *Installed* or *Unpacked*) and lists both
-*Simple* as well as *Complete* overrides.
+A package which is a *complete* override is indicated by text to this effect
+appearing next to it in the output line.
+
+Any *simple* overrides that a package has will be listed below it in the report.
 
 ### `OverrideAudit: Diff Package Override` ###
 

@@ -8,9 +8,8 @@
                 "children":
                 [
                     { "caption": "Package Report", "command": "override_audit_package_report"},
+                    { "caption": "Override Report", "command": "override_audit_override_report"},
                     { "caption": "Diff Override", "command": "override_audit_diff_override"},
-                    { "caption": "Override List", "command": "override_audit_list_package_overrides"},
-
 
                     { "caption": "-" }
                 ]

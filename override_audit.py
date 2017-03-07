@@ -127,7 +127,7 @@ class OverrideAuditPackageReportCommand(sublime_plugin.WindowCommand):
 ###-----------------------------------------------------------------------------
 
 # This is still crude as hell; proof of proof of concept type styff
-class OverrideAuditListPackageOverridesCommand(sublime_plugin.WindowCommand):
+class OverrideAuditOverrideReport(sublime_plugin.WindowCommand):
     def run(self):
         pkg_list = PackageList()
         pkg_counts = pkg_list.package_counts()
@@ -154,7 +154,9 @@ class OverrideAuditListPackageOverridesCommand(sublime_plugin.WindowCommand):
 
             if normal_overrides:
                 result.extend(["  `- {}".format(item) for item in normal_overrides])
-                result.append("")
+            else:
+                result.append ("    [No simple overrides found]")
+            result.append("")
 
         if len(result) == 0:
             result.append("No packages with overrides found")
