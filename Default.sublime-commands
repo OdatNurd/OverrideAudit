@@ -10,5 +10,9 @@
     {
         "caption": "OverrideAudit: Diff Package Override",
         "command": "override_audit_diff_override"
+    },
+    {
+        "caption": "OverrideAudit: Diff All Packages",
+        "command": "override_audit_diff_package"
     }
 ]

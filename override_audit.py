@@ -3,8 +3,98 @@ import sublime_plugin
 
 import os
 
-from .lib.packages import *
+from .lib.packages import PackageInfo, PackageList, PackageFileSet
 from .lib.output_view import output_to_view
+
+###-----------------------------------------------------------------------------
+
+def packages_with_overrides(pkg_list, name_list=None):
+    """
+    Collect a list of package names from the given package list for which there
+    is at least a single (simple) override file and which is not in the list of
+    packages to ignore overrides in.
+
+    Optionally, if name_list is provided, the list of package names will be
+    filtered to only include packages whose name also exists in the name list.
+    """
+    settings = sublime.load_settings("OverrideAudit.sublime-settings")
+    ignored = settings.get("ignore_overrides_in", [])
+
+    items = [name for name, pkg in pkg_list if len(pkg.override_files()) > 0
+                                               and name not in ignored]
+
+    if name_list is not None:
+        items = list(filter(lambda name: name in name_list, items))
+
+    return items
+
+def decorate_package_name(pkg_info, status=False):
+    """
+    Decorate the name of the provided package with a prefix that describes its
+    status and optionally also a suffix if it is a complete override.
+    """
+    suffix = ""
+    if status and pkg_info.has_possible_overrides(simple=False):
+        suffix = " <Complete Override>"
+
+    return "[{}{}{}] {}{}".format(
+               "S" if pkg_info.shipped_path is not None else " ",
+               "I" if pkg_info.installed_path is not None else " ",
+               "U" if pkg_info.unpacked_path is not None else " ",
+               pkg_info.name,
+               suffix)
+
+###-----------------------------------------------------------------------------
+
+class OverrideAuditDiffPackage(sublime_plugin.WindowCommand):
+    def _perform_diff(self, pkg_info, context_lines, result):
+        for file in pkg_info.override_files():
+            result.append("    {}".format(file))
+
+            diff = pkg_info.override_diff(file, context_lines,
+                                          empty_result="No differences found",
+                                          indent=8)
+            if diff is None:
+                diff = "Error diffing override; please check the console"
+            result.extend([diff, ""])
+
+        result.append("")
+
+
+    def _diff_packages(self, names, pkg_list):
+        settings = sublime.load_settings("OverrideAudit.sublime-settings")
+        context_lines = settings.get("diff_context_lines", 3)
+
+        result = ["Diffing overrides for {} package{}\n".format(
+                     len(names),
+                     "s" if len(names) != 1 else "")]
+
+        for name in names:
+            pkg_info = pkg_list[name]
+            result.append (decorate_package_name(pkg_info, status=True))
+
+            self._perform_diff(pkg_info, context_lines, result)
+
+        output_to_view(self.window,
+                       "Override Diff Report: All Packages",
+                       result,
+                       reuse=settings.get("reuse_views", True),
+                       clear=settings.get("clear_existing", True),
+                       syntax="Packages/OverrideAudit/syntax/OverrideAudit-diff.sublime-syntax")
+
+    def run(self, package=None):
+        pkg_list = PackageList()
+
+        settings = sublime.load_settings("OverrideAudit.sublime-settings")
+        ignored = settings.get("ignore_overrides_in", [])
+
+        name_list = None if package is None else [package]
+        items = packages_with_overrides(pkg_list, name_list)
+
+        if items:
+            return self._diff_packages(items, pkg_list)
+
+        print("Unable to diff; no unignored, valid packages specified")
 
 ###-----------------------------------------------------------------------------
 
@@ -52,11 +142,8 @@ class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
             self._show_override_list(pkg_list[pkg_override_list[index]])
 
     def _show_pkg_list(self, pkg_list):
-        settings = sublime.load_settings("OverrideAudit.sublime-settings")
-        ignored = settings.get("ignore_overrides_in", [])
+        items = packages_with_overrides(pkg_list)
 
-        items = [name for name, pkg in pkg_list if len(pkg.override_files()) > 0
-                                                  and name not in ignored]
         if not items:
             print("No unignored packages have overrides")
         self.window.show_quick_panel(
@@ -126,7 +213,6 @@ class OverrideAuditPackageReportCommand(sublime_plugin.WindowCommand):
 
 ###-----------------------------------------------------------------------------
 
-# This is still crude as hell; proof of proof of concept type styff
 class OverrideAuditOverrideReport(sublime_plugin.WindowCommand):
     def run(self):
         pkg_list = PackageList()
@@ -145,12 +231,7 @@ class OverrideAuditOverrideReport(sublime_plugin.WindowCommand):
             if shipped_override:
                 pkg_name = pkg_name + " <Complete Override>"
 
-            result.append (
-                "[{}{}{}] {}".format(
-                "S" if pkg_info.shipped_path is not None else " ",
-                "I" if pkg_info.installed_path is not None else " ",
-                "U" if pkg_info.unpacked_path is not None else " ",
-                pkg_name))
+            result.append (decorate_package_name(pkg_info, status=True))
 
             if normal_overrides:
                 result.extend(["  `- {}".format(item) for item in normal_overrides])
