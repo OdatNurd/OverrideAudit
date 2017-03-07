@@ -138,11 +138,11 @@ class OverrideAuditOverrideReport(sublime_plugin.WindowCommand):
         result = []
         for pkg_name, pkg_info in pkg_list:
             normal_overrides = pkg_info.override_files(simple=True)
-            shipped_overrides = pkg_info.override_files(simple=False)
-            if pkg_name in ignored or (not normal_overrides and not shipped_overrides):
+            shipped_override = pkg_info.has_possible_overrides(simple=False)
+            if pkg_name in ignored or (not normal_overrides and not shipped_override):
                continue
 
-            if shipped_overrides:
+            if shipped_override:
                 pkg_name = pkg_name + " <Complete Override>"
 
             result.append (
