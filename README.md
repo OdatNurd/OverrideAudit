@@ -81,13 +81,17 @@ The list of overrides prefixes each package with a shorter version of the flags
 that indicate it's type (*Shipped*, *Installed* or *Unpacked*) and lists both
 *Simple* as well as *Complete* overrides.
 
-### `OverrideAudit: Diff Package Overrides` ###
+### `OverrideAudit: Diff Package Override` ###
 
 This will display a quick panel that lists all packages with at least one
 *Simple* override, and allows you to compare the differences between the base
 file and your override to see what is different between the two.
 
-The diff output is displayed as a Unified Diff.
+When the content of the file is different, the output is displayed in a Unified
+Diff format in a new buffer, allowing you to inspect the changes.
+
+The option `diff_unchanged` allows you to specify the result of performing a
+diff when the override is identical to the underlying file.
 
 ---
 
