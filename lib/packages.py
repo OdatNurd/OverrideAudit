@@ -234,7 +234,8 @@ class PackageInfo():
         self.overrides[simple] = over_list & base_list
         return self.overrides[simple]
 
-    def override_diff(self, override_file, context_lines):
+    def override_diff(self, override_file, context_lines, empty_result=None,
+                      indent=None):
         """
         Calculate and return a unified diff of the override file provided. In
         the diff, the first file is the packed version of the file being used
@@ -247,12 +248,17 @@ class PackageInfo():
             print("Unable to diff %s" % os.path.join(self.name, override_file))
             return None
 
+        indent = "" if indent is None else " " * indent
+
         diff = difflib.unified_diff(packed[0], unpacked[0],
                                     packed[1], unpacked[1],
                                     packed[2], unpacked[2],
                                     context_lines)
 
-        result = u"".join(line for line in diff)
+        result = u"".join(indent + line for line in diff)
+        if empty_result is not None and result == "":
+            result = indent + empty_result
+
         return result
 
 ###-----------------------------------------------------------------------------
