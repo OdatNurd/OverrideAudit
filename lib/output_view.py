@@ -115,4 +115,6 @@ def output_to_view(window,
 
     view.set_read_only(True)
 
+    return view
+
 ###-----------------------------------------------------------------------------
