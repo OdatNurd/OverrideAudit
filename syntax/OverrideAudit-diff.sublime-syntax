@@ -26,7 +26,6 @@ contexts:
       scope: meta.diff.range.unified
       captures:
         1: punctuation.definition.range.diff
-        2: meta.toc-list.line-number.diff
         3: punctuation.definition.range.diff
     - match: '^        (((\-{3}) .+ (\-{4}))|((\*{3}) .+ (\*{4})))$\n?'
       scope: meta.diff.range.context
