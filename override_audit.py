@@ -202,7 +202,7 @@ class OverrideAuditPackageReportCommand(sublime_plugin.WindowCommand):
         result.extend([r_sep, ""])
 
         output_to_view(self.window,
-                       "OverrideAudit: Package List",
+                       "OverrideAudit: Package Report",
                        result,
                        reuse=settings.get("reuse_views", True),
                        clear=settings.get("clear_existing", True),
@@ -225,9 +225,6 @@ class OverrideAuditOverrideReport(sublime_plugin.WindowCommand):
             if pkg_name in ignored or (not normal_overrides and not shipped_override):
                continue
 
-            if shipped_override:
-                pkg_name = pkg_name + " <Complete Override>"
-
             result.append (decorate_package_name(pkg_info, status=True))
 
             if normal_overrides:
@@ -240,7 +237,7 @@ class OverrideAuditOverrideReport(sublime_plugin.WindowCommand):
             result.append("No packages with overrides found")
 
         output_to_view(self.window,
-                       "OverrideAudit: Package Override List",
+                       "OverrideAudit: Override Report",
                        result,
                        reuse=settings.get("reuse_views", True),
                        clear=settings.get("clear_existing", True),

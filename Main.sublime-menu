@@ -10,7 +10,7 @@
                     { "caption": "Package Report", "command": "override_audit_package_report"},
                     { "caption": "Override Report", "command": "override_audit_override_report"},
                     { "caption": "Diff Override", "command": "override_audit_diff_override"},
-                    { "caption": "Diff All Packages", "command": "override_audit_diff_package"},
+                    { "caption": "Diff All Package Overrides", "command": "override_audit_diff_package"},
 
                     { "caption": "-" }
                 ]
