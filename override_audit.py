@@ -91,10 +91,7 @@ class OverrideAuditDiffPackage(sublime_plugin.WindowCommand):
         name_list = None if package is None else [package]
         items = packages_with_overrides(pkg_list, name_list)
 
-        if items:
-            return self._diff_packages(items, pkg_list)
-
-        print("Unable to diff; no unignored, valid packages specified")
+        self._diff_packages(items, pkg_list)
 
 ###-----------------------------------------------------------------------------
 
