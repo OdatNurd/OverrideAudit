@@ -61,13 +61,19 @@ class OverrideAuditDiffPackage(sublime_plugin.WindowCommand):
         result.append("")
 
 
-    def _diff_packages(self, names, pkg_list):
+    def _diff_packages(self, names, pkg_list, single_package):
         settings = sublime.load_settings("OverrideAudit.sublime-settings")
         context_lines = settings.get("diff_context_lines", 3)
 
-        result = ["Diffing overrides for {} package{}\n".format(
-                     len(names),
-                     "s" if len(names) != 1 else "")]
+        result = []
+        title = "Override Diff Report: "
+        if len(names) == 1 and single_package:
+            title += names[0]
+            result.append("Diffing overrides for {}\n".format(names[0]))
+        else:
+            title += "All Packages"
+            result.append("Diffing overrides for {} packages\n".format(
+                          len(names)))
 
         for name in names:
             pkg_info = pkg_list[name]
@@ -76,7 +82,7 @@ class OverrideAuditDiffPackage(sublime_plugin.WindowCommand):
             self._perform_diff(pkg_info, context_lines, result)
 
         output_to_view(self.window,
-                       "Override Diff Report: All Packages",
+                       title,
                        result,
                        reuse=settings.get("reuse_views", True),
                        clear=settings.get("clear_existing", True),
@@ -91,7 +97,7 @@ class OverrideAuditDiffPackage(sublime_plugin.WindowCommand):
         name_list = None if package is None else [package]
         items = packages_with_overrides(pkg_list, name_list)
 
-        self._diff_packages(items, pkg_list)
+        self._diff_packages(items, pkg_list, package is not None)
 
 ###-----------------------------------------------------------------------------
 
@@ -134,24 +140,29 @@ class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
             items=override_list,
             on_select=lambda i: self._file_pick(pkg_info, override_list, i))
 
-    def _pkg_pick(self, pkg_list, pkg_override_list, index):
+    def _pkg_pick(self, pkg_list, pkg_override_list, index, bulk):
         if index >= 0:
-            self._show_override_list(pkg_list[pkg_override_list[index]])
+            pkg_info = pkg_list[pkg_override_list[index]]
+            if not bulk:
+                self._show_override_list(pkg_info)
+            else:
+                self.window.run_command("override_audit_diff_package",
+                                        {"package": pkg_info.name})
 
-    def _show_pkg_list(self, pkg_list):
+    def _show_pkg_list(self, pkg_list, bulk):
         items = packages_with_overrides(pkg_list)
 
         if not items:
             print("No unignored packages have overrides")
         self.window.show_quick_panel(
                 items=items,
-                on_select=lambda i: self._pkg_pick(pkg_list, items, i))
+                on_select=lambda i: self._pkg_pick(pkg_list, items, i, bulk))
 
-    def run(self, package=None, file=None):
+    def run(self, package=None, file=None, bulk=False):
         pkg_list = PackageList()
 
         if package is None:
-            self._show_pkg_list(pkg_list)
+            self._show_pkg_list(pkg_list, bulk)
         else:
             if package in pkg_list:
                 pkg_info = pkg_list[package]

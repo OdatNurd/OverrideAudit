@@ -8,11 +8,16 @@
         "command": "override_audit_override_report"
     },
     {
-        "caption": "OverrideAudit: Diff Package Override",
+        "caption": "OverrideAudit: Diff Single Override",
         "command": "override_audit_diff_override"
     },
     {
-        "caption": "OverrideAudit: Diff All Package Overrides",
+        "caption": "OverrideAudit: Bulk Diff Single Package",
+        "command": "override_audit_diff_override",
+        "args": {"bulk": true}
+    },
+    {
+        "caption": "OverrideAudit: Bulk Diff All Packages",
         "command": "override_audit_diff_package"
     }
 ]
