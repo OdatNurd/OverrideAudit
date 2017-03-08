@@ -60,18 +60,6 @@ OverrideAudit commands can be executed via the Command Palette or via the menu,
 using options under the `Tools > OverrideAudit` sub-menu. The available commands
 are:
 
-### `OverrideAudit: Package Report` ###
-
-This will display a list of all packages currently installed in Sublime Text,
-in a table format. The table lists the packages in roughly the order that they
-will be loaded by Sublime at startup.
-
-For each package, an indication is made as to whether this package is
-`[S]`hipped, `[I]`nstalled or `[U]`npacked. Additionally, a package that is
-currently disabled is displayed in `[Square Brackets]` while a package that
-represents a dependency for an installed package is displayed in `<Angle
-Brackets>`.
-
 ### `OverrideAudit: Override Report` ###
 
 This will display a list of all packages for which there are overrides of any
@@ -84,7 +72,19 @@ appearing next to it in the output line.
 
 Any *simple* overrides that a package has will be listed below it in the report.
 
-### `OverrideAudit: Diff Package Override` ###
+### `OverrideAudit: Package Report` ###
+
+This will display a list of all packages currently installed in Sublime Text,
+in a table format. The table lists the packages in roughly the order that they
+will be loaded by Sublime at startup.
+
+For each package, an indication is made as to whether this package is
+`[S]`hipped, `[I]`nstalled or `[U]`npacked. Additionally, a package that is
+currently disabled is displayed in `[Square Brackets]` while a package that
+represents a dependency for an installed package is displayed in `<Angle
+Brackets>`.
+
+### `OverrideAudit: Diff Single Override` ###
 
 This will display a quick panel that lists all packages with at least one
 *Simple* override, and allows you to compare the differences between the base
@@ -95,6 +95,27 @@ Diff format in a new buffer, allowing you to inspect the changes.
 
 The option `diff_unchanged` allows you to specify the result of performing a
 diff when the override is identical to the underlying file.
+
+### `OverrideAudit: Bulk Diff All Packages` ###
+
+This will generate a diff for every simple override that exists for all packages
+into a single output report, allowing for a quick overview of all overrides at
+once.
+
+As for the *Override Report* command, each package listed has a condensed
+version of the indicators from the Package Report indicating whether the
+package in question is `[S]`hipped, `[I]`nstalled or `[U]`npacked as well as an
+indication if the package is a *complete* override or not.
+
+Each section of the report is progressively indented so that it is possible to
+use Sublime code folding to hide aware parts of the report as you work.
+
+### ` OverrideAudit: Bulk Diff Single Package` ###
+
+This command operates identically to the bulk diff of all packages with the
+exception that instead of calculating a diff for all overrides in all packages
+you are instead prompted via a quick panel for a single package to diff
+instead.
 
 ---
 
