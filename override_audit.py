@@ -44,6 +44,14 @@ def decorate_package_name(pkg_info, status=False):
                pkg_info.name,
                suffix)
 
+def _apply_context_settings(view, pkg_name, override, is_diff):
+    """
+    Apply to a view settings so context menus know what options to allow.
+    """
+    view.settings().set("override_audit_package", pkg_name)
+    view.settings().set("override_audit_override", override)
+    view.settings().set("override_audit_diff", is_diff)
+
 def open_override_file(window, pkg_name, override):
     """
     Open the provided override from the given package name.
@@ -80,12 +88,14 @@ def diff_override_file(window, pkg_info, override,
         elif action == "ignore":
             return
 
-    output_to_view(window,
+    view = output_to_view(window,
                    "Override of %s" % os.path.join(pkg_info.name, override),
                    "No differences found" if diff_info == "" else diff_info,
                    reuse=reuse,
                    clear=clear,
                    syntax="Packages/Diff/Diff.sublime-syntax")
+
+    _apply_context_settings(view, pkg_info.name, override, True)
 
 ###-----------------------------------------------------------------------------
 
@@ -270,3 +280,64 @@ class OverrideAuditOverrideReport(sublime_plugin.WindowCommand):
                        reuse=settings.get("reuse_views", True),
                        clear=settings.get("clear_existing", True),
                        syntax="Packages/OverrideAudit/syntax/OverrideAudit-overrideList.sublime-syntax")
+
+###-----------------------------------------------------------------------------
+
+class OverrideAuditContextDiffOpenOverride(sublime_plugin.TextCommand):
+    """
+    Provide a command to open or diff an override (the opppsite of what the
+    current view is).
+    """
+    def is_enabled(self):
+        s = self.view.settings()
+        return (s.has("override_audit_package") and
+                s.has("override_audit_override"))
+
+    def is_visible(self):
+        return self.is_enabled()
+
+    def description(self):
+        is_diff = self.view.settings().get("override_audit_diff", False)
+        return "Override Audit: %s Override" % ("Edit" if is_diff else "Diff")
+
+    def run(self, edit):
+        pkg_name = self.view.settings().get("override_audit_package")
+        override = self.view.settings().get("override_audit_override")
+        is_diff  = self.view.settings().get("override_audit_diff", False)
+
+        # TODO: Check if the full override file exists here; remove the settings
+        # and warn the user is not.
+
+        if is_diff:
+            open_override_file(self.view.window(), pkg_name, override)
+        else:
+            pkg_list = PackageList()
+            diff_override_file(self.view.window(), pkg_list[pkg_name], override,
+                               diff_only=True, force_reuse=True)
+
+###-----------------------------------------------------------------------------
+
+class OverrideAuditEventListener(sublime_plugin.EventListener):
+    """
+    Check on file load and save to see if the new file is potentially an
+    override for a package, and set the variables that allow for our context
+    menus to let you edit/diff the override.
+    """
+    def _check_for_override(self, view):
+        result = PackageInfo.check_potential_override(view.file_name())
+        if result is not None:
+            _apply_context_settings(view, result[0], result[1], False)
+
+    def on_post_save(self, view):
+        # TODO: Maybe perform the check anyway and remove/alter the settings if
+        # the filename is different (override moved, view no longer represents
+        # an override)?
+        if not view.settings().has("override_audit_package"):
+            self._check_for_override(view)
+
+    def on_load(self, view):
+        # Things like PackageResourceViewer trigger on_load before the file
+        # actually exists; only allow the context items once the file is
+        # actually saved.
+        if os.path.isfile(view.file_name()):
+            self._check_for_override(view)

@@ -19,5 +19,9 @@
     {
         "caption": "OverrideAudit: Bulk Diff All Packages",
         "command": "override_audit_diff_package"
+    },
+    {
+        "caption": "OverrideAudit: Swap Diff/Override View",
+        "command": "override_audit_context_diff_open_override"
     }
 ]
