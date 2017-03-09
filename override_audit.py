@@ -44,6 +44,49 @@ def decorate_package_name(pkg_info, status=False):
                pkg_info.name,
                suffix)
 
+def open_override_file(window, pkg_name, override):
+    """
+    Open the provided override from the given package name.
+    """
+    filename = os.path.join(sublime.packages_path(), pkg_name, override)
+    window.open_file(filename)
+
+def diff_override_file(window, pkg_info, override,
+                       diff_only=False, force_reuse=False):
+    """
+    Generate a diff for the given package and override.
+    """
+    settings = sublime.load_settings("OverrideAudit.sublime-settings")
+    context_lines = settings.get("diff_context_lines", 3)
+
+    action = "diff" if diff_only else settings.get("diff_unchanged", "diff")
+
+    if force_reuse:
+        reuse, clear = True, True
+    else:
+        reuse = settings.get("reuse_views", True)
+        clear = settings.get("clear_existing", True)
+
+    diff_info = pkg_info.override_diff(override, context_lines)
+
+    if diff_info is None:
+        return
+
+    if diff_info == "":
+        sublime.status_message("No changes detected in override")
+
+        if action == "open":
+            return open_override_file(window, pkg_info.name, override)
+        elif action == "ignore":
+            return
+
+    output_to_view(window,
+                   "Override of %s" % os.path.join(pkg_info.name, override),
+                   "No differences found" if diff_info == "" else diff_info,
+                   reuse=reuse,
+                   clear=clear,
+                   syntax="Packages/Diff/Diff.sublime-syntax")
+
 ###-----------------------------------------------------------------------------
 
 class OverrideAuditDiffPackage(sublime_plugin.WindowCommand):
@@ -102,35 +145,9 @@ class OverrideAuditDiffPackage(sublime_plugin.WindowCommand):
 ###-----------------------------------------------------------------------------
 
 class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
-    def _perform_diff(self, pkg_info, file):
-        settings = sublime.load_settings("OverrideAudit.sublime-settings")
-        action = settings.get("diff_unchanged", "diff")
-
-        diff_info = pkg_info.override_diff(file, settings.get("diff_context_lines", 3))
-
-        if diff_info is None:
-            return
-
-        if diff_info == "":
-            sublime.status_message("No changes detected in override")
-
-            if action == "open":
-                full_filename = os.path.join(sublime.packages_path(), pkg_info.name, file)
-                self.window.open_file(full_filename)
-                return
-            elif action == "ignore":
-                return
-
-        output_to_view(self.window,
-                       "Override of %s" % os.path.join(pkg_info.name, file),
-                       "No differences found" if diff_info == "" else diff_info,
-                       reuse=settings.get("reuse_views", True),
-                       clear=settings.get("clear_existing", True),
-                       syntax="Packages/Diff/Diff.sublime-syntax")
-
     def _file_pick(self, pkg_info, override_list, index):
         if index >= 0:
-            self._perform_diff(pkg_info, override_list[index])
+            diff_override_file(self.window, pkg_info, override_list[index])
 
     def _show_override_list(self, pkg_info):
         override_list = list(pkg_info.override_files())
