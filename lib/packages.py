@@ -42,6 +42,18 @@ from collections import MutableSet, OrderedDict
 # location to check.
 _wrap = (lambda value: value) if sublime.platform() == "linux" else (lambda value: value.lower())
 
+# Paths inside of a zip file always use a Unix path separator, which causes
+# problems under Windows because the partial filenames from the sublime-package
+# file do not match what is detected locally. This can be fixed by using
+# normpath on the zip entry, but in that case we can't find the file in the
+# zip any longer.
+#
+# As an expedient workaround, the code that collects local override files will
+# manually swap the path separator character to a Unix style under windows.
+#
+# This is hacky and could/should probably be fixed in a better way.
+_fixPath = (lambda value: value.replace("\\", "/")) if sublime.platform() == "windows" else (lambda value: value)
+
 class PackageFileSet(MutableSet):
     """
     This is an implementation of a set that is meant to store the names of
@@ -134,7 +146,7 @@ class PackageInfo():
         for (path, dirs, files) in os.walk(pkg_path, followlinks=True):
             rPath = os.path.relpath(path, pkg_path) if path != pkg_path else ""
             for name in files:
-                results.add(os.path.join(rPath, name))
+                results.add(_fixPath(os.path.join(rPath, name)))
 
         return results
 
