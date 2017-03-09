@@ -93,6 +93,59 @@ class PackageFileSet(MutableSet):
 ###-----------------------------------------------------------------------------
 
 class PackageInfo():
+    # The location of packages that ship with Sublime
+    shipped_path = os.path.join(os.path.dirname(sublime.executable_path()), "Packages")
+    installed_path = sublime.installed_packages_path()
+
+    @classmethod
+    def _deep_scan(cls, path, filename):
+        """
+        Scan the entire folder under the given path for the provided file
+        """
+        # See PackageList.__get_package_list
+        for (path, dirs, files) in os.walk(path, followlinks=True):
+            if filename in files:
+                return True
+
+        return False
+
+    @classmethod
+    def check_potential_override(cls, filename):
+        """
+        Given a filename path, check and see if this could conceivably be a
+        reference to an override; i.e. that there is a shipped package with the
+        name given in the filename. Note: No check is done that the shipped
+        package actually HAS such a member.
+
+        The filename provided must be either absolute(and point to the packages
+        path) or relative (in which case it is assumed to point there).
+
+        Returns None if not a potential override or a tuple of the package name
+        and the override name (relative to the package).
+        """
+        if os.path.basename(filename) == "":
+            return None
+
+        if os.path.isabs(filename):
+            if not filename.startswith(sublime.packages_path()):
+                return None
+            filename = os.path.relpath(filename, sublime.packages_path())
+
+        # Get only the first path component, which will be a package name.
+        parts = filename.split(os.path.sep)
+        pkg_name = parts[0]
+        pkg_file = pkg_name + ".sublime-package"
+
+        if (os.path.isfile(os.path.join(cls.shipped_path, pkg_file)) or
+            cls._deep_scan(cls.installed_path, pkg_file)):
+
+            # Always use Unix path separator even on windows; this is how the
+            # sublime-package would represent the override path.
+            override = "/".join(parts[1:])
+            return (pkg_name, override)
+
+        return None
+
     """
     Holds meta information on an installed Sublime Text Package
 
