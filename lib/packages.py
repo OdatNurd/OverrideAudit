@@ -54,6 +54,13 @@ _wrap = (lambda value: value) if sublime.platform() == "linux" else (lambda valu
 # This is hacky and could/should probably be fixed in a better way.
 _fixPath = (lambda value: value.replace("\\", "/")) if sublime.platform() == "windows" else (lambda value: value)
 
+def plugin_loaded():
+    """
+    Set up in PackageInfo the location where shipped sublime-packages live.
+    """
+    exe_path = os.path.dirname(sublime.executable_path())
+    PackageInfo.shipped_packages_path = os.path.join(exe_path, "Packages")
+
 class PackageFileSet(MutableSet):
     """
     This is an implementation of a set that is meant to store the names of
@@ -93,9 +100,9 @@ class PackageFileSet(MutableSet):
 ###-----------------------------------------------------------------------------
 
 class PackageInfo():
-    # The location of packages that ship with Sublime
-    shipped_path = os.path.join(os.path.dirname(sublime.executable_path()), "Packages")
-    installed_path = sublime.installed_packages_path()
+    # The location of packages that ship with sublime live; this is set up at
+    # the time the plugin is fully loaded.
+    shipped_packages_path = None
 
     @classmethod
     def _deep_scan(cls, path, filename):
@@ -136,8 +143,8 @@ class PackageInfo():
         pkg_name = parts[0]
         pkg_file = pkg_name + ".sublime-package"
 
-        if (os.path.isfile(os.path.join(cls.shipped_path, pkg_file)) or
-            cls._deep_scan(cls.installed_path, pkg_file)):
+        if (os.path.isfile(os.path.join(cls.shipped_packages_path, pkg_file)) or
+            cls._deep_scan(sublime.installed_packages_path(), pkg_file)):
 
             # Always use Unix path separator even on windows; this is how the
             # sublime-package would represent the override path.
@@ -341,8 +348,7 @@ class PackageList():
         self._disabled = 0
         self._dependencies = 0
 
-        exec_dir = os.path.dirname(sublime.executable_path())
-        self._shipped = self.__get_package_list(os.path.join(exec_dir, "Packages"), shipped=True)
+        self._shipped = self.__get_package_list(PackageInfo.shipped_packages_path, shipped=True)
         self._installed = self.__get_package_list(sublime.installed_packages_path ())
         self._unpacked = self.__get_package_list(sublime.packages_path (), packed=False)
 
