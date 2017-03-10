@@ -52,6 +52,14 @@ def _apply_context_settings(view, pkg_name, override, is_diff):
     view.settings().set("override_audit_override", override)
     view.settings().set("override_audit_diff", is_diff)
 
+def _remove_context_settings(view):
+    """
+    Remove the view settings tso context menus know to not operate on the view.
+    """
+    view.settings().erase("override_audit_package")
+    view.settings().erase("override_audit_override")
+    view.settings().erase("override_audit_diff")
+
 def open_override_file(window, pkg_name, override):
     """
     Open the provided override from the given package name.
@@ -305,8 +313,9 @@ class OverrideAuditContextDiffOpenOverride(sublime_plugin.TextCommand):
         override = self.view.settings().get("override_audit_override")
         is_diff  = self.view.settings().get("override_audit_diff", False)
 
-        # TODO: Check if the full override file exists here; remove the settings
-        # and warn the user is not.
+        # TODO: May be a good idea to check around here to see if the settings
+        # are defunct and need to be removed if that's not already happening
+        # elsewhere.
 
         if is_diff:
             open_override_file(self.view.window(), pkg_name, override)
@@ -327,13 +336,12 @@ class OverrideAuditEventListener(sublime_plugin.EventListener):
         result = PackageInfo.check_potential_override(view.file_name())
         if result is not None:
             _apply_context_settings(view, result[0], result[1], False)
+        else:
+            _remove_context_settings(view)
 
     def on_post_save(self, view):
-        # TODO: Maybe perform the check anyway and remove/alter the settings if
-        # the filename is different (override moved, view no longer represents
-        # an override)?
-        if not view.settings().has("override_audit_package"):
-            self._check_for_override(view)
+        # Will remove existing settings if the view is no longer an override
+        self._check_for_override(view)
 
     def on_load(self, view):
         # Things like PackageResourceViewer trigger on_load before the file
