@@ -117,6 +117,25 @@ exception that instead of calculating a diff for all overrides in all packages
 you are instead prompted via a quick panel for a single package to diff
 instead.
 
+### `OverrideAudit: Swap Diff/Override View` ###
+
+This command is only available in the Command Palette while the current file is
+either an edit session for an override or a diff of an override.
+
+Unlike most other commands, this does not appear in the top level `Tools >
+Override Audit` menu, instead appearing in the context menu for the current
+view as appropriate. In this case the menu item tells you explicitly whether it
+will edit or diff the current file.
+
+When used in a diff, the override will be opened for editing or the currently
+open view into the file will be focused, if present. When used in a view that
+is editing an override, the command will instead open a diff of the override
+based on the current file content on disk.
+
+In either case, the existing edit or diff view will be switched to/updated,
+regardless of the current values of the `reuse_view` and `clear_existing`
+settings.
+
 ---
 
 ## Configuration ##
