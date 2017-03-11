@@ -1,6 +1,7 @@
 import sublime
 import sublime_plugin
 
+from bisect import bisect
 import os
 
 from .lib.packages import PackageInfo, PackageList, PackageFileSet
@@ -293,36 +294,68 @@ class OverrideAuditOverrideReport(sublime_plugin.WindowCommand):
 
 class OverrideAuditContextDiffOpenOverride(sublime_plugin.TextCommand):
     """
-    Provide a command to open or diff an override (the opppsite of what the
-    current view is).
+    Offer to diff or edit an override via context menu
+
+    When diff is None, the command requires settings in the view to know what
+    to do and what operation to take. Otherwise, diff is a boolean which tells
+    us what the command should be doing to the current override.
     """
-    def is_enabled(self):
-        s = self.view.settings()
-        return (s.has("override_audit_package") and
-                s.has("override_audit_override"))
+    def run(self, edit, event=None, diff=None):
+        if diff is None:
+            # When not given diff is a toggle for the current state
+            pkg_name = self.view.settings().get("override_audit_package")
+            override = self.view.settings().get("override_audit_override")
+            diff     = not self.view.settings().get("override_audit_diff")
 
-    def is_visible(self):
-        return self.is_enabled()
-
-    def description(self):
-        is_diff = self.view.settings().get("override_audit_diff", False)
-        return "Override Audit: %s Override" % ("Edit" if is_diff else "Diff")
-
-    def run(self, edit):
-        pkg_name = self.view.settings().get("override_audit_package")
-        override = self.view.settings().get("override_audit_override")
-        is_diff  = self.view.settings().get("override_audit_diff", False)
+        else:
+            point    = self.view.window_to_text((event["x"], event["y"]))
+            pkg_name = self.package_for_override(point)
+            override = self.override_at_point(point)
 
         # TODO: May be a good idea to check around here to see if the settings
         # are defunct and need to be removed if that's not already happening
         # elsewhere.
 
-        if is_diff:
-            open_override_file(self.view.window(), pkg_name, override)
-        else:
+        if diff:
             pkg_list = PackageList()
             diff_override_file(self.view.window(), pkg_list[pkg_name], override,
                                diff_only=True, force_reuse=True)
+        else:
+            open_override_file(self.view.window(), pkg_name, override)
+
+    def description(self, event=None, diff=None):
+        # When not given diff is a toggle for the current state
+        if diff is None:
+            diff = not self.view.settings().get("override_audit_diff", False)
+
+        return "Override Audit: %s Override" % ("Diff" if diff else "Edit")
+
+    def override_at_point(self, point):
+        if not self.view.match_selector(point, "text.override-audit entity.name.filename"):
+            return None
+        return self.view.substr(self.view.extract_scope(point))
+
+    def package_for_override(self, point):
+        packages = self.view.find_by_selector("entity.package.name")
+        if packages:
+            p_lines = [self.view.rowcol(p.begin())[0] for p in packages]
+            pkg_region = packages[bisect(p_lines, self.view.rowcol(point)[0]) - 1]
+
+            return self.view.substr(pkg_region)
+
+        return None
+
+    def is_visible(self, event=None, diff=None):
+        if diff is not None:
+            point = self.view.window_to_text((event["x"], event["y"]))
+            return self.override_at_point(point) is not None
+
+        settings = self.view.settings()
+        return (settings.has("override_audit_package") and
+                settings.has("override_audit_override"))
+
+    def want_event(self):
+        return True
 
 ###-----------------------------------------------------------------------------
 

@@ -19,6 +19,6 @@ contexts:
     - match: '^\s*(`-) (.*)$'
       captures:
         1: punctuation.override.begin
-        2: entity.package.override
+        2: entity.package.override entity.name.filename
     - match: ^$
       pop: true

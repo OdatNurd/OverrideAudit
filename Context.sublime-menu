@@ -1,7 +1,12 @@
 [
     { "caption": "-" },
 
+    // Visible only within a view that represents a diff or override; toggles
     { "command": "override_audit_context_diff_open_override" },
+
+    // Visible only within an override report/bulk diff
+    { "command": "override_audit_context_diff_open_override", "args": {"diff": false}},
+    { "command": "override_audit_context_diff_open_override", "args": {"diff": true}},
 
     { "caption": "-" },
 ]
