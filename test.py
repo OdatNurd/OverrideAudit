@@ -1,9 +1,9 @@
 import sublime
 import sublime_plugin
 
-from .lib.packages import *
+from .lib.packages import PackageList
 
-###-----------------------------------------------------------------------------
+###----------------------------------------------------------------------------
 
 # For development only; runs tests for the current development path
 class OverideAuditTestCommand(sublime_plugin.WindowCommand):
@@ -16,14 +16,14 @@ class OverideAuditTestCommand(sublime_plugin.WindowCommand):
         # self.window.run_command("override_audit_list_package_overrides")
         self.window.run_command("override_audit_diff_override")
 
-###-----------------------------------------------------------------------------
+###----------------------------------------------------------------------------
 
 class OverrideAuditPackageListTestCommand(sublime_plugin.WindowCommand):
     """
     For testing the PackageList class.
     """
     def run(self):
-        print ("================================================================")
+        print("=============================================================")
         p_list = PackageList()
         print("Total Packages Installed:", len(p_list))
         print(p_list["Objective-C"])
@@ -32,4 +32,4 @@ class OverrideAuditPackageListTestCommand(sublime_plugin.WindowCommand):
         for name, info in p_list:
             print(name)
 
-###-----------------------------------------------------------------------------
+###----------------------------------------------------------------------------

@@ -1,15 +1,13 @@
 import sublime
 import io
 import os
-import string
 import zipfile
 import codecs
 from datetime import datetime
-import time
 import difflib
 from collections import MutableSet, OrderedDict
 
-###-----------------------------------------------------------------------------
+###----------------------------------------------------------------------------
 
 # TODO: The PackageInfo() class should take an extra parameter that lets you
 # give it the name of a package and it will try to find its paths. This is a
@@ -25,8 +23,8 @@ from collections import MutableSet, OrderedDict
 # filenames and MacOS and Windows are not. In theory sublime or the user folder
 # may conceivably be placed on a case-insensitive file system, or a Mac user
 # could enable case sensitivity on their file system. For completeness this
-# would need to detect if the file system at each of the three package locations
-# is case sensitive or not.
+# would need to detect if the file system at each of the three package
+# locations is case sensitive or not.
 #
 # That has issues of it's own; creating files requiring appropriate permissions
 # in each folder and what to do if some but not all such locations are case
@@ -34,12 +32,12 @@ from collections import MutableSet, OrderedDict
 # the code now stands and provide a configuration option to alter the default
 # assumptions so users have the final say.
 
-###-----------------------------------------------------------------------------
+###----------------------------------------------------------------------------
 
-# This assumes that Linux is always using a case sensitive file system and MacOS
-# is not (by default, HFS is case-insensitive). In order to detect this with
-# certainty, a file would have to be created inside of each potential package
-# location to check.
+# This assumes that Linux is always using a case sensitive file system and
+# MacOS is not (by default, HFS is case-insensitive). In order to detect this
+# with certainty, a file would have to be created inside of each potential
+# package location to check.
 _wrap = (lambda value: value) if sublime.platform() == "linux" else (lambda value: value.lower())
 
 # Paths inside of a zip file always use a Unix path separator, which causes
@@ -54,12 +52,15 @@ _wrap = (lambda value: value) if sublime.platform() == "linux" else (lambda valu
 # This is hacky and could/should probably be fixed in a better way.
 _fixPath = (lambda value: value.replace("\\", "/")) if sublime.platform() == "windows" else (lambda value: value)
 
+
 def plugin_loaded():
     """
     Set up in PackageInfo the location where shipped sublime-packages live.
     """
     exe_path = os.path.dirname(sublime.executable_path())
     PackageInfo.shipped_packages_path = os.path.join(exe_path, "Packages")
+
+###----------------------------------------------------------------------------
 
 class PackageFileSet(MutableSet):
     """
@@ -78,11 +79,11 @@ class PackageFileSet(MutableSet):
     def __repr__(self):
         return '{}'.format(list(self._content.values()))
 
-    def __contains__(self,value):
+    def __contains__(self, value):
         return _wrap(value) in self._content
 
     def __iter__(self):
-        return iter(self._content.values ())
+        return iter(self._content.values())
 
     def __len__(self):
         return len(self._content)
@@ -97,7 +98,7 @@ class PackageFileSet(MutableSet):
         except KeyError:
             pass
 
-###-----------------------------------------------------------------------------
+###----------------------------------------------------------------------------
 
 class PackageInfo():
     # The location of packages that ship with sublime live; this is set up at
@@ -161,16 +162,16 @@ class PackageInfo():
        * Installed if it is a sublime-package installed in InstalledPackages
        * Unpacked if there is a directory inside "Packages\" with that name
 
-    Stored paths are fully qualified names of either the sublime-package file or
-    the directory where the unpacked package resides.
+    Stored paths are fully qualified names of either the sublime-package file
+    or the directory where the unpacked package resides.
 
     If there is a sublime-package file in InstalledPackages that is the same
     name as a shipped package, Sublime will ignore the shipped package in favor
     of the installed version.
     """
     def __init__(self, name):
-        settings = sublime.load_settings ("Preferences.sublime-settings")
-        ignored_list = settings.get ("ignored_packages", [])
+        settings = sublime.load_settings("Preferences.sublime-settings")
+        ignored_list = settings.get("ignored_packages", [])
 
         self.name = name
 
@@ -188,21 +189,20 @@ class PackageInfo():
 
     def __repr__(self):
         return "[name={0}, shipped={1}, installed={2}, unpacked={3}]".format(
-            self.name ,
+            self.name,
             self.shipped_path,
             self.installed_path,
             self.unpacked_path)
 
-    def __get_sublime_pkg_contents(self,pkg_filename):
+    def __get_sublime_pkg_contents(self, pkg_filename):
         if not zipfile.is_zipfile(pkg_filename):
-            raise zipfile.BadZipFile("Invalid sublime-package file '{}'".format(name))
+            raise zipfile.BadZipFile("Invalid sublime-package file '{}'".format(pkg_filename))
 
-        pName = os.path.basename(pkg_filename)
         with zipfile.ZipFile(pkg_filename) as zFile:
             return PackageFileSet([entry.filename for entry in zFile.infolist()])
 
-    def __get_pkg_dir_contents(self,pkg_path):
-        results=PackageFileSet()
+    def __get_pkg_dir_contents(self, pkg_path):
+        results = PackageFileSet()
         for (path, dirs, files) in os.walk(pkg_path, followlinks=True):
             rPath = os.path.relpath(path, pkg_path) if path != pkg_path else ""
             for name in files:
@@ -210,7 +210,7 @@ class PackageInfo():
 
         return results
 
-    def __get_pkg_contents(self,filename):
+    def __get_pkg_contents(self, filename):
         result = None
         if filename is not None:
             if filename in self.content:
@@ -278,8 +278,8 @@ class PackageInfo():
 
         simple overrides are unpacked files overriding files in a packed
         package, while non-simple overrides are when an installed
-        sublime-package is doing a complete override on a shipped package of the
-        same name
+        sublime-package is doing a complete override on a shipped package of
+        the same name
         """
         if simple:
             return bool(self.package_file() and self.is_unpacked())
@@ -287,8 +287,8 @@ class PackageInfo():
 
     def override_files(self, simple=True):
         """
-        Get the list of overridden files for this package and the given override
-        type; the list may be empty.
+        Get the list of overridden files for this package and the given
+        override type; the list may be empty.
         """
         if not self.has_possible_overrides(simple):
             return PackageFileSet()
@@ -333,7 +333,7 @@ class PackageInfo():
 
         return result
 
-###-----------------------------------------------------------------------------
+###----------------------------------------------------------------------------
 
 class PackageList():
     """
@@ -349,12 +349,12 @@ class PackageList():
         self._dependencies = 0
 
         self._shipped = self.__get_package_list(PackageInfo.shipped_packages_path, shipped=True)
-        self._installed = self.__get_package_list(sublime.installed_packages_path ())
-        self._unpacked = self.__get_package_list(sublime.packages_path (), packed=False)
+        self._installed = self.__get_package_list(sublime.installed_packages_path())
+        self._unpacked = self.__get_package_list(sublime.packages_path(), packed=False)
 
     def package_counts(self):
         return (self._shipped, self._installed, self._unpacked,
-            self._disabled, self._dependencies)
+                self._disabled, self._dependencies)
 
     def __len__(self):
         return len(self.list)
@@ -402,7 +402,7 @@ class PackageList():
         pkg.unpacked_path = os.path.join(path, name)
 
         metadata = os.path.join(pkg.unpacked_path, "dependency-metadata.json")
-        if os.path.isfile (metadata):
+        if os.path.isfile(metadata):
             pkg.is_dependency = True
             self._dependencies += 1
 
@@ -425,4 +425,4 @@ class PackageList():
 
         return count
 
-###-----------------------------------------------------------------------------
+###----------------------------------------------------------------------------

@@ -1,7 +1,7 @@
 import sublime
 import sublime_plugin
 
-###-----------------------------------------------------------------------------
+###----------------------------------------------------------------------------
 
 def find_view(window, title):
     """
@@ -10,6 +10,7 @@ def find_view(window, title):
     for view in window.views():
         if view.name() == title:
             return view
+
 
 def new_scratch_view(window, title, syntax=None):
     """
@@ -25,13 +26,15 @@ def new_scratch_view(window, title, syntax=None):
 
     return view
 
+
 def clear_view(view):
     """
     Clear view contents entirely. Also returns it to single selection.
     """
     view.sel().clear()
-    view.sel().add(sublime.Region(0, view.size ()))
+    view.sel().add(sublime.Region(0, view.size()))
     view.run_command("left_delete")
+
 
 def _save_state(view):
     """
@@ -40,7 +43,8 @@ def _save_state(view):
     """
     return (view.size(), list(view.sel()), view.viewport_position())
 
-def _restore_state(view,state):
+
+def _restore_state(view, state):
     """
     Restore the selection and viewport position that was previously saved via
     _save_state(). If the last selection was at the end of the buffer, put it
@@ -51,8 +55,9 @@ def _restore_state(view,state):
     sel = state[1]
     vpos = state[2]
 
-    # If the last selection was at the end of the buffer, replace that selection
-    # with the new end of the buffer so the relative position remains the same.
+    # If the last selection was at the end of the buffer, replace that
+    # selection with the new end of the buffer so the relative position remains
+    # the same.
     if sublime.Region(size, size) == sel[-1]:
         sel[-1] = sublime.Region(view.size(), view.size())
 
@@ -61,6 +66,7 @@ def _restore_state(view,state):
         view.sel().add(region)
 
     view.set_viewport_position(vpos, False)
+
 
 def output_to_view(window,
                    title,
@@ -77,9 +83,9 @@ def output_to_view(window,
     If an existing view is used, clear indicates if the current content should
     be cleared or not before adding the new data.
 
-    When a new view is created, the optional syntax and settings will be applied
-    to the newly created view; when a view is reused, it is assumed that these
-    have already been set up.
+    When a new view is created, the optional syntax and settings will be
+    applied to the newly created view; when a view is reused, it is assumed
+    that these have already been set up.
 
     The text will be appended to the end of the buffer. Care is taken to ensure
     that the cursor position, view position and selection are maintained when
@@ -117,4 +123,4 @@ def output_to_view(window,
 
     return view
 
-###-----------------------------------------------------------------------------
+###----------------------------------------------------------------------------
