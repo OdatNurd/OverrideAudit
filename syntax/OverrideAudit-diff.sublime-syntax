@@ -13,6 +13,15 @@ contexts:
         1: storage.modifier
         2: entity.name.package.enabled
         3: comment
+
+    - match: '^(\[[SIU ]{3}]) (\[)({{pkg_name}})(])[ \n](<[\w\s]+>\n)?'
+      captures:
+        1: storage.modifier
+        2: comment
+        3: entity.name.package.disabled comment
+        4: comment
+        5: comment
+
     - match: '^    (\w.*)'
       captures:
         1: entity.name.filename.override

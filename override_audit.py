@@ -36,6 +36,12 @@ def _decorate_package_name(pkg_info, status=False):
     status and optionally also a suffix if it is a complete override.
     """
     suffix = ""
+
+    settings = sublime.load_settings("Preferences.sublime-settings")
+    ignored = settings.get("ignored_packages", [])
+
+    pkg_name = "[{}]".format(pkg_info.name) if pkg_info.name in ignored else pkg_info.name
+
     if status and pkg_info.has_possible_overrides(simple=False):
         suffix = " <Complete Override>"
 
@@ -43,7 +49,7 @@ def _decorate_package_name(pkg_info, status=False):
                "S" if pkg_info.shipped_path is not None else " ",
                "I" if pkg_info.installed_path is not None else " ",
                "U" if pkg_info.unpacked_path is not None else " ",
-               pkg_info.name,
+               pkg_name,
                suffix)
 
 

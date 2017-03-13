@@ -14,10 +14,20 @@ contexts:
         3: comment
       push: package_row
 
+    - match: '(\[[SIU ]{3}]) (\[)({{pkg_name}})(\])[ \n](<[\w\s]+>\n)?'
+      captures:
+        1: storage.modifier
+        2: comment
+        3: entity.name.package.disabled comment
+        4: comment
+        5: comment
+      push: package_row
+
   package_row:
     - match: '^\s*(`-) (.*)$'
       captures:
         1: punctuation.override.begin
         2: entity.name.filename.override
+
     - match: ^$
       pop: true
