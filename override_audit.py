@@ -115,6 +115,13 @@ def _diff_override_file(window, pkg_info, override,
 ###----------------------------------------------------------------------------
 
 class OverrideAuditDiffPackage(sublime_plugin.WindowCommand):
+    """
+    Perform a bulk diff of all overrides in either all packages or a single
+    package, depending on the argument provided.
+
+    This is invoked from OverrideAuditDiffOverride when you invoke that command
+    with the bulk argument set to true.
+    """
     def _perform_diff(self, pkg_info, context_lines, result):
         for file in pkg_info.override_files():
             result.append("    {}".format(file))
@@ -166,6 +173,11 @@ class OverrideAuditDiffPackage(sublime_plugin.WindowCommand):
 ###----------------------------------------------------------------------------
 
 class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
+    """
+    Selective diff of a single override or package based on the provided
+    arguments. The user will be prompted via quick panel to select the value of
+    any elided arguments (except bulk which controls the output).
+    """
     def _file_pick(self, pkg_info, override_list, index):
         if index >= 0:
             _diff_override_file(self.window, pkg_info, override_list[index])
@@ -217,6 +229,9 @@ class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
 ###----------------------------------------------------------------------------
 
 class OverrideAuditPackageReportCommand(sublime_plugin.WindowCommand):
+    """
+    Generate a tabular report of all installed packages and their state.
+    """
     def run(self):
         pkg_list = PackageList()
         pkg_counts = pkg_list.package_counts()
@@ -260,6 +275,10 @@ class OverrideAuditPackageReportCommand(sublime_plugin.WindowCommand):
 ###----------------------------------------------------------------------------
 
 class OverrideAuditOverrideReport(sublime_plugin.WindowCommand):
+    """
+    Generate a report on all packages which have overrides and what they are,
+    if any.
+    """
     def run(self):
         pkg_list = PackageList()
 
@@ -295,15 +314,22 @@ class OverrideAuditOverrideReport(sublime_plugin.WindowCommand):
 
 class OverrideAuditContextDiffOpenOverride(sublime_plugin.TextCommand):
     """
-    Offer to diff or edit an override via context menu
+    Offer to diff or edit an override via context menu selection.
 
-    When diff is None, the command requires settings in the view to know what
-    to do and what operation to take. Otherwise, diff is a boolean which tells
-    us what the command should be doing to the current override.
+    This handles both the context menu for a view which contains an edit
+    session for an override or a diff of one, or the context menu items which
+    apply to override names in the override and bulk diff reports.
+
+    When diff is None, the command assumes it is operating on a view and uses
+    internal settings on the view to know which of the two menu options to
+    provide.
+
+    Otherwise the command presented assumes it is the context menu for an
+    override file, and diff indicates if the command is to diff or edit.
     """
     def run(self, edit, event=None, diff=None):
         if diff is None:
-            # When not given diff is a toggle for the current state
+            # When not given diff is a toggle for the current state of a view.
             pkg_name = self.view.settings().get("override_audit_package")
             override = self.view.settings().get("override_audit_override")
             diff     = not self.view.settings().get("override_audit_diff")
@@ -325,7 +351,7 @@ class OverrideAuditContextDiffOpenOverride(sublime_plugin.TextCommand):
             _open_override_file(self.view.window(), pkg_name, override)
 
     def description(self, event=None, diff=None):
-        # When not given diff is a toggle for the current state
+        # When not given diff is a toggle for the current state of a view.
         if diff is None:
             diff = not self.view.settings().get("override_audit_diff", False)
 
