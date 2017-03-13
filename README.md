@@ -82,7 +82,9 @@ in question is `[S]`hipped, `[I]`nstalled or `[U]`npacked.
 A package which is a *complete* override is indicated by text to this effect
 appearing next to it in the output line.
 
-Any *simple* overrides that a package has will be listed below it in the report.
+Any *simple* overrides that a package has will be listed below it in the report
+and support context menu entries that allow you to quickly open or diff that
+particular override.
 
 ### `OverrideAudit: Diff Single Override` ###
 
@@ -109,6 +111,9 @@ indication if the package is a *complete* override or not.
 
 Each section of the report is progressively indented so that it is possible to
 use Sublime code folding to hide away parts of the report as you work.
+
+As in the *Override Report*, the file names of the overrides support context
+menus that allows you to quickly open or diff them in their own distinct view.
 
 ### ` OverrideAudit: Bulk Diff Single Package` ###
 
