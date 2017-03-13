@@ -15,13 +15,11 @@ contexts:
       push: package_row
 
   package_row:
-    - meta_scope: meta.package
-
     # Disabled packages
     - match: '(\[)({{pkg_name}})[\]>]?(\])\s+\|'
       captures:
         1: comment
-        2: entity.package.name.disabled meta.toc-list comment
+        2: entity.name.package.disabled comment
         3: comment
       push: boxen
 
@@ -29,14 +27,14 @@ contexts:
     - match: '(<)({{pkg_name}})[\]>]?(>)\s+\|'
       captures:
         1: storage.modifier
-        2: entity.package.name.dependency meta.toc-list storage.modifier
+        2: entity.name.package.dependency storage.modifier
         3: storage.modifier
       push: boxen
 
     # Normal packages
     - match: '({{pkg_name}})\s+\|'
       captures:
-        1: entity.package.name.enabled meta.toc-list entity.name
+        1: entity.name.package.enabled
       push: boxen
 
     - match: '$'
@@ -47,13 +45,13 @@ contexts:
       scope: comment
 
     - match: '{{shipped_pkg}}'
-      scope: storage.type entity.package.shipped
+      scope: entity.package.shipped storage.type
 
     - match: '{{installed_pkg}}'
-      scope: storage.type entity.package.installed
+      scope: entity.package.installed storage.type
 
     - match: '{{unpacked_pkg}}'
-      scope: storage.type entity.package.unpacked
+      scope: entity.package.unpacked storage.type
 
     - match: '$'
       pop: true

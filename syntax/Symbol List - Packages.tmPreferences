@@ -4,15 +4,13 @@
     <key>name</key>
     <string>Symbol List</string>
     <key>scope</key>
-    <string>text.override-audit &amp; (entity.package.override)</string>
+    <string>text.override-audit entity.name.package</string>
     <key>settings</key>
     <dict>
         <key>showInSymbolList</key>
         <integer>1</integer>
         <key>showInIndexedSymbolList</key>
         <integer>0</integer>
-        <key>symbolTransformation</key>
-        <string>s/^\s*/    /;  # pad</string>
     </dict>
 </dict>
 </plist>

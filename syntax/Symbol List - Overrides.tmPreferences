@@ -4,7 +4,7 @@
     <key>name</key>
     <string>Symbol List</string>
     <key>scope</key>
-    <string>text.override-audit.diff entity.name.filename</string>
+    <string>text.override-audit entity.name.filename.override</string>
     <key>settings</key>
     <dict>
         <key>showInSymbolList</key>
