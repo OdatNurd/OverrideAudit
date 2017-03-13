@@ -386,6 +386,37 @@ class OverrideAuditContextDiffOpenOverride(sublime_plugin.TextCommand):
 
 ###----------------------------------------------------------------------------
 
+class OverrideAuditContextDiffPackage(sublime_plugin.TextCommand):
+    """
+    Offer to bulk diff an entire package based on a context menu selection.
+
+    The menu item is visible only in context menus which present a package name
+    such as the global package list, override list or existing diff report.
+    """
+    def run(self, edit, event):
+        point    = self.view.window_to_text((event["x"], event["y"]))
+        pkg_name = self.package_at_point(point)
+
+        self.view.window().run_command("override_audit_diff_package",
+                                      {"package": pkg_name})
+
+    def description(self, event):
+        return "Override Audit: Bulk Diff Package"
+
+    def package_at_point(self, point):
+        if not self.view.match_selector(point, "text.override-audit entity.package.name"):
+            return None
+        return self.view.substr(self.view.extract_scope(point))
+
+    def is_visible(self, event):
+        point = self.view.window_to_text((event["x"], event["y"]))
+        return self.package_at_point(point) is not None
+
+    def want_event(self):
+        return True
+
+###----------------------------------------------------------------------------
+
 class OverrideAuditEventListener(sublime_plugin.EventListener):
     """
     Check on file load and save to see if the new file is potentially an
