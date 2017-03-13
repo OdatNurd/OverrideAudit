@@ -345,6 +345,10 @@ class OverrideAuditContextDiffOpenOverride(sublime_plugin.TextCommand):
             pkg_name = self.package_for_override(point)
             override = self.override_at_point(point)
 
+        if not override or not pkg_name:
+            print("Unable to determine what to edit/diff")
+            return
+
         # TODO: May be a good idea to check around here to see if the settings
         # are defunct and need to be removed if that's not already happening
         # elsewhere.
@@ -369,7 +373,7 @@ class OverrideAuditContextDiffOpenOverride(sublime_plugin.TextCommand):
         return self.view.substr(self.view.extract_scope(point))
 
     def package_for_override(self, point):
-        packages = self.view.find_by_selector("entity.package.name")
+        packages = self.view.find_by_selector("entity.name.package")
         if packages:
             p_lines = [self.view.rowcol(p.begin())[0] for p in packages]
             pkg_region = packages[bisect(p_lines, self.view.rowcol(point)[0]) - 1]
