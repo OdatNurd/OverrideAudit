@@ -1,7 +1,7 @@
 [
     { "caption": "-" },
 
-    { "command": "override_audit_context_diff_open_override" },
+    { "command": "override_audit_context_override", "args": { "group": -1, "index": -1, "action": "toggle" } },
 
     { "caption": "-" },
 ]

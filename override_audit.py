@@ -328,81 +328,141 @@ class OverrideAuditDiffPackageCommand(sublime_plugin.WindowCommand):
 ###----------------------------------------------------------------------------
 
 
-class OverrideAuditContextDiffOpenOverrideCommand(sublime_plugin.TextCommand):
+class ContextHelper():
+    """
+    Helper class to allow context specific commands to seamlessly work in view
+    context menu, tab context menus and the command palette.
+
+    Finds the appropriate target view and package/override/diff options based
+    on where it is used.
+    """
+    def _extract(self, scope, event):
+        if event is None:
+            return None
+
+        point = self.view.window_to_text((event["x"], event["y"]))
+        if not self.view.match_selector(point, scope):
+            return None
+
+        return self.view.substr(self.view.extract_scope(point))
+
+    def _package_at_point(self, event):
+        return self._extract("text.override-audit entity.name.package", event)
+
+    def _override_at_point(self, event):
+        return self._extract("text.override-audit entity.name.filename.override", event)
+
+    def _package_for_override_at(self, event):
+        if event is not None:
+            point = self.view.window_to_text((event["x"], event["y"]))
+            packages = self.view.find_by_selector("entity.name.package")
+
+            if packages:
+                p_lines = [self.view.rowcol(p.begin())[0] for p in packages]
+                pkg_region = packages[bisect(p_lines, self.view.rowcol(point)[0]) - 1]
+
+                return self.view.substr(pkg_region)
+
+        return None
+
+    def view_target(self, view, group=-1, index=-1, **kwargs):
+        """
+        Get target view specified by group and index, if needed.
+        """
+        window = view.window()
+        return view if group == -1 else window.views_in_group(group)[index]
+
+    def view_context(self, view, event=None, **kwargs):
+        """
+        Return a tuple of (pkg_name, override_name, is_diff) for the provided
+        view and possible event. Some members of the tuple will be None if they
+        do not apply or cannot be determined by the current command state.
+
+        If view is none, view_target is invoked to determine it.
+
+        Some/all members of the tuple may be None.
+        """
+        if view is None:
+            view = self.view_target(self.view, **kwargs)
+
+        pkg_name = None
+        override = None
+        is_diff = None
+
+        # Favor settings if they exist
+        settings = view.settings()
+        if (settings.has("override_audit_package") and
+                settings.has("override_audit_override")):
+
+            pkg_name = view.settings().get("override_audit_package")
+            override = view.settings().get("override_audit_override")
+            is_diff  = view.settings().get("override_audit_diff", None)
+
+        # Check for context clicks on a package or override name
+        elif event is not None:
+            pkg_name = self._package_at_point(event)
+            if pkg_name is None:
+                override = self._override_at_point(event)
+                if override is not None:
+                    pkg_name = self._package_for_override_at(event)
+
+        return (pkg_name, override, is_diff)
+
+    def want_event(self):
+        return True
+
+###----------------------------------------------------------------------------
+
+
+class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextCommand):
     """
     Offer to diff or edit an override via context menu selection.
 
-    This handles both the context menu for a view which contains an edit
-    session for an override or a diff of one, or the context menu items which
-    apply to override names in the override and bulk diff reports.
-
-    When diff is None, the command assumes it is operating on a view and uses
-    internal settings on the view to know which of the two menu options to
-    provide.
-
-    Otherwise the command presented assumes it is the context menu for an
-    override file, and diff indicates if the command is to diff or edit.
+    Works as a view context menu (on an override), tab context menu or via the
+    command palette.
     """
-    def run(self, edit, event=None, diff=None):
-        if diff is None:
-            # When not given diff is a toggle for the current state of a view.
-            pkg_name = self.view.settings().get("override_audit_package")
-            override = self.view.settings().get("override_audit_override")
-            diff     = not self.view.settings().get("override_audit_diff")
+    def run(self, edit, action, **kwargs):
+        target = self.view_target(self.view, **kwargs)
+        pkg_name, override, is_diff = self.view_context(target, **kwargs)
 
-        else:
-            point    = self.view.window_to_text((event["x"], event["y"]))
-            pkg_name = self.package_for_override(point)
-            override = self.override_at_point(point)
-
-        if not override or not pkg_name:
-            print("Unable to determine what to edit/diff")
-            return
+        if action == "toggle":
+            action = "diff" if not is_diff else "edit"
 
         # TODO: May be a good idea to check around here to see if the settings
         # are defunct and need to be removed if that's not already happening
         # elsewhere.
 
-        if diff:
+        if action == "diff":
             pkg_list = PackageList()
-            _diff_override_file(self.view.window(), pkg_list[pkg_name], override,
+            _diff_override_file(target.window(), pkg_list[pkg_name], override,
                                 diff_only=True, force_reuse=True)
-        else:
-            _open_override_file(self.view.window(), pkg_name, override)
+        elif action == "edit":
+            _open_override_file(target.window(), pkg_name, override)
 
-    def description(self, event=None, diff=None):
-        # When not given diff is a toggle for the current state of a view.
-        if diff is None:
-            diff = not self.view.settings().get("override_audit_diff", False)
+        else:
+            print("Error: unknown action for override context")
+
+    def description(self, action, **kwargs):
+        pkg_name, override, is_diff = self.view_context(None, **kwargs)
+
+        # When known diff is a toggle for the current state of a view.
+        if is_diff is not None:
+            diff = not is_diff
+        else:
+            diff = True if action == "diff" else False
 
         return "OverrideAudit: %s Override" % ("Diff" if diff else "Edit")
 
-    def override_at_point(self, point):
-        if not self.view.match_selector(point, "text.override-audit entity.name.filename.override"):
-            return None
-        return self.view.substr(self.view.extract_scope(point))
+    def is_visible(self, action, **kwargs):
+        pkg_name, override, is_diff = self.view_context(None, **kwargs)
 
-    def package_for_override(self, point):
-        packages = self.view.find_by_selector("entity.name.package")
-        if packages:
-            p_lines = [self.view.rowcol(p.begin())[0] for p in packages]
-            pkg_region = packages[bisect(p_lines, self.view.rowcol(point)[0]) - 1]
+        if action == "toggle":
+            return True if is_diff is not None else False
 
-            return self.view.substr(pkg_region)
+        elif pkg_name is not None and override is not None:
+            return True if is_diff is None else False
 
-        return None
-
-    def is_visible(self, event=None, diff=None):
-        if diff is not None:
-            point = self.view.window_to_text((event["x"], event["y"]))
-            return self.override_at_point(point) is not None
-
-        settings = self.view.settings()
-        return (settings.has("override_audit_package") and
-                settings.has("override_audit_override"))
-
-    def want_event(self):
-        return True
+        return False
 
 
 ###----------------------------------------------------------------------------

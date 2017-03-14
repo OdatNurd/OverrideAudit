@@ -2,11 +2,11 @@
     { "caption": "-" },
 
     // Visible only within a view that represents a diff or override; toggles
-    { "command": "override_audit_context_diff_open_override" },
+    { "command": "override_audit_context_override", "args": { "action": "toggle" } },
 
     // Visible only within an override report/bulk diff
-    { "command": "override_audit_context_diff_open_override", "args": {"diff": false}},
-    { "command": "override_audit_context_diff_open_override", "args": {"diff": true}},
+    { "command": "override_audit_context_override", "args": { "action": "edit" } },
+    { "command": "override_audit_context_override", "args": { "action": "diff" } },
 
     // Visible only within reports that contain package names
     { "command": "override_audit_context_diff_package" },
