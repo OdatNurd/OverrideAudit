@@ -468,7 +468,7 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
 ###----------------------------------------------------------------------------
 
 
-class OverrideAuditContextDiffPackageCommand(sublime_plugin.TextCommand):
+class OverrideAuditContextPackageCommand(ContextHelper,sublime_plugin.TextCommand):
     """
     Offer to bulk diff an entire package based on a context menu selection.
 
@@ -476,26 +476,16 @@ class OverrideAuditContextDiffPackageCommand(sublime_plugin.TextCommand):
     such as the global package list, override list or existing diff report.
     """
     def run(self, edit, event):
-        point    = self.view.window_to_text((event["x"], event["y"]))
-        pkg_name = self.package_at_point(point)
+        pkg_name = self._package_at_point(event)
 
         self.view.window().run_command("override_audit_diff_package",
                                        {"package": pkg_name})
 
-    def description(self, event):
+    def description(self, **kwargs):
         return "OverrideAudit: Bulk Diff Package"
 
-    def package_at_point(self, point):
-        if not self.view.match_selector(point, "text.override-audit entity.name.package"):
-            return None
-        return self.view.substr(self.view.extract_scope(point))
-
-    def is_visible(self, event):
-        point = self.view.window_to_text((event["x"], event["y"]))
-        return self.package_at_point(point) is not None
-
-    def want_event(self):
-        return True
+    def is_visible(self, event, **kwargs):
+        return self._package_at_point(event) is not None
 
 
 ###----------------------------------------------------------------------------

@@ -9,7 +9,7 @@
     { "command": "override_audit_context_override", "args": { "action": "diff" } },
 
     // Visible only within reports that contain package names
-    { "command": "override_audit_context_diff_package" },
+    { "command": "override_audit_context_package" },
 
     { "caption": "-" },
 ]
