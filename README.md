@@ -128,7 +128,7 @@ This command is only available in the Command Palette while the current file is
 either an edit session for an override or a diff of an override.
 
 Unlike most other commands, this does not appear in the top level `Tools >
-Override Audit` menu, instead appearing in the context menu for the current
+OverrideAudit` menu, instead appearing in the context menu for the current
 view as appropriate. In this case the menu item tells you explicitly whether it
 will edit or diff the current file.
 
@@ -147,7 +147,7 @@ settings.
 
 The following configuration options are available for OverrideAudit. You can
 see the default settings as well as your own custom settings under the
-`Preferences > Package Settings > Override Audit` menu entries. On MacOS, the
+`Preferences > Package Settings > OverrideAudit` menu entries. On MacOS, the
 `Preferences` menu is under `Sublime Text` in the menu.
 
 ### `reuse_views`: true/false (Default: true)###

@@ -4,7 +4,7 @@
         "children":
         [
             {
-                "caption": "Override Audit",
+                "caption": "OverrideAudit",
                 "children":
                 [
                     { "caption": "Package Report", "command": "override_audit_package_report"},
@@ -32,7 +32,7 @@
                 "children":
                 [
                     {
-                        "caption": "Override Audit",
+                        "caption": "OverrideAudit",
                         "children":
                         [
                             {

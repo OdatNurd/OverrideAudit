@@ -365,7 +365,7 @@ class OverrideAuditContextDiffOpenOverride(sublime_plugin.TextCommand):
         if diff is None:
             diff = not self.view.settings().get("override_audit_diff", False)
 
-        return "Override Audit: %s Override" % ("Diff" if diff else "Edit")
+        return "OverrideAudit: %s Override" % ("Diff" if diff else "Edit")
 
     def override_at_point(self, point):
         if not self.view.match_selector(point, "text.override-audit entity.name.filename.override"):
@@ -411,7 +411,7 @@ class OverrideAuditContextDiffPackage(sublime_plugin.TextCommand):
                                       {"package": pkg_name})
 
     def description(self, event):
-        return "Override Audit: Bulk Diff Package"
+        return "OverrideAudit: Bulk Diff Package"
 
     def package_at_point(self, point):
         if not self.view.match_selector(point, "text.override-audit entity.name.package"):
