@@ -320,13 +320,13 @@ class OverrideAuditDiffPackageCommand(sublime_plugin.WindowCommand):
 
         result = []
         title = "Override Diff Report: "
+        description = "Bulk Diff Report for overrides in"
         if len(names) == 1 and single_package:
             title += names[0]
-            result.append("Diffing overrides for {}\n".format(names[0]))
+            result.append(description + " {}\n".format(names[0]))
         else:
             title += "All Packages"
-            result.append("Diffing overrides for {} packages\n".format(
-                          len(names)))
+            result.append(description + " {} packages\n".format(len(names)))
 
         for name in names:
             pkg_info = pkg_list[name]
