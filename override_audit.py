@@ -10,6 +10,13 @@ from .lib.output_view import output_to_view
 ###----------------------------------------------------------------------------
 
 
+def plugin_loaded():
+    """
+    Initialize the PackageInfo class at plugin load time.
+    """
+    PackageInfo.init()
+
+
 def _packages_with_overrides(pkg_list, name_list=None):
     """
     Collect a list of package names from the given package list for which there

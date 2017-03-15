@@ -53,13 +53,6 @@ _wrap = (lambda value: value) if sublime.platform() == "linux" else (lambda valu
 _fixPath = (lambda value: value.replace("\\", "/")) if sublime.platform() == "windows" else (lambda value: value)
 
 
-def plugin_loaded():
-    """
-    Set up in PackageInfo the location where shipped sublime-packages live.
-    """
-    exe_path = os.path.dirname(sublime.executable_path())
-    PackageInfo.shipped_packages_path = os.path.join(exe_path, "Packages")
-
 ###----------------------------------------------------------------------------
 
 class PackageFileSet(MutableSet):
@@ -104,6 +97,11 @@ class PackageInfo():
     # The location of packages that ship with sublime live; this is set up at
     # the time the plugin is fully loaded.
     shipped_packages_path = None
+
+    @classmethod
+    def init(cls):
+        exe_path = os.path.dirname(sublime.executable_path())
+        cls.shipped_packages_path = os.path.join(exe_path, "Packages")
 
     @classmethod
     def _deep_scan(cls, path, filename):
