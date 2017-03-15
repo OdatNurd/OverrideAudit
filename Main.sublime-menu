@@ -12,7 +12,7 @@
                     { "caption": "Diff Single Override...", "command": "override_audit_diff_override"},
                     { "caption": "Bulk Diff: Single Package...", "command": "override_audit_diff_override", "args": {"bulk": true}},
                     { "caption": "Bulk Diff: All Packages", "command": "override_audit_diff_package"},
-
+                    { "caption": "Refresh Current Report", "command": "override_audit_context_report"},
                     { "caption": "-" }
                 ]
             }

@@ -54,22 +54,30 @@ def _decorate_package_name(pkg_info, status=False):
                suffix)
 
 
-def _apply_context_settings(view, pkg_name, override, is_diff):
+def _apply_override_settings(view, pkg_name, override, is_diff):
     """
-    Apply to a view settings so context menus know what options to allow.
+    Apply view settings marking the view as an override view.
     """
     view.settings().set("override_audit_package", pkg_name)
     view.settings().set("override_audit_override", override)
     view.settings().set("override_audit_diff", is_diff)
 
 
-def _remove_context_settings(view):
+def _remove_override_settings(view):
     """
-    Remove the view settings tso context menus know to not operate on the view.
+    Remove view settings marking the view as an override view.
     """
     view.settings().erase("override_audit_package")
     view.settings().erase("override_audit_override")
     view.settings().erase("override_audit_diff")
+
+
+def _apply_report_settings(view, report_type):
+    """
+    Apply view settings marking the view as a report view.
+    """
+    view.settings().set("override_audit_report", True)
+    view.settings().set("override_audit_report_type", report_type)
 
 
 def _open_override_file(window, pkg_name, override):
@@ -138,7 +146,7 @@ def _diff_override_file(window, pkg_info, override,
                    clear=clear,
                    syntax="Packages/Diff/Diff.sublime-syntax")
 
-    _apply_context_settings(view, pkg_info.name, override, True)
+    _apply_override_settings(view, pkg_info.name, override, True)
 
 
 ###----------------------------------------------------------------------------
@@ -148,11 +156,13 @@ class OverrideAuditPackageReportCommand(sublime_plugin.WindowCommand):
     """
     Generate a tabular report of all installed packages and their state.
     """
-    def run(self):
+    def run(self, force_reuse=False):
         pkg_list = PackageList()
         pkg_counts = pkg_list.package_counts()
 
         settings = sublime.load_settings("OverrideAudit.sublime-settings")
+        reuse = True if force_reuse else settings.get("reuse_views", True)
+        clear = True if force_reuse else settings.get("clear_existing", True)
 
         title = "{} Total Packages".format(len(pkg_list))
         t_sep = "=" * len(title)
@@ -162,7 +172,7 @@ class OverrideAuditPackageReportCommand(sublime_plugin.WindowCommand):
                  "{0} [I]nstalled (user) sublime-package files\n"
                  "{0} [U]npacked in Packages\\ directory\n"
                  "{0} Currently in ignored_packages\n"
-                 "{0} Installed dependencies\n").format(fmt).format(*pkg_counts)
+                 "{0} Installed Dependencies\n").format(fmt).format(*pkg_counts)
 
         row = "| {:<40} | {:3} | {:3} | {:<3} |".format("", "", "", "")
         r_sep = "-" * len(row)
@@ -181,12 +191,13 @@ class OverrideAuditPackageReportCommand(sublime_plugin.WindowCommand):
                     "U" if pkg_info.unpacked_path is not None else " "))
         result.extend([r_sep, ""])
 
-        output_to_view(self.window,
-                       "OverrideAudit: Package Report",
-                       result,
-                       reuse=settings.get("reuse_views", True),
-                       clear=settings.get("clear_existing", True),
-                       syntax="Packages/OverrideAudit/syntax/OverrideAudit-pkgList.sublime-syntax")
+        view = output_to_view(self.window,
+                              "OverrideAudit: Package Report",
+                              result,
+                              reuse=reuse,
+                              clear=clear,
+                              syntax="Packages/OverrideAudit/syntax/OverrideAudit-pkgList.sublime-syntax")
+        _apply_report_settings(view, ":packages")
 
 
 ###----------------------------------------------------------------------------
@@ -197,11 +208,13 @@ class OverrideAuditOverrideReportCommand(sublime_plugin.WindowCommand):
     Generate a report on all packages which have overrides and what they are,
     if any.
     """
-    def run(self):
+    def run(self, force_reuse=False):
         pkg_list = PackageList()
 
         settings = sublime.load_settings("OverrideAudit.sublime-settings")
         ignored = settings.get("ignore_overrides_in", [])
+        reuse = True if force_reuse else settings.get("reuse_views", True)
+        clear = True if force_reuse else settings.get("clear_existing", True)
 
         result = []
         for pkg_name, pkg_info in pkg_list:
@@ -221,12 +234,13 @@ class OverrideAuditOverrideReportCommand(sublime_plugin.WindowCommand):
         if len(result) == 0:
             result.append("No packages with overrides found")
 
-        output_to_view(self.window,
-                       "OverrideAudit: Override Report",
-                       result,
-                       reuse=settings.get("reuse_views", True),
-                       clear=settings.get("clear_existing", True),
-                       syntax="Packages/OverrideAudit/syntax/OverrideAudit-overrideList.sublime-syntax")
+        view = output_to_view(self.window,
+                              "OverrideAudit: Override Report",
+                              result,
+                              reuse=reuse,
+                              clear=clear,
+                              syntax="Packages/OverrideAudit/syntax/OverrideAudit-overrideList.sublime-syntax")
+        _apply_report_settings(view, ":overrides")
 
 
 ###----------------------------------------------------------------------------
@@ -311,19 +325,23 @@ class OverrideAuditDiffPackageCommand(sublime_plugin.WindowCommand):
             result.extend([diff, ""])
 
         if len(override_list) == 0:
-            result.append("    - No overrides found")
+            result.append("    [No simple overrides found]")
         result.append("")
 
-    def _diff_packages(self, names, pkg_list, single_package):
+    def _diff_packages(self, names, pkg_list, single_package, force_reuse):
         settings = sublime.load_settings("OverrideAudit.sublime-settings")
         context_lines = settings.get("diff_context_lines", 3)
+        reuse = True if force_reuse else settings.get("reuse_views", True)
+        clear = True if force_reuse else settings.get("clear_existing", True)
 
         result = []
         title = "Override Diff Report: "
         description = "Bulk Diff Report for overrides in"
+        report_type = ":bulk_all"
         if len(names) == 1 and single_package:
             title += names[0]
             result.append(description + " {}\n".format(names[0]))
+            report_type = names[0]
         else:
             title += "All Packages"
             result.append(description + " {} packages\n".format(len(names)))
@@ -334,14 +352,15 @@ class OverrideAuditDiffPackageCommand(sublime_plugin.WindowCommand):
 
             self._perform_diff(pkg_info, context_lines, result)
 
-        output_to_view(self.window,
-                       title,
-                       result,
-                       reuse=settings.get("reuse_views", True),
-                       clear=settings.get("clear_existing", True),
-                       syntax="Packages/OverrideAudit/syntax/OverrideAudit-diff.sublime-syntax")
+        view = output_to_view(self.window,
+                              title,
+                              result,
+                              reuse=reuse,
+                              clear=clear,
+                              syntax="Packages/OverrideAudit/syntax/OverrideAudit-diff.sublime-syntax")
+        _apply_report_settings(view, report_type)
 
-    def run(self, package=None):
+    def run(self, package=None, force_reuse=False):
         pkg_list = PackageList()
 
         if package is not None:
@@ -353,7 +372,7 @@ class OverrideAuditDiffPackageCommand(sublime_plugin.WindowCommand):
         else:
             items = _packages_with_overrides(pkg_list)
 
-        self._diff_packages(items, pkg_list, package is not None)
+        self._diff_packages(items, pkg_list, package is not None, force_reuse)
 
 
 ###----------------------------------------------------------------------------
@@ -525,6 +544,49 @@ class OverrideAuditContextPackageCommand(ContextHelper,sublime_plugin.TextComman
 ###----------------------------------------------------------------------------
 
 
+class OverrideAuditContextReportCommand(ContextHelper,sublime_plugin.TextCommand):
+    """
+    Offer to refresh existing reports after manual changes have been made.
+    """
+    def run(self, edit, **kwargs):
+        report_type = self._report_type(**kwargs)
+        window = self.view_target(self.view, **kwargs).window()
+        args = {"force_reuse": True}
+
+        command = {
+            ":packages":  "override_audit_package_report",
+            ":overrides": "override_audit_override_report",
+        }.get(report_type, "override_audit_diff_package")
+
+        if report_type[0] != ":":
+            args["package"] = report_type
+
+        window.run_command(command, args)
+
+    def description(self, **kwargs):
+        report = self._report_type(**kwargs)
+        report = {
+            ":packages":  "Package Report",
+            ":overrides": "Override Report",
+            ":bulk_all":  "Bulk Diff Report"
+        }.get(report, "Bulk Diff of '%s'" % report)
+
+        return "OverrideAudit: Refresh %s" % report
+
+    def is_visible(self, **kwargs):
+        return self._report_type(**kwargs) is not None
+
+    def _report_type(self, **kwargs):
+        target = self.view_target(self.view, **kwargs)
+        if target.settings().get("override_audit_report", False) is True:
+            return target.settings().get("override_audit_report_type")
+
+        return None
+
+
+###----------------------------------------------------------------------------
+
+
 class OverrideAuditEventListener(sublime_plugin.EventListener):
     """
     Check on file load and save to see if the new file is potentially an
@@ -534,9 +596,9 @@ class OverrideAuditEventListener(sublime_plugin.EventListener):
     def _check_for_override(self, view):
         result = PackageInfo.check_potential_override(view.file_name())
         if result is not None:
-            _apply_context_settings(view, result[0], result[1], False)
+            _apply_override_settings(view, result[0], result[1], False)
         else:
-            _remove_context_settings(view)
+            _remove_override_settings(view)
 
     def on_post_save(self, view):
         # Will remove existing settings if the view is no longer an override

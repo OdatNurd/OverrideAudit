@@ -124,12 +124,25 @@ As in the *Override Report*, the name of each package and the filenames of each
 override support context menus that allows you to quickly bulk diff, open or
 diff them in their own distinct view.
 
-### ` OverrideAudit: Bulk Diff Single Package` ###
+### `OverrideAudit: Bulk Diff Single Package` ###
 
 This command operates identically to the bulk diff of all packages with the
 exception that instead of calculating a diff for all overrides in all packages
 you are instead prompted via a quick panel for a single package to diff
 instead.
+
+### `OverrideAudit: Refresh Report` ###
+
+This command is available from within an OverrideAudit report view (Package
+list, Override list, or Bulk Diff) via the Command Palette, context menu or
+main menu, and allows you to quickly re-run the same report.
+
+When a report is refreshed, OverrideAudit ignores the current values of the
+`reuse_views` and `clear_existing` option and operates as if they are both set
+to `true` so that the existing report will be replaced.
+
+This command is also available as a context menu entry from within the report
+view or its associated tab.
 
 ### `OverrideAudit: Swap Diff/Override View` ###
 

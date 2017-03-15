@@ -21,6 +21,10 @@
         "command": "override_audit_diff_package"
     },
     {
+        "caption": "OverrideAudit: Refresh Report",
+        "command": "override_audit_context_report"
+    },
+    {
         "caption": "OverrideAudit: Swap Diff/Override View",
         "command": "override_audit_context_override",
         "args": { "action": "toggle" }
