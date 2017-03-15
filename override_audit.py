@@ -482,7 +482,7 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
         if action == "toggle":
             action = "diff" if is_diff is False else "edit"
 
-        return "OverrideAudit: %s Override" % (action.title())
+        return "OverrideAudit: %s Override '%s'" % (action.title(), override)
 
     def is_visible(self, action, **kwargs):
         pkg_name, override, is_diff = self.view_context(None, **kwargs)
@@ -513,8 +513,10 @@ class OverrideAuditContextPackageCommand(ContextHelper,sublime_plugin.TextComman
         self.view.window().run_command("override_audit_diff_package",
                                        {"package": pkg_name})
 
-    def description(self, **kwargs):
-        return "OverrideAudit: Bulk Diff Package"
+    def description(self, event, **kwargs):
+        pkg_name = self._package_at_point(event)
+
+        return "OverrideAudit: Bulk Diff Package '%s'" % pkg_name
 
     def is_visible(self, event, **kwargs):
         return self._package_at_point(event) is not None
