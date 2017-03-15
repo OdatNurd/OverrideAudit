@@ -146,12 +146,10 @@ def _diff_override_file(window, pkg_info, override,
         elif action == "ignore":
             return
 
-    view = output_to_view(window,
-                   "Override of %s" % os.path.join(pkg_info.name, override),
-                   "No differences found" if diff_info == "" else diff_info,
-                   reuse=reuse,
-                   clear=clear,
-                   syntax="Packages/Diff/Diff.sublime-syntax")
+    title = "Override of %s" % os.path.join(pkg_info.name, override)
+    content = "No differences found" if diff_info == "" else diff_info
+    view = output_to_view(window, title, content, reuse, clear,
+                          "Packages/Diff/Diff.sublime-syntax")
 
     _apply_override_settings(view, pkg_info.name, override, True)
 
@@ -198,12 +196,9 @@ class OverrideAuditPackageReportCommand(sublime_plugin.WindowCommand):
                     "U" if pkg_info.unpacked_path is not None else " "))
         result.extend([r_sep, ""])
 
-        view = output_to_view(self.window,
-                              "OverrideAudit: Package Report",
-                              result,
-                              reuse=reuse,
-                              clear=clear,
-                              syntax="Packages/OverrideAudit/syntax/OverrideAudit-pkgList.sublime-syntax")
+        view = output_to_view(self.window, "OverrideAudit: Package Report",
+                              result, reuse, clear,
+                              "Packages/OverrideAudit/syntax/OverrideAudit-pkgList.sublime-syntax")
         _apply_report_settings(view, ":packages")
 
 
@@ -241,12 +236,9 @@ class OverrideAuditOverrideReportCommand(sublime_plugin.WindowCommand):
         if len(result) == 0:
             result.append("No packages with overrides found")
 
-        view = output_to_view(self.window,
-                              "OverrideAudit: Override Report",
-                              result,
-                              reuse=reuse,
-                              clear=clear,
-                              syntax="Packages/OverrideAudit/syntax/OverrideAudit-overrideList.sublime-syntax")
+        view = output_to_view(self.window, "OverrideAudit: Override Report",
+                              result, reuse, clear,
+                              "Packages/OverrideAudit/syntax/OverrideAudit-overrideList.sublime-syntax")
         _apply_report_settings(view, ":overrides")
 
 
@@ -359,12 +351,8 @@ class OverrideAuditDiffPackageCommand(sublime_plugin.WindowCommand):
 
             self._perform_diff(pkg_info, context_lines, result)
 
-        view = output_to_view(self.window,
-                              title,
-                              result,
-                              reuse=reuse,
-                              clear=clear,
-                              syntax="Packages/OverrideAudit/syntax/OverrideAudit-diff.sublime-syntax")
+        view = output_to_view(self.window, title, result, reuse, clear,
+                              "Packages/OverrideAudit/syntax/OverrideAudit-diff.sublime-syntax")
         _apply_report_settings(view, report_type)
 
     def run(self, package=None, force_reuse=False):

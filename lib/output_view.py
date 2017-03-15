@@ -72,8 +72,8 @@ def output_to_view(window,
                    title,
                    content,
                    reuse=True,
-                   syntax=None,
                    clear=True,
+                   syntax=None,
                    settings=None):
     """
     Add the content provided to a view in the given window, which has the title
