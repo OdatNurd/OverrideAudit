@@ -24,5 +24,10 @@
         "caption": "OverrideAudit: Swap Diff/Override View",
         "command": "override_audit_context_override",
         "args": { "action": "toggle" }
+    },
+    {
+        "caption": "OverrideAudit: Delete Override",
+        "command": "override_audit_context_override",
+        "args": { "action": "delete" }
     }
 ]

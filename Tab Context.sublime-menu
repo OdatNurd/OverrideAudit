@@ -2,6 +2,7 @@
     { "caption": "-" },
 
     { "command": "override_audit_context_override", "args": { "group": -1, "index": -1, "action": "toggle" } },
+    { "command": "override_audit_context_override", "args": { "group": -1, "index": -1, "action": "delete" } },
 
     { "caption": "-" },
 ]

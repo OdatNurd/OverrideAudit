@@ -80,6 +80,28 @@ def _open_override_file(window, pkg_name, override):
     window.open_file(filename)
 
 
+def _delete_override_file(window, pkg_name, override):
+    """
+    Delete the provided override from the given package name.
+    """
+    # Import send2trash on demand; see Default/side_bar.py.
+    import Default.send2trash as send2trash
+
+    settings = sublime.load_settings("OverrideAudit.sublime-settings")
+    confirm = settings.get("confirm_deletion", True)
+
+    relative_name = os.path.join(pkg_name, override)
+    full_name = os.path.join(sublime.packages_path(), relative_name)
+    if os.path.isfile(full_name):
+        if confirm:
+            msg = "Confirm deletion:\n\n{}".format(relative_name)
+
+        if (confirm == False or
+                sublime.yes_no_cancel_dialog(msg) == sublime.DIALOG_YES):
+            send2trash.send2trash(full_name)
+            window.status_message("Deleted {}".format(relative_name))
+
+
 def _diff_override_file(window, pkg_info, override,
                         diff_only=False, force_reuse=False):
     """
@@ -416,7 +438,7 @@ class ContextHelper():
 
 class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextCommand):
     """
-    Offer to diff or edit an override via context menu selection.
+    Offer to diff, edit or delete an override via context menu selection.
 
     Works as a view context menu (on an override), tab context menu or via the
     command palette.
@@ -439,19 +461,19 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
         elif action == "edit":
             _open_override_file(target.window(), pkg_name, override)
 
+        elif action == "delete":
+            _delete_override_file(target.window(), pkg_name, override)
+
         else:
             print("Error: unknown action for override context")
 
     def description(self, action, **kwargs):
         pkg_name, override, is_diff = self.view_context(None, **kwargs)
 
-        # When known diff is a toggle for the current state of a view.
-        if is_diff is not None:
-            diff = not is_diff
-        else:
-            diff = True if action == "diff" else False
+        if action == "toggle":
+            action = "diff" if is_diff is False else "edit"
 
-        return "OverrideAudit: %s Override" % ("Diff" if diff else "Edit")
+        return "OverrideAudit: %s Override" % (action.title())
 
     def is_visible(self, action, **kwargs):
         pkg_name, override, is_diff = self.view_context(None, **kwargs)
@@ -459,8 +481,9 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
         if action == "toggle":
             return True if is_diff is not None else False
 
-        elif pkg_name is not None and override is not None:
-            return True if is_diff is None else False
+        # Everything else requires package and override to be visible
+        if pkg_name is not None and override is not None:
+            return True if is_diff is None or action == "delete" else False
 
         return False
 

@@ -72,6 +72,11 @@ currently disabled is displayed in `[Square Brackets]` while a package that
 represents a dependency for an installed package is displayed in `<Angle
 Brackets>`.
 
+Additionally, each package name supports a context menu item which allows you
+to open a bulk diff report for that package, allowing you to quickly get an
+overview of the status of any overrides on that package. See the
+`OverrideAudit: Bulk Diff Single Package` command for more information.
+
 ### `OverrideAudit: Override Report` ###
 
 This will display a list of all packages for which there are overrides of any
@@ -85,6 +90,9 @@ appearing next to it in the output line.
 Any *simple* overrides that a package has will be listed below it in the report
 and support context menu entries that allow you to quickly open or diff that
 particular override.
+
+As with the `Package Report`, a context menu item is presented on package names
+to allow a quick bulk diff of overrides in that package.
 
 ### `OverrideAudit: Diff Single Override` ###
 
@@ -112,8 +120,9 @@ indication if the package is a *complete* override or not.
 Each section of the report is progressively indented so that it is possible to
 use Sublime code folding to hide away parts of the report as you work.
 
-As in the *Override Report*, the file names of the overrides support context
-menus that allows you to quickly open or diff them in their own distinct view.
+As in the *Override Report*, the name of each package and the filenames of each
+override support context menus that allows you to quickly bulk diff, open or
+diff them in their own distinct view.
 
 ### ` OverrideAudit: Bulk Diff Single Package` ###
 
@@ -150,7 +159,7 @@ see the default settings as well as your own custom settings under the
 `Preferences > Package Settings > OverrideAudit` menu entries. On MacOS, the
 `Preferences` menu is under `Sublime Text` in the menu.
 
-### `reuse_views`: true/false (Default: true)###
+### `reuse_views`: true/false (Default: true) ###
 
 OverrideAudit generally creates an output view to show you the results of
 operations. When this option is enabled (the default), OA will try to find the
@@ -180,6 +189,14 @@ Override Report or the commands that find and diff overrides.
 When displaying a diff for an override, this specifies how many unchanged lines
 before and after each difference are displayed to provide better context for
 the changes.
+
+### `confirm_deletion` : true/false (Default: true) ###
+
+When removing files, this setting controls whether OverrideAudit will prompt
+you to confirm the deletion before it happens or not.
+
+OverrideAudit uses the `send2trash` library that ships with Sublime Text to
+perform file deletions.
 
 ---
 
