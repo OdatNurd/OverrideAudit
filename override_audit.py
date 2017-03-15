@@ -299,7 +299,8 @@ class OverrideAuditDiffPackageCommand(sublime_plugin.WindowCommand):
     with the bulk argument set to true.
     """
     def _perform_diff(self, pkg_info, context_lines, result):
-        for file in pkg_info.override_files():
+        override_list = pkg_info.override_files()
+        for file in override_list:
             result.append("    {}".format(file))
 
             diff = pkg_info.override_diff(file, context_lines,
@@ -309,6 +310,8 @@ class OverrideAuditDiffPackageCommand(sublime_plugin.WindowCommand):
                 diff = "Error diffing override; please check the console"
             result.extend([diff, ""])
 
+        if len(override_list) == 0:
+            result.append("    - No overrides found")
         result.append("")
 
     def _diff_packages(self, names, pkg_list, single_package):
@@ -341,8 +344,14 @@ class OverrideAuditDiffPackageCommand(sublime_plugin.WindowCommand):
     def run(self, package=None):
         pkg_list = PackageList()
 
-        name_list = None if package is None else [package]
-        items = _packages_with_overrides(pkg_list, name_list)
+        if package is not None:
+            if package not in pkg_list:
+                print("Cannot diff package; package not found")
+                return
+
+            items = [package]
+        else:
+            items = _packages_with_overrides(pkg_list)
 
         self._diff_packages(items, pkg_list, package is not None)
 

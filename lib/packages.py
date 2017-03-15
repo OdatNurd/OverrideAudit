@@ -317,7 +317,6 @@ class PackageInfo():
         unpacked = self._get_unpacked_override_contents(override_file)
 
         if not packed or not unpacked:
-            print("Unable to diff %s" % os.path.join(self.name, override_file))
             return None
 
         indent = "" if indent is None else " " * indent
