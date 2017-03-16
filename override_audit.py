@@ -609,5 +609,12 @@ class OverrideAuditEventListener(sublime_plugin.EventListener):
         if os.path.isfile(view.file_name()):
             self._check_for_override(view)
 
+    def on_query_context(self, view, key, operator, operand, match_all):
+        if key != "override_audit_override_view":
+            return None
+
+        return (view.settings().has("override_audit_package") and
+                view.settings().has("override_audit_override"))
+
 
 ###----------------------------------------------------------------------------

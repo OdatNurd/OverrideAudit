@@ -1,0 +1,10 @@
+[
+    {
+        "keys": ["super+alt+up"],
+        "command": "override_audit_context_override",
+        "args": {"action": "toggle"},
+        "context": [
+            { "key": "override_audit_override_view" }
+        ]
+    }
+]
