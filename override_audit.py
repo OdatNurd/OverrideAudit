@@ -111,7 +111,7 @@ def _delete_override_file(window, pkg_name, override):
         if confirm:
             msg = "Confirm deletion:\n\n{}".format(relative_name)
 
-        if (confirm == False or
+        if (confirm is False or
                 sublime.yes_no_cancel_dialog(msg) == sublime.DIALOG_YES):
             send2trash.send2trash(full_name)
             window.status_message("Deleted {}".format(relative_name))
@@ -410,6 +410,13 @@ class ContextHelper():
 
         return None
 
+    def _report_type(self, **kwargs):
+        target = self.view_target(self.view, **kwargs)
+        if target.settings().get("override_audit_report", False) is True:
+            return target.settings().get("override_audit_report_type")
+
+        return None
+
     def view_target(self, view, group=-1, index=-1, **kwargs):
         """
         Get target view specified by group and index, if needed.
@@ -533,7 +540,10 @@ class OverrideAuditContextPackageCommand(ContextHelper,sublime_plugin.TextComman
         return "OverrideAudit: Bulk Diff Package '%s'" % pkg_name
 
     def is_visible(self, event, **kwargs):
-        return self._package_at_point(event) is not None
+        pkg_name = self._package_at_point(event)
+        if pkg_name is not None and self._report_type(**kwargs) == pkg_name:
+            return False
+        return pkg_name is not None
 
 
 ###----------------------------------------------------------------------------
@@ -570,13 +580,6 @@ class OverrideAuditContextReportCommand(ContextHelper,sublime_plugin.TextCommand
 
     def is_visible(self, **kwargs):
         return self._report_type(**kwargs) is not None
-
-    def _report_type(self, **kwargs):
-        target = self.view_target(self.view, **kwargs)
-        if target.settings().get("override_audit_report", False) is True:
-            return target.settings().get("override_audit_report_type")
-
-        return None
 
 
 ###----------------------------------------------------------------------------
