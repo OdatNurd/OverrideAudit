@@ -241,12 +241,14 @@ see the default settings as well as your own custom settings under the
 `Preferences > Package Settings > OverrideAudit` menu entries. On MacOS, the
 `Preferences` menu is under `Sublime Text` in the menu.
 
+
 ### `reuse_views`: true/false (Default: true) ###
 
 OverrideAudit generally creates an output view to show you the results of
 operations. When this option is enabled (the default), OA will try to find the
 view created last time and reuse it for the new command. When disabled, a new
 view is created every time.
+
 
 ### `clear_existing`: true/false (Default: true) ###
 
@@ -255,6 +257,7 @@ view is cleared of its contents prior to executing the command or if the new
 output is appended to the end of the existing view.
 
 Some OverrideAudit commands may ignore this setting.
+
 
 ### `ignore_overrides_in`: Array (Default: []) ###
 
@@ -266,11 +269,13 @@ This does not affect packages displayed in the general package list; it only
 hides packages from lists that show packages with overrides, such as the
 Override Report or the commands that find and diff overrides.
 
+
 ### `diff_context_lines`: Number (Default: 3) ###
 
 When displaying a diff for an override, this specifies how many unchanged lines
 before and after each difference are displayed to provide better context for
 the changes.
+
 
 ### `confirm_deletion` : true/false (Default: true) ###
 
@@ -279,6 +284,18 @@ you to confirm the deletion before it happens or not.
 
 OverrideAudit uses the `send2trash` library that ships with Sublime Text to
 perform file deletions.
+
+
+### `binary_file_patterns: Array (Default: from user settings) ###
+
+This setting is identical to the Sublime Text setting of the same name and
+controls what files are considered to be binary for the purposes of performing
+a diff operation.
+
+The default value for this operation is taken from your regular Sublime Text
+user settings, so you only need to specify a value in the *OverrideAudit*
+settings if you want to consider a different set of files binary for the
+purposes of diffs.
 
 ---
 

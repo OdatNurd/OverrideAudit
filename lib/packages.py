@@ -6,6 +6,7 @@ import codecs
 from datetime import datetime
 import difflib
 from collections import MutableSet, OrderedDict
+import fnmatch
 
 ###----------------------------------------------------------------------------
 
@@ -94,6 +95,22 @@ class PackageFileSet(MutableSet):
 ###----------------------------------------------------------------------------
 
 class PackageInfo():
+    """
+    Holds meta information on an installed Sublime Text Package
+
+    A package can exist in one or more of these three states:
+       * Shipped if it is a sublime-package that ships with Sublime Text
+       * Installed if it is a sublime-package installed in InstalledPackages
+       * Unpacked if there is a directory inside "Packages\" with that name
+
+    Stored paths are fully qualified names of either the sublime-package file
+    or the directory where the unpacked package resides.
+
+    If there is a sublime-package file in InstalledPackages that is the same
+    name as a shipped package, Sublime will ignore the shipped package in favor
+    of the installed version.
+    """
+
     # The location of packages that ship with sublime live; this is set up at
     # the time the plugin is fully loaded.
     shipped_packages_path = None
@@ -152,21 +169,6 @@ class PackageInfo():
 
         return None
 
-    """
-    Holds meta information on an installed Sublime Text Package
-
-    A package can exist in one or more of these three states:
-       * Shipped if it is a sublime-package that ships with Sublime Text
-       * Installed if it is a sublime-package installed in InstalledPackages
-       * Unpacked if there is a directory inside "Packages\" with that name
-
-    Stored paths are fully qualified names of either the sublime-package file
-    or the directory where the unpacked package resides.
-
-    If there is a sublime-package file in InstalledPackages that is the same
-    name as a shipped package, Sublime will ignore the shipped package in favor
-    of the installed version.
-    """
     def __init__(self, name):
         settings = sublime.load_settings("Preferences.sublime-settings")
         ignored_list = settings.get("ignored_packages", [])
@@ -185,6 +187,8 @@ class PackageInfo():
         self.content = dict()
         self.overrides = dict()
         self.expired = dict()
+
+        self.binary_patterns = None
 
     def __repr__(self):
         return "[name={0}, shipped={1}, installed={2}, unpacked={3}]".format(
@@ -250,6 +254,19 @@ class PackageInfo():
             return (content, source, mtime.strftime("%Y-%m-%d %H:%M:%S.%f %z"))
         except (UnicodeDecodeError, FileNotFoundError):
             return None
+
+    def _override_is_binary(self, override_file):
+        if self.binary_patterns is None:
+            settings = sublime.load_settings("OverrideAudit.sublime-settings")
+            if not settings.has("binary_file_patterns"):
+                settings = sublime.load_settings("Preferences.sublime-settings")
+
+            self.binary_patterns = settings.get("binary_file_patterns", [])
+
+        for pattern in self.binary_patterns:
+            if fnmatch.fnmatch(override_file, pattern):
+                return True
+        return False
 
     def package_file(self):
         return self.installed_path or self.shipped_path
@@ -339,19 +356,26 @@ class PackageInfo():
         return self.expired[simple]
 
     def override_diff(self, override_file, context_lines, empty_result=None,
-                      indent=None):
+                      binary_result=None, indent=None):
         """
         Calculate and return a unified diff of the override file provided. In
         the diff, the first file is the packed version of the file being used
         by sublime and the second is the unpacked override file
         """
+        indent = "" if indent is None else " " * indent
+
+        if self._override_is_binary(override_file):
+            return "" if binary_result is None else indent + binary_result
+
         packed = self._get_packed_pkg_file_contents(override_file)
         unpacked = self._get_unpacked_override_contents(override_file)
+
+        if packed is None:
+            print("NOPACK: ", override_file)
 
         if not packed or not unpacked:
             return None
 
-        indent = "" if indent is None else " " * indent
 
         diff = difflib.unified_diff(packed[0], unpacked[0],
                                     packed[1], unpacked[1],

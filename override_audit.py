@@ -137,7 +137,8 @@ def _diff_override_file(window, pkg_info, override,
         reuse = settings.get("reuse_views", True)
         clear = settings.get("clear_existing", True)
 
-    diff_info = pkg_info.override_diff(override, context_lines)
+    diff_info = pkg_info.override_diff(override, context_lines,
+                                       binary_result="<File is binary>")
 
     if diff_info is None:
         return
@@ -363,9 +364,11 @@ class OverrideAuditDiffPackageCommand(sublime_plugin.WindowCommand):
 
             diff = pkg_info.override_diff(file, context_lines,
                                           empty_result="No differences found",
+                                          binary_result="<File is binary>",
                                           indent=8)
             if diff is None:
-                diff = "Error diffing override; please check the console"
+                diff = (" " * 8) + ("Error opening or decoding file;"
+                                    " is it UTF-8 or Binary?")
             result.extend([diff, ""])
 
         if len(override_list) == 0:
