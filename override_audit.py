@@ -235,11 +235,13 @@ class OverrideAuditOverrideReportCommand(sublime_plugin.WindowCommand):
             result.append("WARNING: Showing only expired overrides!\n"
                           "WARNING: Non-expired overrides may exist!\n")
 
+        displayed = 0
         for pkg_name, pkg_info in pkg_list:
             if pkg_name not in ignored:
-                self._output_package(result, pkg_info, only_expired)
+                if self._output_package(result, pkg_info, only_expired):
+                    displayed += 1
 
-        if len(result) == 0:
+        if displayed == 0:
             result.append("No packages with overrides found")
 
         view = output_to_view(self.window, title, result, reuse, clear,
@@ -249,18 +251,16 @@ class OverrideAuditOverrideReportCommand(sublime_plugin.WindowCommand):
     def _output_package(self, result, pkg_info, only_expired):
         shipped_override = pkg_info.has_possible_overrides(simple=False)
         normal_overrides = pkg_info.override_files(simple=True)
+
         expired_overrides = pkg_info.expired_override_files(simple=True)
+        expired_pkg = bool(pkg_info.expired_override_files(simple=False))
 
+        # No need to do anything if there are no overrides at all
         if not normal_overrides and not shipped_override:
-            return
+            return False
 
-        # TODO: If the expired overrides is empty, this is not an expired
-        # complete override, and only_expired is turned on, skip doing anything
-        # for this package.
-        #
-        # Also return a boolean if output was made and have the caller use that
-        # instead of the length of the results to know if anything was
-        # displayed or not.
+        if only_expired and not expired_overrides and not expired_pkg:
+            return False
 
         result.append(_decorate_package_name(pkg_info, status=True,
                                              expired=True))
@@ -268,6 +268,8 @@ class OverrideAuditOverrideReportCommand(sublime_plugin.WindowCommand):
         self._output_overrides(result, normal_overrides,
                                expired_overrides, only_expired)
         result.append("")
+
+        return True
 
     def _output_overrides(self, result, overrides, expired, only_expired):
         if not overrides:
