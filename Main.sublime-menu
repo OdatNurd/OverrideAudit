@@ -9,6 +9,8 @@
                 [
                     { "caption": "Package Report", "command": "override_audit_package_report"},
                     { "caption": "Override Report", "command": "override_audit_override_report"},
+                    { "caption": "Override Report (Show expired)", "command": "override_audit_override_report", "args": {"check_expired": true}},
+                    { "caption": "Override Report (Only expired)", "command": "override_audit_override_report", "args": {"only_expired": true}},
                     { "caption": "Diff Single Override...", "command": "override_audit_diff_override"},
                     { "caption": "Bulk Diff: Single Package...", "command": "override_audit_diff_override", "args": {"bulk": true}},
                     { "caption": "Bulk Diff: All Packages", "command": "override_audit_diff_package"},

@@ -7,23 +7,56 @@ variables:
   pkg_name: '[^<>:"/\\|?*\[\] ][^<>:"/\\|?*\[\]]*?'
 contexts:
   main:
-    - match: '(\[[SIU ]{3}]) ({{pkg_name}})[ \n](<[\w\s]+>\n)?'
+    - match: '^(\[[SIU ]{3}]) '
       captures:
         1: storage.modifier
-        2: entity.name.package.enabled
-        3: comment
-      push: package_row
+      push: package_name
 
-    - match: '(\[[SIU ]{3}]) (\[)({{pkg_name}})(\])[ \n](<[\w\s]+>\n)?'
+    - match: '^WARNING:'
+      scope: keyword.control.expired
+
+  package_name:
+    - match: '{{pkg_name}}(?=[ \n])(?=.*\[)'
+      scope: entity.name.package.enabled.expired
+      set: check_status
+
+    - match: '{{pkg_name}}(?=[ \n])'
+      scope: entity.name.package.enabled
+      set: check_status
+
+    - match: '(\[)({{pkg_name}})(])(?=.*\[)'
       captures:
-        1: storage.modifier
-        2: comment
-        3: entity.name.package.disabled comment
-        4: comment
-        5: comment
-      push: package_row
+        1: comment
+        2: entity.name.package.disabled.expired comment
+        3: comment
+      set: check_status
+
+    - match: '(\[)({{pkg_name}})(])'
+      captures:
+        1: comment
+        2: entity.name.package.disabled comment
+        3: comment
+      set: check_status
+
+  check_status:
+    - match: ' (<[\w\s]+>)'
+      captures:
+        1: comment
+
+    - match: ' (\[[\w\s]+])'
+      captures:
+        1: meta.package.expired keyword.control.expired
+
+    - match: '$'
+      set: package_row
 
   package_row:
+    - match: '^\s*(`-) (\[X]) (.*)$'
+      captures:
+        1: punctuation.override.begin
+        2: meta.override.expired keyword.control.expired
+        3: entity.name.filename.override.expired
+
     - match: '^\s*(`-) (.*)$'
       captures:
         1: punctuation.override.begin

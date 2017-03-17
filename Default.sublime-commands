@@ -8,6 +8,16 @@
         "command": "override_audit_override_report"
     },
     {
+        "caption": "OverrideAudit: Override Report (Show expired)",
+        "command": "override_audit_override_report",
+        "args": {"check_expired": true}
+    },
+    {
+        "caption": "OverrideAudit: Override Report (Only expired)",
+        "command": "override_audit_override_report",
+        "args": {"only_expired": true}
+    },
+    {
         "caption": "OverrideAudit: Diff Single Override",
         "command": "override_audit_diff_override"
     },
