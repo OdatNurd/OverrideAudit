@@ -56,9 +56,16 @@ familiar enough with the process to know how to do it properly.
 
 ## Usage ##
 
-OverrideAudit commands can be executed via the Command Palette or via the menu,
-using options under the `Tools > OverrideAudit` sub-menu. The available commands
-are:
+OverrideAudit commands may be executed via the Command Palette as well as via
+the menu using options under the `Tools > OverrideAudit` sub-menu.
+
+In addition, some commands are available as context menu items when you open
+the context menu over a package name or override name in a report, or over a
+report in general.
+
+The following lists the available commands as seen in the Command Palette; the
+menu items are similarly named.
+
 
 ### `OverrideAudit: Package Report` ###
 
@@ -67,32 +74,55 @@ in a table format. The table lists the packages in roughly the order that they
 will be loaded by Sublime at startup.
 
 For each package, an indication is made as to whether this package is
-`[S]`hipped, `[I]`nstalled or `[U]`npacked. Additionally, a package that is
-currently disabled is displayed in `[Square Brackets]` while a package that
-represents a dependency for an installed package is displayed in `<Angle
-Brackets>`.
+`[S]`hipped, `[I]`nstalled or `[U]`npacked (see the [terminology](#terminology)
+section for more information).
 
-Additionally, each package name supports a context menu item which allows you
-to open a bulk diff report for that package, allowing you to quickly get an
-overview of the status of any overrides on that package. See the
-`OverrideAudit: Bulk Diff Single Package` command for more information.
+Additionally, a package that is currently disabled is displayed in `[Square
+Brackets]` while a package that represents a dependency for an installed
+package is displayed in `<Angle Brackets>`.
+
+Each package name supports a context menu item which allows you to open a bulk
+diff report for that package, allowing you to quickly get an overview of the
+status of any overrides on that package. See the `OverrideAudit: Bulk Diff
+Single Package` command for more information.
+
 
 ### `OverrideAudit: Override Report` ###
 
 This will display a list of all packages for which there are overrides of any
-type, *simple* or *complete*. For each such package, a condensed version of the
-indicators from the Package Report are displayed, indicating whether the package
-in question is `[S]`hipped, `[I]`nstalled or `[U]`npacked.
+type, *simple* or *complete*. (see the [terminology](#terminology) section for
+more information).
+
+For each such package, a condensed version of the indicators from the `Package
+Report` are displayed, indicating whether the package in question is
+`[S]`hipped, `[I]`nstalled or `[U]`npacked.
 
 A package which is a *complete* override is indicated by text to this effect
-appearing next to it in the output line.
-
-Any *simple* overrides that a package has will be listed below it in the report
-and support context menu entries that allow you to quickly open or diff that
-particular override.
+appearing next to it in the output line, while any *simple* overrides that a
+package has will be listed below it in the report.
 
 As with the `Package Report`, a context menu item is presented on package names
-to allow a quick bulk diff of overrides in that package.
+to allow a quick bulk diff of overrides in that package. Additionally, override
+filenames include context commands to allow you to quickly edit, diff or delete
+that override.
+
+
+### `OverrideAudit: Override Report (Show expired)` ###
+
+This command operates similarly to the standard `Override Report` command, but
+includes *extra* information on any overrides or packages that are *expired*
+(see the [terminology](#terminology) section).
+
+
+### `OverrideAUdit: Override Report (Only expired)` ###
+
+This command operates similarly to the standard `Override Report` command, but
+instead includes **only** packages which have some form of *expired* override (either
+*simple* or *complete*).
+
+This allows you to focus solely on those overrides which may require your
+immediate attention.
+
 
 ### `OverrideAudit: Diff Single Override` ###
 
@@ -103,8 +133,12 @@ file and your override to see what is different between the two.
 When the content of the file is different, the output is displayed in a Unified
 Diff format in a new buffer, allowing you to inspect the changes.
 
+As a shortcut, you can directly diff an override file from any `Override
+Report` or existing `Bulk Diff` report.
+
 The option `diff_unchanged` allows you to specify the result of performing a
 diff when the override is identical to the underlying file.
+
 
 ### `OverrideAudit: Bulk Diff All Packages` ###
 
@@ -124,44 +158,79 @@ As in the *Override Report*, the name of each package and the filenames of each
 override support context menus that allows you to quickly bulk diff, open or
 diff them in their own distinct view.
 
+
 ### `OverrideAudit: Bulk Diff Single Package` ###
 
-This command operates identically to the bulk diff of all packages with the
-exception that instead of calculating a diff for all overrides in all packages
-you are instead prompted via a quick panel for a single package to diff
-instead.
+This command operates identically to the `Bulk Diff All Packages` command, with
+the exception that instead of calculating a diff for all overrides in all
+packages you are instead prompted via a quick panel for a single package to
+diff instead.
+
+You can also access a bulk diff of a single package via a context menu on the
+name of a package in a `Package Report`, `Override Report` or a `Bulk Diff`
+report.
 
 ### `OverrideAudit: Refresh Report` ###
 
-This command is available from within an OverrideAudit report view (Package
-list, Override list, or Bulk Diff) via the Command Palette, context menu or
-main menu, and allows you to quickly re-run the same report.
+This command is available from within all OverrideAudit report views (`Package
+Report`, `Override Report`, or `Bulk Diff`) via the Command Palette, context
+menu or main menu, and allows you to quickly re-run the same report.
 
 When a report is refreshed, OverrideAudit ignores the current values of the
-`reuse_views` and `clear_existing` option and operates as if they are both set
+`reuse_views` and `clear_existing` options and operates as if they are both set
 to `true` so that the existing report will be replaced.
 
-This command is also available as a context menu entry from within the report
-view or its associated tab.
+This command is also available as a context menu entry from within a report
+view or its associated editor tab.
+
 
 ### `OverrideAudit: Swap Diff/Override View` ###
 
 This command is only available in the Command Palette while the current file is
 either an edit session for an override or a diff of an override.
 
-Unlike most other commands, this does not appear in the top level `Tools >
-OverrideAudit` menu, instead appearing in the context menu for the current
-view as appropriate. In this case the menu item tells you explicitly whether it
-will edit or diff the current file.
+Although this command does not appear in the top level `Tools > OverrideAudit`
+menu, it does appear within the context menu of an appropriate file view, as
+well as on the context menu of an override file from within an `Override
+Report` or `Bulk Diff`.
 
-When used in a diff, the override will be opened for editing or the currently
-open view into the file will be focused, if present. When used in a view that
-is editing an override, the command will instead open a diff of the override
-based on the current file content on disk.
+Additionally, OverrideAudit contains a key binding to the standard Sublime key
+for swapping between associated files (<kbd>Alt+O</kbd> on Windows/Linux or
+<kbd>&#8984;+Alt+Up</kbd> on MacOS) that operates from within an appropriate
+file view.
 
-In either case, the existing edit or diff view will be switched to/updated,
-regardless of the current values of the `reuse_view` and `clear_existing`
-settings.
+Regardless of how you trigger the command, any existing edit or diff view for
+this override will be switched to directly. In the case of a diff view, the
+diff will be recalculated, allowing any *saved* changes to be immediately
+reflected.
+
+This command ignores the current values of the `reuse_view` and
+`clear_existing` settings and operates as if they are both set to `true` in
+order to ensure that you don't end up with a large number of duplicate views.
+
+
+### `OverrideAudit: Delete Override` ###
+
+This command is only available in the Command Palette while the current file is
+either an edit session for an override or a diff of an override.
+
+Like the `Swap Diff/Override View` command, this command does not appear in the
+top level `Tools > OverrideAudit` menu but does appear within the context menu
+of an appropriate file view and on the context menu of an override file from
+within an `Override Report` or `Bulk Diff`.
+
+This command will delete the current override after prompting you to verify
+that you really mean to delete this file. OverrideAudit attempts to send the
+override to the trash using the same internal mechanism that Sublime Text uses
+to delete files.
+
+When an override is deleted, any existing edit sessions of the override will
+remain open, and Sublime will indicate that they have unsaved changes because
+the file is missing.
+
+The configuration setting `confirm_delete` can be set to `false` if you want to
+be able to delete overrides without being prompted first.
+
 
 ---
 
@@ -218,6 +287,7 @@ perform file deletions.
 The following terms are used in the documentation, and are described here for
 those not familiar with how Sublime Text 3 works with and uses packages.
 
+
 ### Packed Package ###
 
 A *Packed* package is a package that is contained in a `sublime-package` file.
@@ -231,6 +301,7 @@ resources that make up the package are contained in a single file.
 > the contents of the `Python` package, which provides support for writing
 > Python programs in Sublime Text.
 
+
 ### Unpacked Package ###
 
 An *Unpacked* package is a package that is stored as files in a subdirectory of
@@ -241,6 +312,7 @@ of the package comes from the name of the directory the package is stored in.
 > The contents of the directory `Packages\User` are considered to be the
 > contents of a package named `User`
 
+
 ### Shipped Package ###
 
 A *Shipped* Package is a *Packed* package that ships with Sublime Text itself.
@@ -250,6 +322,7 @@ common to all users of Sublime on the same computer.
 
 > The shipped package `Default.sublime-package` provides the set of default key
 > bindings, settings, menu entries and so on that all other plugins modify.
+
 
 ### Installed Package ###
 
@@ -264,6 +337,7 @@ between packages that are installed in a specific format and location.
 > `Package Control` is installed as an **Installed Package**, and many packages
 > that it installs are also installed in this manner.
 
+
 ### Override ###
 
 An *Override* is a file or files which override similarly named files contained
@@ -275,6 +349,7 @@ that if the packaged version of the file is modified by the package author, the
 override will continue to mask those changes and improvements.
 
 Detecting when this is happening is one of the core features of OverrideAudit.
+
 
 ### Simple Override ###
 
@@ -288,6 +363,7 @@ the Sublime `Packages` directory named the same as an existing *Shipped* or
 > causes Sublime to ignore the *Shipped* version of the file from the `Python`
 > package, allowing you to modify how Python is built.
 
+
 ### Complete Override ###
 
 A *Complete* override is less common than a *Simple* override. This variety of
@@ -299,6 +375,22 @@ instead, as if it was the package that was shipped with Sublime.
 > The File `Installed Packages\Python.sublime-package` is a complete override of
 > the *Shipped* `Python` package. As far as Sublime is concerned, this is the
 > `Python` package that provides all functionality for this language.
+
+
+### Expired Override ###
+
+This terminology is unique to OverrideAudit, and is used to indicate that an
+override (either *simple* or *complete*) is overriding a file that has been
+updated at the source (e.g. by Sublime text being upgraded or the package
+author modifying it).
+
+When this happens Sublime does not warn you on its own, and will continue to
+use your overrides, potentially causing you to miss out on important bug fixes
+or new features.
+
+The tools in OverrideAudit are designed to help warn you when this is happening
+and allow you to easily see what has changed so you can decide how best to
+address the situation.
 
 ---
 
