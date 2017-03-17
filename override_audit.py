@@ -38,7 +38,7 @@ def _packages_with_overrides(pkg_list, name_list=None):
     return items
 
 
-def _decorate_package_name(pkg_info, status=False, expired=False):
+def _decorate_package_name(pkg_info):
     """
     Decorate the name of the provided package with a prefix that describes its
     status and optionally also a suffix if it is a complete override or is
@@ -51,10 +51,10 @@ def _decorate_package_name(pkg_info, status=False, expired=False):
 
     pkg_name = "[{}]".format(pkg_info.name) if pkg_info.name in ignored else pkg_info.name
 
-    if status and pkg_info.has_possible_overrides(simple=False):
+    if pkg_info.has_possible_overrides(simple=False):
         suffix += " <Complete Override>"
 
-    if expired and bool(pkg_info.expired_override_files(simple=False)):
+    if bool(pkg_info.expired_override_files(simple=False)):
         suffix += " [EXPIRED]"
 
     return "[{}{}{}] {}{}".format(
@@ -262,8 +262,7 @@ class OverrideAuditOverrideReportCommand(sublime_plugin.WindowCommand):
         if only_expired and not expired_overrides and not expired_pkg:
             return False
 
-        result.append(_decorate_package_name(pkg_info, status=True,
-                                             expired=True))
+        result.append(_decorate_package_name(pkg_info))
 
         self._output_overrides(result, normal_overrides,
                                expired_overrides, only_expired)
@@ -388,7 +387,7 @@ class OverrideAuditDiffPackageCommand(sublime_plugin.WindowCommand):
 
         for name in names:
             pkg_info = pkg_list[name]
-            result.append(_decorate_package_name(pkg_info, status=True))
+            result.append(_decorate_package_name(pkg_info))
 
             self._perform_diff(pkg_info, context_lines, result)
 
