@@ -1,6 +1,6 @@
 %YAML 1.2
 ---
-name: OverrideAUdit
+name: OverrideAudit
 scope: text.override-audit.diff
 hidden: true
 variables:
@@ -69,12 +69,13 @@ contexts:
       captures:
         1: punctuation.separator.key-value.diff
         2: meta.toc-list.file-name.diff
+
   package_name:
-    - match: '{{pkg_name}}(?=[ \n])(?=.*\[)'
+    - match: '{{pkg_name}}(?= <.*\[)'
       scope: entity.name.package.enabled.expired
       set: check_status
 
-    - match: '{{pkg_name}}(?=[ \n])'
+    - match: '{{pkg_name}}(?=\n| <)'
       scope: entity.name.package.enabled
       set: check_status
 

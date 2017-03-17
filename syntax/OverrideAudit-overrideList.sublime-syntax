@@ -16,11 +16,11 @@ contexts:
       scope: keyword.control.expired
 
   package_name:
-    - match: '{{pkg_name}}(?=[ \n])(?=.*\[)'
+    - match: '{{pkg_name}}(?= <.*\[)'
       scope: entity.name.package.enabled.expired
       set: check_status
 
-    - match: '{{pkg_name}}(?=[ \n])'
+    - match: '{{pkg_name}}(?=\n| <)'
       scope: entity.name.package.enabled
       set: check_status
 
