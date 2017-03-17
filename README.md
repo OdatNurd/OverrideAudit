@@ -147,7 +147,9 @@ overrides at once.
 As for the *Override Report* command, each package listed has a condensed
 version of the indicators from the Package Report indicating whether the
 package in question is `[S]`hipped, `[I]`nstalled or `[U]`npacked as well as an
-indication if the package is a *complete* override or not.
+indication if the package is a *complete* override or not. Additionally,
+expired *complete* and *simple* overrides are also indicated in the bulk diff
+report.
 
 Each section of the report is progressively indented so that it is possible to
 use Sublime code folding to hide away parts of the report as you work.

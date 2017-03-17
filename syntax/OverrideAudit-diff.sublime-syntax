@@ -8,23 +8,18 @@ variables:
 
 contexts:
   main:
-    - match: '^(\[[SIU ]{3}]) ({{pkg_name}})[ \n](<[\w\s]+>\n)?'
+    - match: '^(\[[SIU ]{3}]) '
       captures:
         1: storage.modifier
-        2: entity.name.package.enabled
-        3: comment
-
-    - match: '^(\[[SIU ]{3}]) (\[)({{pkg_name}})(])[ \n](<[\w\s]+>\n)?'
-      captures:
-        1: storage.modifier
-        2: comment
-        3: entity.name.package.disabled comment
-        4: comment
-        5: comment
-
+      push: package_name
     - match: '^    (\w.*)'
       captures:
         1: entity.name.filename.override
+    - match: '^    (\[X]) (\w.*)'
+      captures:
+        1: meta.override.expired keyword.control.expired
+        2: entity.name.filename.override.expired
+
     - match: '^        ((\*{15})|(={67})|(-{3}))$\n?'
       scope: meta.separator.diff
       captures:
@@ -74,3 +69,38 @@ contexts:
       captures:
         1: punctuation.separator.key-value.diff
         2: meta.toc-list.file-name.diff
+  package_name:
+    - match: '{{pkg_name}}(?=[ \n])(?=.*\[)'
+      scope: entity.name.package.enabled.expired
+      set: check_status
+
+    - match: '{{pkg_name}}(?=[ \n])'
+      scope: entity.name.package.enabled
+      set: check_status
+
+    - match: '(\[)({{pkg_name}})(])(?=.*\[)'
+      captures:
+        1: comment
+        2: entity.name.package.disabled.expired comment
+        3: comment
+      set: check_status
+
+    - match: '(\[)({{pkg_name}})(])'
+      captures:
+        1: comment
+        2: entity.name.package.disabled comment
+        3: comment
+      set: check_status
+
+  check_status:
+    - match: ' (<[\w\s]+>)'
+      captures:
+        1: comment
+
+    - match: ' (\[[\w\s]+])'
+      captures:
+        1: meta.package.expired keyword.control.expired
+
+    - match: '$'
+      pop: true
+

@@ -352,9 +352,14 @@ class OverrideAuditDiffPackageCommand(sublime_plugin.WindowCommand):
     with the bulk argument set to true.
     """
     def _perform_diff(self, pkg_info, context_lines, result):
-        override_list = pkg_info.override_files()
+        override_list = pkg_info.override_files(simple=True)
+        expired_list = pkg_info.expired_override_files(simple=True)
+
         for file in override_list:
-            result.append("    {}".format(file))
+            if file in expired_list:
+                result.append("    [X] {}".format(file))
+            else:
+                result.append("    {}".format(file))
 
             diff = pkg_info.override_diff(file, context_lines,
                                           empty_result="No differences found",
@@ -387,8 +392,8 @@ class OverrideAuditDiffPackageCommand(sublime_plugin.WindowCommand):
 
         for name in names:
             pkg_info = pkg_list[name]
-            result.append(_decorate_package_name(pkg_info))
 
+            result.append(_decorate_package_name(pkg_info))
             self._perform_diff(pkg_info, context_lines, result)
 
         view = output_to_view(self.window, title, result, reuse, clear,
