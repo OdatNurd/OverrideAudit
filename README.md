@@ -90,16 +90,21 @@ Single Package` command for more information.
 ### `OverrideAudit: Override Report` ###
 
 This will display a list of all packages for which there are overrides of any
-type, *simple* or *complete*. (see the [terminology](#terminology) section for
-more information).
+type, *simple* or *complete*, with an indication on any package or override
+file that is currently *expired* (see the [terminology](#terminology) section
+for more information on these terms).
 
-For each such package, a condensed version of the indicators from the `Package
-Report` are displayed, indicating whether the package in question is
+For each package displayed, a condensed version of the indicators from the
+`Package Report` are displayed, indicating whether the package in question is
 `[S]`hipped, `[I]`nstalled or `[U]`npacked.
 
 A package which is a *complete* override is indicated by text to this effect
-appearing next to it in the output line, while any *simple* overrides that a
-package has will be listed below it in the report.
+appearing next to it in the output line. If such a package is *expired*, an
+additional note to this effect is added to let you know.
+
+All *simple* overrides for a package are displayed below the package name in
+the report, and may be prefixed with a `[X]` mark if they are currently
+*expired*.
 
 As with the `Package Report`, a context menu item is presented on package names
 to allow a quick bulk diff of overrides in that package. Additionally, override
@@ -107,20 +112,13 @@ filenames include context commands to allow you to quickly edit, diff or delete
 that override.
 
 
-### `OverrideAudit: Override Report (Show expired)` ###
-
-This command operates similarly to the standard `Override Report` command, but
-includes *extra* information on any overrides or packages that are *expired*
-(see the [terminology](#terminology) section).
-
-
 ### `OverrideAUdit: Override Report (Only expired)` ###
 
-This command operates similarly to the standard `Override Report` command, but
-instead includes **only** packages which have some form of *expired* override (either
-*simple* or *complete*).
+This command operates the same as the standard `Override Report` command, but
+constrains its output to **only** packages which have some form of expired
+override (either *simple* or *complete*).
 
-This allows you to focus solely on those overrides which may require your
+This allows you to focus solely on those overrides which may require your more
 immediate attention.
 
 

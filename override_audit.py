@@ -41,7 +41,8 @@ def _packages_with_overrides(pkg_list, name_list=None):
 def _decorate_package_name(pkg_info, status=False, expired=False):
     """
     Decorate the name of the provided package with a prefix that describes its
-    status and optionally also a suffix if it is a complete override.
+    status and optionally also a suffix if it is a complete override or is
+    expired.
     """
     suffix = ""
 
@@ -211,13 +212,11 @@ class OverrideAuditPackageReportCommand(sublime_plugin.WindowCommand):
 class OverrideAuditOverrideReportCommand(sublime_plugin.WindowCommand):
     """
     Generate a report on all packages which have overrides and what they are,
-    if any. Optionally mark anything expired as such or filter to only expired.
+    if any. The report always includes expired packages and overrides, but the
+    optional paramter filters to only show expired results.
     """
-    def run(self, force_reuse=False, check_expired=False, only_expired=False):
+    def run(self, force_reuse=False, only_expired=False):
         pkg_list = PackageList()
-
-        if only_expired:
-            check_expired = True
 
         settings = sublime.load_settings("OverrideAudit.sublime-settings")
         ignored = settings.get("ignore_overrides_in", [])
@@ -229,7 +228,7 @@ class OverrideAuditOverrideReportCommand(sublime_plugin.WindowCommand):
             report = ":overrides_expired"
         else:
             title = "OverrideAudit: Override Report"
-            report = ":overrides" if not check_expired else ":overrides_check"
+            report = ":overrides"
 
         result = []
         if only_expired:
@@ -238,8 +237,7 @@ class OverrideAuditOverrideReportCommand(sublime_plugin.WindowCommand):
 
         for pkg_name, pkg_info in pkg_list:
             if pkg_name not in ignored:
-                self._output_package(result, pkg_info,
-                                     check_expired, only_expired)
+                self._output_package(result, pkg_info, only_expired)
 
         if len(result) == 0:
             result.append("No packages with overrides found")
@@ -248,20 +246,24 @@ class OverrideAuditOverrideReportCommand(sublime_plugin.WindowCommand):
                               "Packages/OverrideAudit/syntax/OverrideAudit-overrideList.sublime-syntax")
         _apply_report_settings(view, report)
 
-    def _output_package(self, result, pkg_info, check_expired, only_expired):
+    def _output_package(self, result, pkg_info, only_expired):
         shipped_override = pkg_info.has_possible_overrides(simple=False)
         normal_overrides = pkg_info.override_files(simple=True)
+        expired_overrides = pkg_info.expired_override_files(simple=True)
 
         if not normal_overrides and not shipped_override:
             return
 
-        if check_expired:
-            expired_overrides = pkg_info.expired_override_files(simple=True)
-        else:
-            expired_overrides = []
+        # TODO: If the expired overrides is empty, this is not an expired
+        # complete override, and only_expired is turned on, skip doing anything
+        # for this package.
+        #
+        # Also return a boolean if output was made and have the caller use that
+        # instead of the length of the results to know if anything was
+        # displayed or not.
 
         result.append(_decorate_package_name(pkg_info, status=True,
-                                             expired=check_expired))
+                                             expired=True))
 
         self._output_overrides(result, normal_overrides,
                                expired_overrides, only_expired)
@@ -597,15 +599,12 @@ class OverrideAuditContextReportCommand(ContextHelper,sublime_plugin.TextCommand
         command = {
             ":packages":          "override_audit_package_report",
             ":overrides":         "override_audit_override_report",
-            ":overrides_check":   "override_audit_override_report",
             ":overrides_expired": "override_audit_override_report"
         }.get(report_type, "override_audit_diff_package")
         args = {"force_reuse": True}
 
         if report_type[0] != ":":
             args["package"] = report_type
-        elif report_type == ":overrides_check":
-            args["check_expired"] = True
         elif report_type == ":overrides_expired":
             args["only_expired"] = True
 
@@ -616,8 +615,7 @@ class OverrideAuditContextReportCommand(ContextHelper,sublime_plugin.TextCommand
         report = {
             ":packages":          "Package Report",
             ":overrides":         "Override Report",
-            ":overrides_check":   "Override Report (including expired)",
-            ":overrides_expired": "Override Report (only expired)",
+            ":overrides_expired": "Override Report (Expired only)",
             ":bulk_all":          "Bulk Diff Report"
         }.get(report, "Bulk Diff of '%s'" % report)
 
