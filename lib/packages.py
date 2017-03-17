@@ -58,8 +58,8 @@ _fixPath = (lambda value: value.replace("\\", "/")) if sublime.platform() == "wi
 class PackageFileSet(MutableSet):
     """
     This is an implementation of a set that is meant to store the names of
-    the contents of package files. The values in the set are case sensitive if
-    the platform itself is case sensitive.
+    the contents of package files. The values in the set are case insensitive
+    if the platform itself is case insensitive.
 
     The insertion order of the data in the set is maintained so that as long as
     files are added in package order, they will be iterated in package order.
@@ -184,6 +184,7 @@ class PackageInfo():
 
         self.content = dict()
         self.overrides = dict()
+        self.expired = dict()
 
     def __repr__(self):
         return "[name={0}, shipped={1}, installed={2}, unpacked={3}]".format(
@@ -303,6 +304,39 @@ class PackageInfo():
 
         self.overrides[simple] = over_list & base_list
         return self.overrides[simple]
+
+    def expired_override_files(self, simple=True):
+        """
+        Get a list of all overriden files for this package which are older than
+        the sublime-package file that is currently being used by sublime; the
+        list of files may be empty.
+
+        Note that this currently compares timestamps using the timestamp of the
+        sublime-package as a whole and not with the timestamp of the files as
+        contained within it.
+        """
+        if not self.has_possible_overrides(simple):
+            return PackageFileSet()
+
+        if simple in self.expired:
+            return self.expired[simple]
+
+        result = PackageFileSet()
+        if not simple:
+            if self.shipped_mtime > self.installed_mtime:
+                result = PackageFileSet(self.override_files(simple))
+
+        else:
+            base_time = self.installed_mtime or self.shipped_mtime
+            overrides = self.override_files(simple)
+
+            base_path = os.path.join(sublime.packages_path(), self.name)
+            for name in overrides:
+                if base_time > os.path.getmtime(os.path.join(base_path, name)):
+                    result.add(name)
+
+        self.expired[simple] = result
+        return self.expired[simple]
 
     def override_diff(self, override_file, context_lines, empty_result=None,
                       indent=None):
