@@ -238,7 +238,7 @@ class PackageInfo():
                 source = "Installed Packages" if self.installed_path is not None else "Shipped Packages"
                 source = os.path.join(source, self.name, override_file)
 
-                return (content, source, datetime(*info.date_time).strftime("%Y-%m-%d %H:%M:%S.%f %z"))
+                return (content, source, datetime(*info.date_time).strftime("%Y-%m-%d %H:%M:%S"))
         except (KeyError, UnicodeDecodeError, FileNotFoundError):
             return None
 
@@ -251,7 +251,7 @@ class PackageInfo():
             mtime = datetime.fromtimestamp(os.stat(name).st_mtime)
             source = os.path.join("Packages", self.name, override_file)
 
-            return (content, source, mtime.strftime("%Y-%m-%d %H:%M:%S.%f %z"))
+            return (content, source, mtime.strftime("%Y-%m-%d %H:%M:%S"))
         except (UnicodeDecodeError, FileNotFoundError):
             return None
 
