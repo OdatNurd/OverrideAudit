@@ -179,14 +179,16 @@ class PackageInfo():
         self.is_disabled = True if name in ignored_list else False
 
         self.shipped_path = None
-        self.shipped_mtime = None
         self.installed_path = None
-        self.installed_mtime = None
         self.unpacked_path = None
 
-        self.content = dict()
+        self.shipped_mtime = None
+        self.installed_mtime = None
+
+        self.pkg_content = dict()
+
         self.overrides = dict()
-        self.expired = dict()
+        self.expired_overrides = dict()
 
         self.binary_patterns = None
 
@@ -216,15 +218,15 @@ class PackageInfo():
     def __get_pkg_contents(self, filename):
         result = None
         if filename is not None:
-            if filename in self.content:
-                return self.content[filename]
+            if filename in self.pkg_content:
+                return self.pkg_content[filename]
 
             if os.path.isdir(filename):
                 result = self.__get_pkg_dir_contents(filename)
             else:
                 result = self.__get_sublime_pkg_contents(filename)
 
-            self.content[filename] = result
+            self.pkg_content[filename] = result
 
         return result
 
@@ -335,8 +337,8 @@ class PackageInfo():
         if not self.has_possible_overrides(simple):
             return PackageFileSet()
 
-        if simple in self.expired:
-            return self.expired[simple]
+        if simple in self.expired_overrides:
+            return self.expired_overrides[simple]
 
         result = PackageFileSet()
         if not simple:
@@ -352,8 +354,8 @@ class PackageInfo():
                 if base_time > os.path.getmtime(os.path.join(base_path, name)):
                     result.add(name)
 
-        self.expired[simple] = result
-        return self.expired[simple]
+        self.expired_overrides[simple] = result
+        return self.expired_overrides[simple]
 
     def override_diff(self, override_file, context_lines, empty_result=None,
                       binary_result=None, indent=None):
