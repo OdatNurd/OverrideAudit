@@ -1,7 +1,7 @@
 %YAML 1.2
 ---
 name: OverrideAudit
-scope: text.override-audit
+scope: text.override-audit.pkglist
 hidden: true
 variables:
   pkg_name: '[^<>:"/\\|?*\[\] ][^<>:"/\\|?*\[\]]*?'
