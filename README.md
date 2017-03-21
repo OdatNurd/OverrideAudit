@@ -4,9 +4,12 @@ OverrideAudit
 ---
 
 **NOTE:** This package is still under active development, so things are still
-in a state of flux and not all features are currently present. I endeavor not
-to push any breaking changes but it is entirely possible that commands or their
-operation may slightly change out from under you.
+in a state of flux and not all planned features are currently implemented,
+although everything currently listed in this README is in a usable state.
+
+I endeavor not to push any breaking changes but it is entirely possible that
+commands or their operation may slightly change out from under you between
+updates.
 
 Suggestions/improvements are also quite welcomed!
 
@@ -112,7 +115,7 @@ filenames include context commands to allow you to quickly edit, diff or delete
 that override.
 
 
-### `OverrideAUdit: Override Report (Only expired)` ###
+### `OverrideAudit: Override Report (Only expired)` ###
 
 This command operates the same as the standard `Override Report` command, but
 constrains its output to **only** packages which have some form of expired
