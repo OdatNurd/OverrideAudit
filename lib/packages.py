@@ -186,6 +186,8 @@ class PackageInfo():
         self.installed_mtime = None
 
         self.pkg_content = dict()
+        self.pkg_zip_list = dict()
+        self.pkg_zip_dict = dict()
 
         self.overrides = dict()
         self.expired_overrides = dict()
@@ -199,12 +201,31 @@ class PackageInfo():
             self.installed_path,
             self.unpacked_path)
 
-    def __get_sublime_pkg_contents(self, pkg_filename):
+    def __get_sublime_pkg_zip_list(self, pkg_filename):
+        if pkg_filename in self.pkg_zip_list:
+            return self.pkg_zip_list[pkg_filename]
+
         if not zipfile.is_zipfile(pkg_filename):
-            raise zipfile.BadZipFile("Invalid sublime-package file '{}'".format(pkg_filename))
+            raise zipfile.BadZipFile("Invalid sublime-package file '%s'" %
+                pkg_filename)
 
         with zipfile.ZipFile(pkg_filename) as zFile:
-            return PackageFileSet([entry.filename for entry in zFile.infolist()])
+            self.pkg_zip_list[pkg_filename] = zFile.infolist()
+
+        return self.pkg_zip_list[pkg_filename]
+
+    def __get_sublime_pkg_zip_dict(self, pkg_filename):
+        if pkg_filename in self.pkg_zip_dict:
+            return self.pkg_zip_dict[pkg_filename]
+
+        zip_list = self.__get_sublime_pkg_zip_list(pkg_filename)
+        self.pkg_zip_dict[pkg_filename] = dict((x.filename, x) for x in zip_list)
+
+        return self.pkg_zip_dict[pkg_filename]
+
+    def __get_sublime_pkg_contents(self, pkg_filename):
+        info_list = self.__get_sublime_pkg_zip_list(pkg_filename)
+        return PackageFileSet([entry.filename for entry in info_list])
 
     def __get_pkg_dir_contents(self, pkg_path):
         results = PackageFileSet()
@@ -302,6 +323,25 @@ class PackageInfo():
         if simple:
             return bool(self.package_file() and self.is_unpacked())
         return bool(self.installed_path and self.shipped_path)
+
+    def override_file_zipinfo(self, override_file, simple=True):
+        if not self.has_possible_overrides(simple):
+            return None
+
+        source_pkg = self.package_file() if simple else self.shipped_path
+        pkg_zip_dict = self.__get_sublime_pkg_zip_dict(source_pkg)
+
+        zipinfo = pkg_zip_dict.get(override_file, None)
+        if zipinfo is not None:
+            return zipinfo
+
+        if _wrap("AbC") == "abc":
+            pkg_zip_list = self.__get_sublime_pkg_zip_list(source_pkg)
+            for entry in pkg_zip_list:
+                if _wrap(entry.filename) == override_file:
+                    return entry
+
+        return None
 
     def override_files(self, simple=True):
         """
