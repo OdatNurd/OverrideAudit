@@ -56,6 +56,7 @@ _fixPath = (lambda value: value.replace("\\", "/")) if sublime.platform() == "wi
 
 ###----------------------------------------------------------------------------
 
+
 class PackageFileSet(MutableSet):
     """
     This is an implementation of a set that is meant to store the names of
@@ -92,7 +93,9 @@ class PackageFileSet(MutableSet):
         except KeyError:
             pass
 
+
 ###----------------------------------------------------------------------------
+
 
 class PackageInfo():
     """
@@ -100,19 +103,21 @@ class PackageInfo():
 
     A package can exist in one or more of these three states:
        * Shipped if it is a sublime-package that ships with Sublime Text
-       * Installed if it is a sublime-package installed in InstalledPackages
+       * Installed if it is a sublime-package installed in Installed Packages\
        * Unpacked if there is a directory inside "Packages\" with that name
 
     Stored paths are fully qualified names of either the sublime-package file
     or the directory where the unpacked package resides.
 
-    If there is a sublime-package file in InstalledPackages that is the same
+    If there is a sublime-package file in Installed Packages\ that is the same
     name as a shipped package, Sublime will ignore the shipped package in favor
-    of the installed version.
+    of the installed version. This is a complete override and methods in this
+    class know to look in the package file being used by Sublime in this case
+    when looking up overriden file contents.
     """
 
     # The location of packages that ship with sublime live; this is set up at
-    # the time the plugin is fully loaded.
+    # the time the plugin is fully loaded and derived from the executable path.
     shipped_packages_path = None
 
     @classmethod
@@ -140,7 +145,7 @@ class PackageInfo():
         name given in the filename. Note: No check is done that the shipped
         package actually HAS such a member.
 
-        The filename provided must be either absolute(and point to the packages
+        The filename provided must be either absolute(and point to the Packages
         path) or relative (in which case it is assumed to point there).
 
         Returns None if not a potential override or a tuple of the package name
@@ -160,7 +165,7 @@ class PackageInfo():
         pkg_file = pkg_name + ".sublime-package"
 
         if (os.path.isfile(os.path.join(cls.shipped_packages_path, pkg_file)) or
-            cls._deep_scan(sublime.installed_packages_path(), pkg_file)):
+                cls._deep_scan(sublime.installed_packages_path(), pkg_file)):
 
             # Always use Unix path separator even on windows; this is how the
             # sublime-package would represent the override path.
@@ -186,8 +191,8 @@ class PackageInfo():
         self.installed_mtime = None
 
         self.pkg_content = dict()
-        self.pkg_zip_list = dict()
-        self.pkg_zip_dict = dict()
+        self.zip_list = dict()
+        self.zip_dict = dict()
 
         self.overrides = dict()
         self.expired_overrides = dict()
@@ -202,30 +207,30 @@ class PackageInfo():
             self.unpacked_path)
 
     def __get_sublime_pkg_zip_list(self, pkg_filename):
-        if pkg_filename in self.pkg_zip_list:
-            return self.pkg_zip_list[pkg_filename]
+        if pkg_filename in self.zip_list:
+            return self.zip_list[pkg_filename]
 
         if not zipfile.is_zipfile(pkg_filename):
             raise zipfile.BadZipFile("Invalid sublime-package file '%s'" %
-                pkg_filename)
+                                     pkg_filename)
 
         with zipfile.ZipFile(pkg_filename) as zFile:
-            self.pkg_zip_list[pkg_filename] = zFile.infolist()
+            self.zip_list[pkg_filename] = zFile.infolist()
 
-        return self.pkg_zip_list[pkg_filename]
+        return self.zip_list[pkg_filename]
 
     def __get_sublime_pkg_zip_dict(self, pkg_filename):
-        if pkg_filename in self.pkg_zip_dict:
-            return self.pkg_zip_dict[pkg_filename]
+        if pkg_filename in self.zip_dict:
+            return self.zip_dict[pkg_filename]
 
         zip_list = self.__get_sublime_pkg_zip_list(pkg_filename)
-        self.pkg_zip_dict[pkg_filename] = dict((x.filename, x) for x in zip_list)
+        self.zip_dict[pkg_filename] = dict((e.filename, e) for e in zip_list)
 
-        return self.pkg_zip_dict[pkg_filename]
+        return self.zip_dict[pkg_filename]
 
     def __get_sublime_pkg_contents(self, pkg_filename):
-        info_list = self.__get_sublime_pkg_zip_list(pkg_filename)
-        return PackageFileSet([entry.filename for entry in info_list])
+        zip_list = self.__get_sublime_pkg_zip_list(pkg_filename)
+        return PackageFileSet([entry.filename for entry in zip_list])
 
     def __get_pkg_dir_contents(self, pkg_path):
         results = PackageFileSet()
@@ -255,13 +260,19 @@ class PackageInfo():
         try:
             with zipfile.ZipFile(self.package_file()) as zip:
                 info = zip.getinfo(override_file)
-                handle = codecs.EncodedFile(zip.open(info, mode="rU"), "utf-8")
-                content = io.TextIOWrapper(handle, encoding="utf-8").readlines()
+                file = codecs.EncodedFile(zip.open(info, mode="rU"), "utf-8")
+                content = io.TextIOWrapper(file, encoding="utf-8").readlines()
 
-                source = "Installed Packages" if self.installed_path is not None else "Shipped Packages"
+                source = "Shipped Packages"
+                if self.installed_path is not None:
+                    source = "Installed Packages"
+
                 source = os.path.join(source, self.name, override_file)
 
-                return (content, source, datetime(*info.date_time).strftime("%Y-%m-%d %H:%M:%S"))
+                mtime = datetime(*info.date_time).strftime("%Y-%m-%d %H:%M:%S")
+
+                return (content, source, mtime)
+
         except (KeyError, UnicodeDecodeError, FileNotFoundError):
             return None
 
@@ -318,26 +329,36 @@ class PackageInfo():
         simple overrides are unpacked files overriding files in a packed
         package, while non-simple overrides are when an installed
         sublime-package is doing a complete override on a shipped package of
-        the same name
+        the same name.
         """
         if simple:
             return bool(self.package_file() and self.is_unpacked())
         return bool(self.installed_path and self.shipped_path)
 
     def override_file_zipinfo(self, override_file, simple=True):
+        """
+        Given the name of an override file, return the zipinfo structure from
+        the containing package, where the package queried is based on the state
+        of the simple flag.
+
+        On case-insensitive file systems, this will attempt to look up the
+        override in a case insensitive manner.
+
+        The given override file must be in the zip path format.
+        """
         if not self.has_possible_overrides(simple):
             return None
 
         source_pkg = self.package_file() if simple else self.shipped_path
-        pkg_zip_dict = self.__get_sublime_pkg_zip_dict(source_pkg)
+        zip_dict = self.__get_sublime_pkg_zip_dict(source_pkg)
 
-        zipinfo = pkg_zip_dict.get(override_file, None)
+        zipinfo = zip_dict.get(override_file, None)
         if zipinfo is not None:
             return zipinfo
 
         if _wrap("AbC") == "abc":
-            pkg_zip_list = self.__get_sublime_pkg_zip_list(source_pkg)
-            for entry in pkg_zip_list:
+            zip_list = self.__get_sublime_pkg_zip_list(source_pkg)
+            for entry in zip_list:
                 if _wrap(entry.filename) == override_file:
                     return entry
 
@@ -367,13 +388,14 @@ class PackageInfo():
     def expired_override_files(self, simple=True):
         """
         Get a list of all overriden files for this package which are older than
-        the sublime-package file that is currently being used by sublime; the
-        list of files may be empty.
+        the source sublime-package file that is currently being used by
+        sublime; the list of files may be empty.
 
         Note that this currently compares timestamps of the two package files
         when simple is False. When simple is True, we compare the local file
         timestamp to the record that comes out of the package file being used
-        by Sublime.
+        by Sublime and fall back to the timestamp of the package itself if the
+        file entry can't be found.
         """
         if not self.has_possible_overrides(simple):
             return PackageFileSet()
@@ -408,7 +430,7 @@ class PackageInfo():
         """
         Calculate and return a unified diff of the override file provided. In
         the diff, the first file is the packed version of the file being used
-        by sublime and the second is the unpacked override file
+        by sublime and the second is the unpacked override file.
         """
         indent = "" if indent is None else " " * indent
 
@@ -418,12 +440,8 @@ class PackageInfo():
         packed = self._get_packed_pkg_file_contents(override_file)
         unpacked = self._get_unpacked_override_contents(override_file)
 
-        if packed is None:
-            print("NOPACK: ", override_file)
-
         if not packed or not unpacked:
             return None
-
 
         diff = difflib.unified_diff(packed[0], unpacked[0],
                                     packed[1], unpacked[1],
@@ -436,7 +454,9 @@ class PackageInfo():
 
         return result
 
+
 ###----------------------------------------------------------------------------
+
 
 class PackageList():
     """
@@ -456,6 +476,13 @@ class PackageList():
         self._unpacked = self.__get_package_list(sublime.packages_path(), packed=False)
 
     def package_counts(self):
+        """
+        Return a tuple which contains the number of packages that fit certain
+        critera: (shipped, installed, unpacked, disabled, dependencies).
+
+        Note that installed packages indicates the number of packages installed
+        by the user into the Installed Packages\ folder.
+        """
         return (self._shipped, self._installed, self._unpacked,
                 self._disabled, self._dependencies)
 
@@ -468,7 +495,7 @@ class PackageList():
     def __contains__(self, item):
         return item in self.list
 
-    # Iterate packages in load order
+    # Iterate packages in (rough) load order
     def __iter__(self):
         if "Default" in self.list:
             yield "Default", self.list["Default"]
@@ -511,8 +538,9 @@ class PackageList():
 
     def __get_package_list(self, location, packed=True, shipped=False):
         count = 0
-        # Follow symlinks since we're stopping after one level anyway. Maybe an
-        # issue if someone goes crazy in the installed packages directory?
+        # Follow symlinks since we're stopping after one level anyway except in
+        # the Installed Packages\ folder. Maybe an issue if someone goes crazy
+        # in there?
         for (path, dirs, files) in os.walk(location, followlinks=True):
             if packed:
                 for name in [f for f in files if f.endswith(".sublime-package")]:
@@ -527,5 +555,6 @@ class PackageList():
                 break
 
         return count
+
 
 ###----------------------------------------------------------------------------
