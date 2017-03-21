@@ -1,54 +1,17 @@
 %YAML 1.2
 ---
 name: OverrideAudit
-scope: text.override-audit
+scope: text.override-audit.overridelist
 hidden: true
-variables:
-  pkg_name: '[^<>:"/\\|?*\[\] ][^<>:"/\\|?*\[\]]*?'
 contexts:
   main:
     - match: '^(\[[SIU ]{3}]) '
       captures:
         1: storage.modifier
-      push: package_name
+      push: [package_row, scope:text.override-audit.diff#package_name]
 
     - match: '^WARNING:'
       scope: keyword.control.expired
-
-  package_name:
-    - match: '{{pkg_name}}(?= <.*\[)'
-      scope: entity.name.package.enabled.expired
-      set: check_status
-
-    - match: '{{pkg_name}}(?=\n| <)'
-      scope: entity.name.package.enabled
-      set: check_status
-
-    - match: '(\[)({{pkg_name}})(])(?=.*\[)'
-      captures:
-        1: comment
-        2: entity.name.package.disabled.expired comment
-        3: comment
-      set: check_status
-
-    - match: '(\[)({{pkg_name}})(])'
-      captures:
-        1: comment
-        2: entity.name.package.disabled comment
-        3: comment
-      set: check_status
-
-  check_status:
-    - match: ' (<[\w\s]+>)'
-      captures:
-        1: comment
-
-    - match: ' (\[[\w\s]+])'
-      captures:
-        1: meta.package.expired keyword.control.expired
-
-    - match: '$'
-      set: package_row
 
   package_row:
     - match: '^\s*(`-) (\[X]) (.*)$'
