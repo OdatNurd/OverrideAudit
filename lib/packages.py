@@ -370,9 +370,10 @@ class PackageInfo():
         the sublime-package file that is currently being used by sublime; the
         list of files may be empty.
 
-        Note that this currently compares timestamps using the timestamp of the
-        sublime-package as a whole and not with the timestamp of the files as
-        contained within it.
+        Note that this currently compares timestamps of the two package files
+        when simple is False. When simple is True, we compare the local file
+        timestamp to the record that comes out of the package file being used
+        by Sublime.
         """
         if not self.has_possible_overrides(simple):
             return PackageFileSet()
@@ -386,12 +387,17 @@ class PackageInfo():
                 result = PackageFileSet(self.override_files(simple))
 
         else:
-            base_time = self.installed_mtime or self.shipped_mtime
-            overrides = self.override_files(simple)
-
             base_path = os.path.join(sublime.packages_path(), self.name)
+            overrides = self.override_files(simple)
+            pkg_time = self.installed_mtime or self.shipped_mtime
+
             for name in overrides:
-                if base_time > os.path.getmtime(os.path.join(base_path, name)):
+                zipinfo = self.override_file_zipinfo(name, simple)
+                base_time = (pkg_time if zipinfo is None else
+                             datetime(*zipinfo.date_time).timestamp())
+                file_time = os.path.getmtime(os.path.join(base_path, name))
+
+                if file_time is not None and base_time > file_time:
                     result.add(name)
 
         self.expired_overrides[simple] = result
