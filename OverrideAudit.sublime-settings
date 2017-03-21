@@ -28,4 +28,16 @@
     // Should the user be asked to confirm before OverrideAudit deletes any
     // files?
     "confirm_deletion": true,
+
+    // Control what is considered to be a binary file for the purposes of
+    // skipping attempts to calculate diff information. Any override file which
+    // matches an item in this list will be considered binary and reported as
+    // such in diff views.
+    //
+    // This setting is purposefully named identically to the Sublime Text
+    // setting, which OverrideAudit will automatically use if this setting does
+    // not exist here inside the OverrideAudit specific settings.
+    //
+    // For that reason, the setting is commented out by default.
+    // "binary_file_patterns": ["*.png"],
 }
