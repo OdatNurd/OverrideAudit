@@ -215,7 +215,7 @@ class OverrideAuditOverrideReportCommand(sublime_plugin.WindowCommand):
     if any. The report always includes expired packages and overrides, but the
     optional paramter filters to only show expired results.
     """
-    def run(self, force_reuse=False, only_expired=False):
+    def run(self, force_reuse=False, only_expired=False, ignore_empty=False):
         pkg_list = PackageList()
 
         settings = sublime.load_settings("OverrideAudit.sublime-settings")
@@ -242,7 +242,15 @@ class OverrideAuditOverrideReportCommand(sublime_plugin.WindowCommand):
                     displayed += 1
 
         if displayed == 0:
-            result.append("No packages with overrides found")
+            message = "No packages with %soverrides found" % (
+                "expired " if only_expired else "")
+
+            if ignore_empty:
+                print(message)
+                sublime.status_message(message)
+                return
+
+            result.append(message)
 
         view = output_to_view(self.window, title, result, reuse, clear,
                               "Packages/OverrideAudit/syntax/OverrideAudit-overrideList.sublime-syntax")
