@@ -45,11 +45,9 @@ def _decorate_package_name(pkg_info):
     expired.
     """
     suffix = ""
+    pkg_name = pkg_info.name
 
-    settings = sublime.load_settings("Preferences.sublime-settings")
-    ignored = settings.get("ignored_packages", [])
-
-    pkg_name = "[{}]".format(pkg_info.name) if pkg_info.name in ignored else pkg_info.name
+    pkg_name = "[{}]".format(pkg_name) if pkg_info.is_disabled else pkg_name
 
     if pkg_info.has_possible_overrides(simple=False):
         suffix += " <Complete Override>"
@@ -148,6 +146,7 @@ def _diff_override_file(window, pkg_info, override,
 
         if action == "open":
             return _open_override_file(window, pkg_info.name, override)
+
         elif action == "ignore":
             return
 
