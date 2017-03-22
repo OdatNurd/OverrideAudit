@@ -465,11 +465,20 @@ class PackageList():
     For most intents and purposes this is a dictionary object with keys that
     are package names and values that are PackageInfo instances. This includes
     standard dictionary functionality such as iteration and content testing.
+
+    On case insensitive file systems, the names of packages are not case
+    sensitive. In the event that different packages provide different cases of
+    package name, the first name seen (i.e. either shipped or installed) will
+    be the "de facto" case for that package.
     """
     def __init__(self):
         self.list = dict()
         self._disabled = 0
         self._dependencies = 0
+
+        # Maps lower cased package names to listed packages on case insensitive
+        # systems.
+        self.case_list = dict() if _wrap("ABC") == "abc" else None
 
         self._shipped = self.__get_package_list(PackageInfo.shipped_packages_path, shipped=True)
         self._installed = self.__get_package_list(sublime.installed_packages_path())
@@ -486,16 +495,27 @@ class PackageList():
         return (self._shipped, self._installed, self._unpacked,
                 self._disabled, self._dependencies)
 
+    def __key(self, key):
+        """
+        Return the de facto key (package name) for the given key; returns the
+        key untouched on case sensitive systems or when the key is not known.
+       """
+        if self.case_list is not None:
+            case_key = key.lower()
+            if case_key in self.case_list:
+                return self.case_list[case_key]
+        return key
+
     def __len__(self):
         return len(self.list)
 
     def __getitem__(self, key):
-        return self.list[key]
+        return self.list[self.__key(key)]
 
-    def __contains__(self, item):
-        return item in self.list
+    def __contains__(self, key):
+        return self.__key(key) in self.list
 
-    # Iterate packages in (rough) load order
+    # Iterate packages in (roughly) load order
     def __iter__(self):
         if "Default" in self.list:
             yield "Default", self.list["Default"]
@@ -509,8 +529,15 @@ class PackageList():
             yield "User", self.list["User"]
 
     def __get_pkg(self, name):
+        """
+        Get or create package by name during initial package scan
+        """
+        name = self.__key(name)
         if name not in self.list:
             self.list[name] = PackageInfo(name)
+            if self.case_list is not None:
+                self.case_list[name.lower()] = name
+
             if self.list[name].is_disabled:
                 self._disabled += 1
 
