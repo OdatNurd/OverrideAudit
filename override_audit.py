@@ -174,6 +174,45 @@ def _diff_override_file(window, pkg_info, override,
 ###----------------------------------------------------------------------------
 
 
+class Spinner():
+    """
+    A simple spinner that follows the active view in the provided window which
+    self terminates when the provided thread is no longer running.
+    """
+    spin_text = "|/-\\"
+
+    def __init__(self, window, thread, prefix):
+        self.window = window
+        self.thread = thread
+        self.prefix = prefix
+        self.tick_view = None
+
+        sublime.set_timeout(lambda: self.tick(0), 250)
+
+    def tick(self, position):
+        current_view = self.window.active_view()
+
+        if self.tick_view is not None and current_view != self.tick_view:
+            self.tick_view.erase_status("oa_spinner")
+            self.tick_view is None
+
+        if not self.thread.is_alive():
+            current_view.erase_status("oa_spinner")
+            return
+
+        text = "%s [%s]" % (self.prefix, self.spin_text[position])
+        position = (position + 1) % len(self.spin_text)
+
+        current_view.set_status("oa_spinner", text)
+        if self.tick_view is None:
+            self.tick_view = current_view
+
+        sublime.set_timeout(lambda: self.tick(position), 250)
+
+
+###----------------------------------------------------------------------------
+
+
 class OverrideAuditPackageReportCommand(sublime_plugin.WindowCommand):
     """
     Generate a tabular report of all installed packages and their state.
