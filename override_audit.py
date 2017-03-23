@@ -52,6 +52,20 @@ def _packages_with_overrides(pkg_list, name_list=None):
     return items
 
 
+def _pkg_display_name(pkg_info):
+    """
+    Return the name to be used to display a package in reports, which is the
+    base package name potentially modified to include the visual distinctions
+    that indicate if it is disabled or a dependency.
+    """
+    if pkg_info.is_disabled:
+        return "[%s]" % pkg_info.name
+    elif pkg_info.is_dependency:
+        return "<%s>" % pkg_info.name
+    else:
+        return pkg_info.name
+
+
 def _decorate_package_name(pkg_info):
     """
     Decorate the name of the provided package with a prefix that describes its
@@ -59,9 +73,6 @@ def _decorate_package_name(pkg_info):
     expired.
     """
     suffix = ""
-    pkg_name = pkg_info.name
-
-    pkg_name = "[{}]".format(pkg_name) if pkg_info.is_disabled else pkg_name
 
     if pkg_info.has_possible_overrides(simple=False):
         suffix += " <Complete Override>"
@@ -73,7 +84,7 @@ def _decorate_package_name(pkg_info):
                "S" if pkg_info.shipped_path is not None else " ",
                "I" if pkg_info.installed_path is not None else " ",
                "U" if pkg_info.unpacked_path is not None else " ",
-               pkg_name,
+               _pkg_display_name(pkg_info),
                suffix)
 
 
@@ -269,13 +280,9 @@ class PackageReportThread(ReportGenerationThread):
 
         result = [title, t_sep, "", stats, r_sep]
         for pkg_name, pkg_info in pkg_list:
-            if pkg_info.is_disabled:
-                pkg_name = "[{}]".format(pkg_name)
-            elif pkg_info.is_dependency:
-                pkg_name = "<{}>".format(pkg_name)
             result.append(
                 "| {:<40} | [{:1}] | [{:1}] | [{:1}] |".format(
-                    pkg_name,
+                    _pkg_display_name(pkg_info),
                     "S" if pkg_info.shipped_path is not None else " ",
                     "I" if pkg_info.installed_path is not None else " ",
                     "U" if pkg_info.unpacked_path is not None else " "))
