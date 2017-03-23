@@ -2,6 +2,7 @@ import sublime
 import sublime_plugin
 
 from bisect import bisect
+import threading
 import os
 
 import sys
@@ -212,18 +213,46 @@ class Spinner():
 
 ###----------------------------------------------------------------------------
 
+class ReportGenerationThread(threading.Thread):
+    """
+    Helper base class for generating a report in a background thread.
+    """
+    def __init__(self, window, prefix, **kwargs):
+        super().__init__()
 
-class OverrideAuditPackageReportCommand(sublime_plugin.WindowCommand):
+        self.window = window
+        self.args = kwargs
+        Spinner(self.window, self, prefix)
+
+    def _display_report(self):
+        settings = sublime.load_settings("OverrideAudit.sublime-settings")
+        force_reuse = self.args.get("force_reuse", False)
+
+        reuse = True if force_reuse else settings.get("reuse_views", True)
+        clear = True if force_reuse else settings.get("clear_existing", True)
+
+        view = output_to_view(self.window, self.caption, self.content,
+                              reuse, clear, self.syntax)
+        _apply_report_settings(view, self.report_type)
+
+    def _set_content(self, caption, content, report_type, syntax):
+        self.caption = caption
+        self.content = content
+        self.report_type = report_type
+        self.syntax = syntax
+
+        sublime.set_timeout(self._display_report(), 10)
+
+###----------------------------------------------------------------------------
+
+
+class PackageReportThread(ReportGenerationThread):
     """
     Generate a tabular report of all installed packages and their state.
     """
-    def run(self, force_reuse=False):
+    def run(self):
         pkg_list = PackageList()
         pkg_counts = pkg_list.package_counts()
-
-        settings = sublime.load_settings("OverrideAudit.sublime-settings")
-        reuse = True if force_reuse else settings.get("reuse_views", True)
-        clear = True if force_reuse else settings.get("clear_existing", True)
 
         title = "{} Total Packages".format(len(pkg_list))
         t_sep = "=" * len(title)
@@ -252,10 +281,20 @@ class OverrideAuditPackageReportCommand(sublime_plugin.WindowCommand):
                     "U" if pkg_info.unpacked_path is not None else " "))
         result.extend([r_sep, ""])
 
-        view = output_to_view(self.window, "OverrideAudit: Package Report",
-                              result, reuse, clear,
-                              "Packages/OverrideAudit/syntax/OverrideAudit-pkgList.sublime-syntax")
-        _apply_report_settings(view, ":packages")
+        self._set_content("OverrideAudit: Package Report", result, ":packages",
+                          "Packages/OverrideAudit/syntax/OverrideAudit-pkgList.sublime-syntax")
+
+
+###----------------------------------------------------------------------------
+
+
+class OverrideAuditPackageReportCommand(sublime_plugin.WindowCommand):
+    """
+    Generate a tabular report of all installed packages and their state.
+    """
+    def run(self, force_reuse=False):
+        PackageReportThread(self.window, "Generating Package Report",
+                            force_reuse=force_reuse).start()
 
 
 ###----------------------------------------------------------------------------
