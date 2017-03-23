@@ -1,7 +1,9 @@
 import sublime
 import sublime_plugin
 
+
 ###----------------------------------------------------------------------------
+
 
 def find_view(window, title):
     """
@@ -122,5 +124,6 @@ def output_to_view(window,
     view.set_read_only(True)
 
     return view
+
 
 ###----------------------------------------------------------------------------

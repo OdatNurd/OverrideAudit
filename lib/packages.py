@@ -8,6 +8,7 @@ import difflib
 from collections import MutableSet, OrderedDict
 import fnmatch
 
+
 ###----------------------------------------------------------------------------
 
 # TODO: The PackageInfo() class should take an extra parameter that lets you

@@ -4,8 +4,21 @@ import sublime_plugin
 from bisect import bisect
 import os
 
+import sys
+from imp import reload
+
+
+# If our submodules have previously been loaded, reload them now before we
+# proceed to ensure everything is up to date.
+modules = ["OverrideAudit.lib.packages", "OverrideAudit.lib.output_view"]
+for module in modules:
+    if module in sys.modules:
+        reload(sys.modules[module])
+
+
 from .lib.packages import PackageInfo, PackageList
 from .lib.output_view import output_to_view
+
 
 ###----------------------------------------------------------------------------
 
