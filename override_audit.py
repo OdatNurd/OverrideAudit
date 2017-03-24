@@ -225,22 +225,52 @@ class Spinner():
 ###----------------------------------------------------------------------------
 
 
-class PackageListCollectionThread(threading.Thread):
+class BackgroundWorkerThread(threading.Thread):
     """
-    Helper thread, collects the list of packages in a background thread,
-    optionally also collecting information on all overides as well.
+    A thread for performing a task in the background, optionally executing a
+    callback in the main thread when processing has completed.
+
+    If given, the callback is invoked in the main thread after processing has
+    completed, with the thread instance as a parameter so that results can be
+    collected.
     """
-    def __init__(self, window, get_overrides=False):
+    def __init__(self, window, spinner_text, callback, **kwargs):
         super().__init__()
 
         self.window = window
-        self.get_overrides = get_overrides
-        Spinner(self.window, self, "Collecting Package List")
-        self.pkg_list = None
+        self.spinner_text = spinner_text
+        self.callback = callback
+        self.args = kwargs
+
+    def _check_result(self):
+        if self.is_alive():
+            sublime.set_timeout(lambda: self._check_result(), 100)
+            return
+
+        if self.callback is not None:
+            self.callback(self)
+
+    def _process(self):
+        pass
 
     def run(self):
+        Spinner(self.window, self, self.spinner_text)
+        sublime.set_timeout(lambda: self._check_result(), 10)
+
+        self._process()
+
+
+###----------------------------------------------------------------------------
+
+
+class PackageListCollectionThread(BackgroundWorkerThread):
+    """
+    Collect the list of packages (and optionally also overrides) in the
+    background.
+    """
+    def _process(self):
         self.pkg_list = PackageList()
-        if self.get_overrides:
+        if self.args.get("get_overrides", False) is True:
             _packages_with_overrides(self.pkg_list)
 
 
@@ -594,10 +624,9 @@ class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
                                     {"package": package})
             return
 
-        # Defer to self._loaded when the package list loads
-        thread = PackageListCollectionThread(self.window, get_overrides=True)
-        sublime.set_timeout(lambda: self._loaded(thread, package, file, bulk), 10)
-        thread.start()
+        callback = lambda thread: self._loaded(thread, package, file, bulk)
+        PackageListCollectionThread(self.window, "Collecting Package List",
+                                    callback, get_overrides=True).start()
 
 
 ###----------------------------------------------------------------------------
