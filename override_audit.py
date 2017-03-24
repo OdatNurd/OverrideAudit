@@ -224,6 +224,29 @@ class Spinner():
 
 ###----------------------------------------------------------------------------
 
+
+class PackageListCollectionThread(threading.Thread):
+    """
+    Helper thread, collects the list of packages in a background thread,
+    optionally also collecting information on all overides as well.
+    """
+    def __init__(self, window, get_overrides=False):
+        super().__init__()
+
+        self.window = window
+        self.get_overrides = get_overrides
+        Spinner(self.window, self, "Collecting Package List")
+        self.pkg_list = None
+
+    def run(self):
+        self.pkg_list = PackageList()
+        if self.get_overrides:
+            _packages_with_overrides(self.pkg_list)
+
+
+###----------------------------------------------------------------------------
+
+
 class ReportGenerationThread(threading.Thread):
     """
     Helper base class for generating a report in a background thread.
@@ -542,8 +565,12 @@ class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
             items=items,
             on_select=lambda i: self._pkg_pick(pkg_list, items, i, bulk))
 
-    def run(self, package=None, file=None, bulk=False):
-        pkg_list = PackageList()
+    def _loaded(self, thread, package, file, bulk):
+        if thread.is_alive():
+            sublime.set_timeout(lambda: self._loaded(thread, package, file, bulk), 100)
+            return
+
+        pkg_list = thread.pkg_list
 
         if package is None:
             self._show_pkg_list(pkg_list, bulk)
@@ -554,11 +581,23 @@ class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
                     self._show_override_list(pkg_info)
                 else:
                     if pkg_info.has_possible_overrides():
-                        self._perform_diff(pkg_info, file)
+                        _diff_override_file(self.window, pkg_info, file)
                     else:
                         print("Package '%s' has no overrides to diff" % package)
             else:
                 print("Unable to diff; no such package '%s'" % package)
+
+    def run(self, package=None, file=None, bulk=False):
+        # Shortcut for bulk diffing a single package
+        if bulk and package is not None:
+            self.window.run_command("override_audit_diff_package",
+                                    {"package": package})
+            return
+
+        # Defer to self._loaded when the package list loads
+        thread = PackageListCollectionThread(self.window, get_overrides=True)
+        sublime.set_timeout(lambda: self._loaded(thread, package, file, bulk), 10)
+        thread.start()
 
 
 ###----------------------------------------------------------------------------
