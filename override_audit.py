@@ -206,7 +206,7 @@ class Spinner():
 
         if self.tick_view is not None and current_view != self.tick_view:
             self.tick_view.erase_status("oa_spinner")
-            self.tick_view is None
+            self.tick_view = None
 
         if not self.thread.is_alive():
             current_view.erase_status("oa_spinner")
