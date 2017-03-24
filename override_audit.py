@@ -896,11 +896,11 @@ class OverrideAuditEventListener(sublime_plugin.EventListener):
         else:
             _remove_override_settings(view)
 
-    def on_post_save(self, view):
+    def on_post_save_async(self, view):
         # Will remove existing settings if the view is no longer an override
         self._check_for_override(view)
 
-    def on_load(self, view):
+    def on_load_async(self, view):
         # Things like PackageResourceViewer trigger on_load before the file
         # actually exists; only allow the context items once the file is
         # actually saved.
