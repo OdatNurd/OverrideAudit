@@ -381,6 +381,83 @@ class OverrideReportThread(ReportGenerationThread):
         print(msg)
         sublime.status_message(msg)
 
+###----------------------------------------------------------------------------
+
+
+class BulkDiffReportThread(ReportGenerationThread):
+    """
+    Perform a bulk diff of all overrides in either all packages or a single
+    package, depending on the argument provided.
+
+    This is invoked from OverrideAuditDiffOverride when you invoke that command
+    with the bulk argument set to true.
+    """
+    def run(self):
+        pkg_list = PackageList()
+
+        package = self.args["package"]
+        force_reuse = self.args["force_reuse"]
+
+        if package is not None:
+            if package not in pkg_list:
+                print("Cannot diff package; package not found")
+                return
+
+            items = [package]
+        else:
+            items = _packages_with_overrides(pkg_list)
+
+        self._diff_packages(items, pkg_list, package is not None, force_reuse)
+
+    def _diff_packages(self, names, pkg_list, single_package, force_reuse):
+        settings = sublime.load_settings("OverrideAudit.sublime-settings")
+        context_lines = settings.get("diff_context_lines", 3)
+
+        result = []
+        title = "Override Diff Report: "
+        description = "Bulk Diff Report for overrides in"
+        report_type = ":bulk_all"
+
+        if len(names) == 1 and single_package:
+            title += names[0]
+            result.append(description + " {}\n".format(names[0]))
+            report_type = names[0]
+        else:
+            title += "All Packages"
+            result.append(description + " {} packages\n".format(len(names)))
+
+        for name in names:
+            pkg_info = pkg_list[name]
+
+            result.append(_decorate_package_name(pkg_info))
+            self._perform_diff(pkg_info, context_lines, result)
+
+        self._set_content(title, result, report_type,
+                          "Packages/OverrideAudit/syntax/OverrideAudit-diff.sublime-syntax")
+
+    def _perform_diff(self, pkg_info, context_lines, result):
+        override_list = pkg_info.override_files(simple=True)
+        expired_list = pkg_info.expired_override_files(simple=True)
+
+        for file in override_list:
+            if file in expired_list:
+                result.append("    [X] {}".format(file))
+            else:
+                result.append("    {}".format(file))
+
+            diff = pkg_info.override_diff(file, context_lines,
+                                          empty_result="No differences found",
+                                          binary_result="<File is binary>",
+                                          indent=8)
+            if diff is None:
+                diff = (" " * 8) + ("Error opening or decoding file;"
+                                    " is it UTF-8 or Binary?")
+            result.extend([diff, ""])
+
+        if len(override_list) == 0:
+            result.append("    [No simple overrides found]")
+        result.append("")
+
 
 ###----------------------------------------------------------------------------
 
@@ -408,6 +485,22 @@ class OverrideAuditOverrideReportCommand(sublime_plugin.WindowCommand):
                              force_reuse=force_reuse,
                              only_expired=only_expired,
                              ignore_empty=ignore_empty).start()
+
+
+###----------------------------------------------------------------------------
+
+
+class OverrideAuditDiffPackageCommand(sublime_plugin.WindowCommand):
+    """
+    Perform a bulk diff of all overrides in either all packages or a single
+    package, depending on the argument provided.
+
+    This is invoked from OverrideAuditDiffOverride when you invoke that command
+    with the bulk argument set to true.
+    """
+    def run(self, package=None, force_reuse=False):
+        BulkDiffReportThread(self.window, "Generating Bulk Diff",
+                             package=package, force_reuse=force_reuse).start()
 
 
 ###----------------------------------------------------------------------------
@@ -466,83 +559,6 @@ class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
                         print("Package '%s' has no overrides to diff" % package)
             else:
                 print("Unable to diff; no such package '%s'" % package)
-
-
-###----------------------------------------------------------------------------
-
-
-class OverrideAuditDiffPackageCommand(sublime_plugin.WindowCommand):
-    """
-    Perform a bulk diff of all overrides in either all packages or a single
-    package, depending on the argument provided.
-
-    This is invoked from OverrideAuditDiffOverride when you invoke that command
-    with the bulk argument set to true.
-    """
-    def _perform_diff(self, pkg_info, context_lines, result):
-        override_list = pkg_info.override_files(simple=True)
-        expired_list = pkg_info.expired_override_files(simple=True)
-
-        for file in override_list:
-            if file in expired_list:
-                result.append("    [X] {}".format(file))
-            else:
-                result.append("    {}".format(file))
-
-            diff = pkg_info.override_diff(file, context_lines,
-                                          empty_result="No differences found",
-                                          binary_result="<File is binary>",
-                                          indent=8)
-            if diff is None:
-                diff = (" " * 8) + ("Error opening or decoding file;"
-                                    " is it UTF-8 or Binary?")
-            result.extend([diff, ""])
-
-        if len(override_list) == 0:
-            result.append("    [No simple overrides found]")
-        result.append("")
-
-    def _diff_packages(self, names, pkg_list, single_package, force_reuse):
-        settings = sublime.load_settings("OverrideAudit.sublime-settings")
-        context_lines = settings.get("diff_context_lines", 3)
-        reuse = True if force_reuse else settings.get("reuse_views", True)
-        clear = True if force_reuse else settings.get("clear_existing", True)
-
-        result = []
-        title = "Override Diff Report: "
-        description = "Bulk Diff Report for overrides in"
-        report_type = ":bulk_all"
-        if len(names) == 1 and single_package:
-            title += names[0]
-            result.append(description + " {}\n".format(names[0]))
-            report_type = names[0]
-        else:
-            title += "All Packages"
-            result.append(description + " {} packages\n".format(len(names)))
-
-        for name in names:
-            pkg_info = pkg_list[name]
-
-            result.append(_decorate_package_name(pkg_info))
-            self._perform_diff(pkg_info, context_lines, result)
-
-        view = output_to_view(self.window, title, result, reuse, clear,
-                              "Packages/OverrideAudit/syntax/OverrideAudit-diff.sublime-syntax")
-        _apply_report_settings(view, report_type)
-
-    def run(self, package=None, force_reuse=False):
-        pkg_list = PackageList()
-
-        if package is not None:
-            if package not in pkg_list:
-                print("Cannot diff package; package not found")
-                return
-
-            items = [package]
-        else:
-            items = _packages_with_overrides(pkg_list)
-
-        self._diff_packages(items, pkg_list, package is not None, force_reuse)
 
 
 ###----------------------------------------------------------------------------
