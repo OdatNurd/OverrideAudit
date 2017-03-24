@@ -295,38 +295,27 @@ class PackageReportThread(ReportGenerationThread):
 ###----------------------------------------------------------------------------
 
 
-class OverrideAuditPackageReportCommand(sublime_plugin.WindowCommand):
-    """
-    Generate a tabular report of all installed packages and their state.
-    """
-    def run(self, force_reuse=False):
-        PackageReportThread(self.window, "Generating Package Report",
-                            force_reuse=force_reuse).start()
-
-
-###----------------------------------------------------------------------------
-
-
-class OverrideAuditOverrideReportCommand(sublime_plugin.WindowCommand):
+class OverrideReportThread(ReportGenerationThread):
     """
     Generate a report on all packages which have overrides and what they are,
     if any. The report always includes expired packages and overrides, but the
     optional paramter filters to only show expired results.
     """
-    def run(self, force_reuse=False, only_expired=False, ignore_empty=False):
+    def run(self):
         pkg_list = PackageList()
 
         settings = sublime.load_settings("OverrideAudit.sublime-settings")
         ignored = settings.get("ignore_overrides_in", [])
-        reuse = True if force_reuse else settings.get("reuse_views", True)
-        clear = True if force_reuse else settings.get("clear_existing", True)
+
+        only_expired = self.args["only_expired"]
+        ignore_empty = self.args["ignore_empty"]
 
         if only_expired:
             title = "OverrideAudit: Expired Override Report"
-            report = ":overrides_expired"
+            report_type = ":overrides_expired"
         else:
             title = "OverrideAudit: Override Report"
-            report = ":overrides"
+            report_type = ":overrides"
 
         result = []
         if only_expired:
@@ -340,19 +329,13 @@ class OverrideAuditOverrideReportCommand(sublime_plugin.WindowCommand):
                     displayed += 1
 
         if displayed == 0:
-            message = "No packages with %soverrides found" % (
-                "expired " if only_expired else "")
-
             if ignore_empty:
-                print(message)
-                sublime.status_message(message)
-                return
+                return sublime.set_timeout(self._notify_empty(), 10)
 
-            result.append(message)
+            result.append(self._empty_msg())
 
-        view = output_to_view(self.window, title, result, reuse, clear,
-                              "Packages/OverrideAudit/syntax/OverrideAudit-overrideList.sublime-syntax")
-        _apply_report_settings(view, report)
+        self._set_content(title, result, report_type,
+                          "Packages/OverrideAudit/syntax/OverrideAudit-overrideList.sublime-syntax")
 
     def _output_package(self, result, pkg_info, only_expired):
         shipped_override = pkg_info.has_possible_overrides(simple=False)
@@ -387,6 +370,45 @@ class OverrideAuditOverrideReportCommand(sublime_plugin.WindowCommand):
         for item in (expired if only_expired else overrides):
             fmt = "  `- {}" if item not in expired else "  `- [X] {}"
             result.append(fmt.format(item))
+
+    def _empty_msg(self):
+        return "No packages with %soverrides found" % (
+                "expired " if self.args["only_expired"] else "")
+
+    def _notify_empty(self):
+        msg = self._empty_msg()
+
+        print(msg)
+        sublime.status_message(msg)
+
+
+###----------------------------------------------------------------------------
+
+
+class OverrideAuditPackageReportCommand(sublime_plugin.WindowCommand):
+    """
+    Generate a tabular report of all installed packages and their state.
+    """
+    def run(self, force_reuse=False):
+        PackageReportThread(self.window, "Generating Package Report",
+                            force_reuse=force_reuse).start()
+
+
+###----------------------------------------------------------------------------
+
+
+class OverrideAuditOverrideReportCommand(sublime_plugin.WindowCommand):
+    """
+    Generate a report on all packages which have overrides and what they are,
+    if any. The report always includes expired packages and overrides, but the
+    optional paramter filters to only show expired results.
+    """
+    def run(self, force_reuse=False, only_expired=False, ignore_empty=False):
+        OverrideReportThread(self.window, "Generating Override Report",
+                             force_reuse=force_reuse,
+                             only_expired=only_expired,
+                             ignore_empty=ignore_empty).start()
+
 
 ###----------------------------------------------------------------------------
 
