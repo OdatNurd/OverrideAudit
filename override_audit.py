@@ -144,10 +144,10 @@ def _delete_override_file(window, pkg_name, override):
             window.status_message("Deleted {}".format(relative_name))
 
 
-def _diff_override_file(window, pkg_info, override,
-                        diff_only=False, force_reuse=False):
+def _thr_diff_override(window, pkg_info, override,
+                       diff_only=False, force_reuse=False):
     """
-    Generate a diff for the given package and override.
+    Generate a diff for the given package and override in a background thread,
     """
     settings = sublime.load_settings("OverrideAudit.sublime-settings")
     context_lines = settings.get("diff_context_lines", 3)
@@ -160,27 +160,30 @@ def _diff_override_file(window, pkg_info, override,
         reuse = settings.get("reuse_views", True)
         clear = settings.get("clear_existing", True)
 
-    diff_info = pkg_info.override_diff(override, context_lines,
-                                       binary_result="<File is binary>")
-
-    if diff_info is None:
-        return
-
-    if diff_info == "":
-        sublime.status_message("No changes detected in override")
-
-        if action == "open":
-            return _open_override_file(window, pkg_info.name, override)
-
-        elif action == "ignore":
+    def _process_diff(thread):
+        diff_info = thread.diff
+        if diff_info is None:
             return
 
-    title = "Override of %s" % os.path.join(pkg_info.name, override)
-    content = "No differences found" if diff_info == "" else diff_info
-    view = output_to_view(window, title, content, reuse, clear,
-                          "Packages/Diff/Diff.sublime-syntax")
+        if diff_info == "":
+            sublime.status_message("No changes detected in override")
 
-    _apply_override_settings(view, pkg_info.name, override, True)
+            if action == "open":
+                return _open_override_file(window, pkg_info.name, override)
+
+            elif action == "ignore":
+                return
+
+        title = "Override of %s" % os.path.join(pkg_info.name, override)
+        content = "No differences found" if diff_info == "" else diff_info
+        view = output_to_view(window, title, content, reuse, clear,
+                              "Packages/Diff/Diff.sublime-syntax")
+
+        _apply_override_settings(view, pkg_info.name, override, True)
+
+    callback = lambda thread: _process_diff(thread)
+    OverrideDiffThread(window, "Diffing Override", callback,
+                       pkg_info=pkg_info, override=override).start()
 
 
 ###----------------------------------------------------------------------------
@@ -272,6 +275,29 @@ class PackageListCollectionThread(BackgroundWorkerThread):
         self.pkg_list = PackageList()
         if self.args.get("get_overrides", False) is True:
             _packages_with_overrides(self.pkg_list)
+
+
+###----------------------------------------------------------------------------
+
+
+class OverrideDiffThread(BackgroundWorkerThread):
+    """
+    Diff a specific package override in a background thread.
+    """
+    def _process(self):
+        settings = sublime.load_settings("OverrideAudit.sublime-settings")
+        context_lines = settings.get("diff_context_lines", 3)
+
+        pkg_info = self.args.get("pkg_info", None)
+        override = self.args.get("override", None)
+
+        if not pkg_info or not override:
+            self.diff = None
+            print("diff thread not given a package or override to diff")
+            return
+
+        self.diff = pkg_info.override_diff(override, context_lines,
+                                           binary_result="<File is binary>")
 
 
 ###----------------------------------------------------------------------------
@@ -567,7 +593,7 @@ class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
     """
     def _file_pick(self, pkg_info, override_list, index):
         if index >= 0:
-            _diff_override_file(self.window, pkg_info, override_list[index])
+            _thr_diff_override(self.window, pkg_info, override_list[index])
 
     def _show_override_list(self, pkg_info):
         override_list = list(pkg_info.override_files())
@@ -611,7 +637,7 @@ class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
                     self._show_override_list(pkg_info)
                 else:
                     if pkg_info.has_possible_overrides():
-                        _diff_override_file(self.window, pkg_info, file)
+                        _thr_diff_override(self.window, pkg_info, file)
                     else:
                         print("Package '%s' has no overrides to diff" % package)
             else:
@@ -744,9 +770,8 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
         # elsewhere.
 
         if action == "diff":
-            pkg_list = PackageList()
-            _diff_override_file(target.window(), pkg_list[pkg_name], override,
-                                diff_only=True, force_reuse=True)
+            self._context_diff(target.window(), pkg_name, override)
+
         elif action == "edit":
             _open_override_file(target.window(), pkg_name, override)
 
@@ -755,6 +780,16 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
 
         else:
             print("Error: unknown action for override context")
+
+    def _context_diff(self, window, package, override):
+        callback = lambda thr: self._pkg_loaded(thr, window, package, override)
+        PackageListCollectionThread(window, "Collecting Package List",
+                                    callback).start()
+
+    def _pkg_loaded(self, thread, window, pkg_name, override):
+        pkg_list = thread.pkg_list
+        _thr_diff_override(window, pkg_list[pkg_name], override,
+                           diff_only=True, force_reuse=True)
 
     def description(self, action, **kwargs):
         pkg_name, override, is_diff = self.view_context(None, **kwargs)
