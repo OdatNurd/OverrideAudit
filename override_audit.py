@@ -890,7 +890,11 @@ class OverrideAuditEventListener(sublime_plugin.EventListener):
     menus to let you edit/diff the override.
     """
     def _check_for_override(self, view):
-        result = PackageInfo.check_potential_override(view.file_name())
+        filename = view.file_name()
+        if filename is None or not os.path.isfile(filename):
+            return
+
+        result = PackageInfo.check_potential_override(filename)
         if result is not None:
             _apply_override_settings(view, result[0], result[1], False)
         else:
@@ -902,10 +906,9 @@ class OverrideAuditEventListener(sublime_plugin.EventListener):
 
     def on_load_async(self, view):
         # Things like PackageResourceViewer trigger on_load before the file
-        # actually exists; only allow the context items once the file is
+        # actually exists; context items are only allowed once the file is
         # actually saved.
-        if os.path.isfile(view.file_name()):
-            self._check_for_override(view)
+        self._check_for_override(view)
 
     def on_query_context(self, view, key, operator, operand, match_all):
         if key != "override_audit_override_view":
