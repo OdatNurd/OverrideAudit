@@ -60,8 +60,8 @@ _fixPath = (lambda value: value.replace("\\", "/")) if sublime.platform() == "wi
 
 class PackageFileSet(MutableSet):
     """
-    This is an implementation of a set that is meant to store the names of
-    the contents of package files. The values in the set are case insensitive
+    This is an implementation of a set that is meant to store the names and
+    contents of package files. The values in the set are case insensitive
     if the platform itself is case insensitive.
 
     The insertion order of the data in the set is maintained so that as long as

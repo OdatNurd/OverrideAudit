@@ -40,4 +40,22 @@
     //
     // For that reason, the setting is commented out by default.
     // "binary_file_patterns": ["*.png"],
+
+    // The following options control automatic report generation of expired
+    // overrides, allowing you to determine if one of your overrides is now
+    // out of date.
+    //
+    // Automatically generated reports will not open a report tab if there is
+    // nothing expired.
+
+    // Set the time (in seconds) between when a package is removed from the
+    // ignored_packages setting in Preferences.sublime-settings and when an
+    // automatic report is generated.
+    //
+    // Modifying the list of ignored_packages while the countdown to a report is
+    // running will reset the countdown, while adding back all removed packages
+    // will stop the report completely.
+    //
+    // Set to 0 to turn off automatic reports when packages are un-ignored.
+    "report_on_unignore": 300
 }

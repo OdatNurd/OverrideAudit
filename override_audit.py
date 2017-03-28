@@ -17,7 +17,7 @@ for module in modules:
         reload(sys.modules[module])
 
 
-from .lib.packages import PackageInfo, PackageList
+from .lib.packages import PackageInfo, PackageList, PackageFileSet
 from .lib.output_view import output_to_view
 
 
@@ -26,9 +26,17 @@ from .lib.output_view import output_to_view
 
 def plugin_loaded():
     """
-    Initialize the PackageInfo class at plugin load time.
+    Initialize plugin state.
     """
     PackageInfo.init()
+    AutoReportTrigger()
+
+
+def plugin_unloaded():
+    """
+    Clean up state before unloading.
+    """
+    AutoReportTrigger.unregister()
 
 
 def _packages_with_overrides(pkg_list, name_list=None):
@@ -184,6 +192,84 @@ def _thr_diff_override(window, pkg_info, override,
     callback = lambda thread: _process_diff(thread)
     OverrideDiffThread(window, "Diffing Override", callback,
                        pkg_info=pkg_info, override=override).start()
+
+
+###----------------------------------------------------------------------------
+
+
+class AutoReportTrigger():
+    """
+    A simple singleton class for running an automated expired updates report
+    whenever a package is removed from the ignored packages list or at startup
+    when the build number of Sublime has changed.
+    """
+    instance = None
+
+    def __init__(self):
+        if AutoReportTrigger.instance is not None:
+            return
+
+        AutoReportTrigger.instance = self
+
+        self.removed = PackageFileSet()
+        self.settings = sublime.load_settings("Preferences.sublime-settings")
+        ignored = self.settings.get("ignored_packages", [])
+        self.cached_ignored = PackageFileSet(ignored)
+
+        self.settings.add_on_change("_oa_sw", lambda: self.__settings_change())
+
+    @classmethod
+    def unregister(cls):
+        if AutoReportTrigger.instance is not None:
+            AutoReportTrigger.instance.settings.clear_on_change("_oa_sw")
+            AutoReportTrigger.instance = None
+
+    def __execute_auto_report(self):
+        """
+        Perform an automatic expired override report.
+        """
+        window = sublime.active_window()
+        window.run_command("override_audit_override_report",
+            {"only_expired": True, "ignore_empty": True})
+
+    def __check_removed(self, removed_set):
+        """
+        Check to see if the set of packages is the same now as when we last
+        noticed it change, and if so execute an auto report.
+        """
+        if removed_set != self.removed:
+            return
+
+        self.removed = PackageFileSet()
+        self.__execute_auto_report()
+
+    def __settings_change(self):
+        """
+        Check to see if we need to schedule an automatic report due to the
+        removal of a package from the list of ignored packages.
+        """
+        new_list = PackageFileSet(self.settings.get("ignored_packages", []))
+        if new_list == self.cached_ignored:
+            return
+
+        removed = self.cached_ignored - new_list
+        added = new_list - self.cached_ignored
+        self.cached_ignored = new_list
+
+        oa_settings = sublime.load_settings("OverrideAudit.sublime-settings")
+        timeout = oa_settings.get("report_on_unignore", 0) * 1000
+
+        if timeout <= 0:
+            return
+
+        self.removed |= removed
+        self.removed -= added
+
+        if len(self.removed) != 0:
+            # Send a copy of the list so we can detect if the list changes
+            # in the interim.
+            current = PackageFileSet(self.removed)
+            sublime.set_timeout(lambda: self.__check_removed(current), timeout)
 
 
 ###----------------------------------------------------------------------------
