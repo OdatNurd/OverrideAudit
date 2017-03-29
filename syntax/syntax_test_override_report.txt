@@ -1,0 +1,90 @@
+# SYNTAX TEST "Packages/OverrideAudit/syntax/OA-OverrideReport.sublime-syntax"
+
+WARNING: Text
+# <- keyword.control.expired
+#^^^^^^^ keyword.control.expired
+#       ^^^^^^ text.override-audit
+
+[S U] Lua
+#<- storage.modifier
+#^^^^ storage.modifier
+#     ^^^ entity.name.package.enabled
+#        ^ text.override-audit
+
+[S U] Lua <Complete Override>
+#     ^^^ entity.name.package.enabled
+#        ^ text.override-audit
+#         ^^^^^^^^^^^^^^^^^^^ comment
+
+[S U] Lua <Complete Override> [EXPIRED]
+#     ^^^ entity.name.package.enabled.expired
+#        ^ text.override-audit
+#         ^^^^^^^^^^^^^^^^^^^ comment
+#                             ^^^^^^^^^ meta.package.expired
+
+[S U] [Lua]
+#      ^^^ entity.name.package.disabled
+#         ^ comment
+
+[S U] [Lua] <Complete Override>
+#      ^^^ entity.name.package.disabled
+#            ^^^^^^^^^^^^^^^^^^ comment
+
+[S U] [Lua] <Complete Override> [EXPIRED]
+#      ^^^ entity.name.package.disabled.expired
+#           ^^^^^^^^^^^^^^^^^^^ comment
+#                               ^^^^^^^^^ meta.package.expired
+
+[S U] Lua Contrived
+#     ^^^^^^^^^^^^^ entity.name.package.enabled
+#                  ^ text.override-audit
+
+[S U] Lua Contrived <Complete Override>
+#     ^^^^^^^^^^^^^ entity.name.package.enabled
+#                  ^ text.override-audit
+#                   ^^^^^^^^^^^^^^^^^^^ comment
+
+[S U] Lua Contrived <Complete Override> [EXPIRED]
+#     ^^^^^^^^^^^^^ entity.name.package.enabled.expired
+#                  ^ text.override-audit
+#                   ^^^^^^^^^^^^^^^^^^^ comment
+#                                       ^^^^^^^^^ meta.package.expired
+
+[S U] Lua C#
+#     ^^^^^^ entity.name.package.enabled
+#           ^ text.override-audit
+
+[S U] Lua C# <Complete Override>
+#     ^^^^^^ entity.name.package.enabled
+#           ^ text.override-audit
+#            ^^^^^^^^^^^^^^^^^^^ comment
+
+[S U] Lua C# <Complete Override> [EXPIRED]
+#     ^^^^^^ entity.name.package.enabled.expired
+#           ^ text.override-audit
+#            ^^^^^^^^^^^^^^^^^^^ comment
+#                                ^^^^^^^^^ meta.package.expired
+
+[S U] Lua
+  `- Lua.sublime-build
+# ^^ punctuation.override.begin
+#   ^ text.override-audit
+#    ^^^^^^^^^^^^^^^^^ entity.name.filename.override
+#                     ^ text.override-audit
+  `- Lua Build.sublime-build
+# ^^ punctuation.override.begin
+#   ^ text.override-audit
+#    ^^^^^^^^^^^^^^^^^^^^^^^ entity.name.filename.override
+#                           ^ text.override-audit
+  `- [X] Lua.sublime-build
+# ^^ punctuation.override.begin
+#   ^ text.override-audit
+#    ^^^ meta.override.expired
+#        ^^^^^^^^^^^^^^^^^ entity.name.filename.override.expired
+#                         ^ text.override-audit
+  `- [X] Lua Build.sublime-build
+# ^^ punctuation.override.begin
+#   ^ text.override-audit
+#    ^^^ meta.override.expired
+#        ^^^^^^^^^^^^^^^^^^^^^^^ entity.name.filename.override.expired
+#                               ^ text.override-audit

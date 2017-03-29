@@ -1,0 +1,33 @@
+# SYNTAX TEST "Packages/OverrideAudit/syntax/OA-Diff.sublime-syntax"
+
+[S U] Objective-C
+    Objective-C++.sublime-syntax
+#   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ entity.name.filename.override
+        No differences found
+#       ^^^^^^^^^^^^^^^^^^^^^ text.override-audit
+
+    Objective-C.sublime-syntax
+        --- Shipped Packages/Objective-C/Objective-C.sublime-syntax 2016-07-26 12:36:30
+#       ^^^ meta.diff.header.from-file punctuation.definition.from-file.diff
+#           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.diff.header.from-file
+        +++ Packages/Objective-C/Objective-C.sublime-syntax 2017-01-23 18:28:23
+#       ^^^ meta.diff.header.to-file punctuation.definition.to-file.diff
+#           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ meta.diff.header.to-file
+        @@ -10,10 +10,11 @@
+#       ^^ meta.diff.range.unified punctuation.definition.range.diff
+#          ^^^^^^^^^^^^^^ meta.diff.range.unified
+           common_protocols:
+#          ^^^^^^^^^^^^^^^^^^^ text.override-audit
+        +  non_func_keywords:
+#       ^ markup.inserted.diff punctuation.definition.inserted.diff
+#        ^^^^^^^^^^^^^^^^^^^^^ markup.inserted.diff
+        -  osx-support-functions:
+#       ^ markup.deleted.diff punctuation.definition.deleted.diff
+#        ^^^^^^^^^^^^^^^^^^^^^^^^^ markup.deleted.diff
+
+[  U] <dependency package>
+#     ^ storage.modifier
+#      ^^^^^^^^^^^^^^^^^^ entity.name.package.dependency
+#                        ^ storage.modifier
+    [No simple overrides found]
+#   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ text.override-audit

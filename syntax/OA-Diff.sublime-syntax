@@ -99,6 +99,13 @@ contexts:
         3: comment
       set: check_status
 
+    - match: '(<)({{pkg_name}})[\]>]?(>)'
+      captures:
+        1: storage.modifier
+        2: entity.name.package.dependency storage.modifier
+        3: storage.modifier
+      set: check_status
+
   check_status:
     - match: ' (<[\w\s]+>)'
       captures:

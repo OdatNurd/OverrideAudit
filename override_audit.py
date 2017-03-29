@@ -49,6 +49,12 @@ def _log(message, *args, status=False):
     if status:
         sublime.active_window().status_message(message)
 
+def _oa_syntax(file):
+    """
+    Return the full name of an Override Audit syntax based on the short name.
+    """
+    return "Packages/OverrideAudit/syntax/%s.sublime-syntax" % file
+
 
 def _packages_with_overrides(pkg_list, name_list=None):
     """
@@ -497,7 +503,7 @@ class PackageReportThread(ReportGenerationThread):
         result.extend([r_sep, ""])
 
         self._set_content("OverrideAudit: Package Report", result, ":packages",
-                          "Packages/OverrideAudit/syntax/OverrideAudit-pkgList.sublime-syntax")
+                          _oa_syntax("OA-PkgReport"))
 
 
 ###----------------------------------------------------------------------------
@@ -543,7 +549,7 @@ class OverrideReportThread(ReportGenerationThread):
             result.append(self._empty_msg())
 
         self._set_content(title, result, report_type,
-                          "Packages/OverrideAudit/syntax/OverrideAudit-overrideList.sublime-syntax")
+                          _oa_syntax("OA-OverrideReport"))
 
     def _output_package(self, result, pkg_info, only_expired):
         shipped_override = pkg_info.has_possible_overrides(simple=False)
@@ -638,8 +644,7 @@ class BulkDiffReportThread(ReportGenerationThread):
             result.append(_decorate_package_name(pkg_info))
             self._perform_diff(pkg_info, context_lines, result)
 
-        self._set_content(title, result, report_type,
-                          "Packages/OverrideAudit/syntax/OverrideAudit-diff.sublime-syntax")
+        self._set_content(title, result, report_type, _oa_syntax("OA-Diff"))
 
     def _perform_diff(self, pkg_info, context_lines, result):
         override_list = pkg_info.override_files(simple=True)

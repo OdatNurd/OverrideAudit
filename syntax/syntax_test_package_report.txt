@@ -1,0 +1,28 @@
+# SYNTAX TEST "Packages/OverrideAudit/syntax/OA-PkgReport.sublime-syntax"
+
+| Default                                  | [S] | [I] | [U] |
+# ^^^^^^^ entity.name.package.enabled
+#        ^ text.override-audit
+#                                            ^^^ entity.package.shipped
+#                                                  ^^^ entity.package.installed
+#                                                        ^^^ entity.package.unpacked
+
+| Color Scheme - Default                   | [S] | [ ] | [ ] |
+# ^^^^^^^^^^^^^^^^^^^^^^ entity.name.package.enabled
+#                       ^ text.override-audit
+
+| C#                                       | [S] | [ ] | [ ] |
+# ^^ entity.name.package.enabled
+#   ^ text.override-audit
+
+| Contrived C#                             | [S] | [ ] | [ ] |
+# ^^^^^^^^^^^^ entity.name.package.enabled
+#             ^ text.override-audit
+
+| [Vintage]                                | [S] | [ ] | [ ] |
+#  ^^^^^^^ entity.name.package.disabled
+#          ^ text.override-audit
+
+| <ssl-linux>                              | [ ] | [ ] | [U] |
+#  ^^^^^^^^^ entity.name.package.dependency
+#            ^ text.override-audit
