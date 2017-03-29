@@ -296,9 +296,9 @@ class AutoReportTrigger():
         self.cached_ignored = new_list
 
         oa_settings = sublime.load_settings("OverrideAudit.sublime-settings")
-        timeout = oa_settings.get("report_on_unignore", 0) * 1000
+        report = oa_settings.get("report_on_unignore", True)
 
-        if timeout <= 0:
+        if not report:
             return
 
         self.removed |= removed
@@ -310,7 +310,7 @@ class AutoReportTrigger():
             # Send a copy of the list so we can detect if the list changes
             # in the interim.
             current = PackageFileSet(self.removed)
-            sublime.set_timeout(lambda: self.__check_removed(current), timeout)
+            sublime.set_timeout(lambda: self.__check_removed(current), 1000)
         else:
             self.__save_status(False)
 

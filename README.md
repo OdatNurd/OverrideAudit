@@ -251,7 +251,7 @@ be able to delete overrides without being prompted first.
 
 Although package overrides are vital to your ability to customize Sublime Text
 to your liking, Sublime will not warn you when you are overriding a file that
-has been changed since the time you first created your override.
+has been changed since the time you first created the override.
 
 In such a situation, the updated source file is ignored and your override
 remains in place, which means that any bug fixes or enhancements that the
@@ -275,9 +275,6 @@ An automated report will be generated in the following circumstances:
  * Whenever a package is removed from the list of `ignored_packages` in your
    preferences file. [Package Control](https://packagecontrol.io/) does this
    whenever it is upgrading a package, for example.
- * At Sublime startup if you restart sublime between upgrading a package and the
-   time that the automatic report is generated. This ensures that you stil get
-   warned of problems in this case.
 
 ---
 ***NOTE:*** If you upgrade a package manually without adding it to the list of
@@ -353,7 +350,7 @@ user settings, so you only need to specify a value in the *OverrideAudit*
 settings if you want to consider a different set of files binary for the
 purposes of diffs.
 
-### `report_on_unignore`: Number (Default: 300) ###
+### `report_on_unignore`: Boolean (Default: true) ###
 
 OverrideAudit can
 [automatically generate a report](#automatic-reports-of-expired-overrides) to
@@ -364,15 +361,7 @@ As well as happening when you manually decide to re-enable a package you have
 been ignoring, this is also an indication that
 [Package Control](https://packagecontrol.io/) has finished upgrading a package.
 
-The value of this setting specifies how long (in seconds) OverrideAudit should
-wait before generating the automatic report. If another package is removed from
-the list before this time expires, the timer is reset so that multiple reports
-are not generated back to back.
-
-The default setting is 300 seconds (5 minutes) which should be enough time to
-ensure that all package upgrades have completed before generating the report.
-
-Setting this value to `0` turns off automatic reports in this case.
+When enabled, the report will only be shown if any expired overrides are found.
 
 ---
 
