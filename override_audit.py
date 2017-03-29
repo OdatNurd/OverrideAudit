@@ -39,6 +39,17 @@ def plugin_unloaded():
     AutoReportTrigger.unregister()
 
 
+def _log(message, *args, status=False):
+    """
+    Simple logging method; writes to the console and optionally also the status
+    message as well.
+    """
+    message = message % args
+    print("OverrideAudit:", message)
+    if status:
+        sublime.active_window().status_message(message)
+
+
 def _packages_with_overrides(pkg_list, name_list=None):
     """
     Collect a list of package names from the given package list for which there
@@ -149,7 +160,7 @@ def _delete_override_file(window, pkg_name, override):
         if (confirm is False or
                 sublime.yes_no_cancel_dialog(msg) == sublime.DIALOG_YES):
             send2trash.send2trash(full_name)
-            window.status_message("Deleted {}".format(relative_name))
+            _log("Deleted %s", relative_name, status=True)
 
 
 def _thr_diff_override(window, pkg_info, override,
@@ -243,7 +254,7 @@ class AutoReportTrigger():
                     pass
 
         if self.last_build == sublime.version() and self.force_report == False:
-            print("Sublime version is unchanged; skipping automatic report")
+            _log("Sublime version is unchanged; skipping automatic report")
             return
 
         if self.last_build != sublime.version():
@@ -254,7 +265,7 @@ class AutoReportTrigger():
         elif self.force_report:
             reason = "Sublime restarted during a package upgrade"
 
-        print(reason + "; generating automatic report")
+        _log(reason + "; generating automatic report")
         sublime.set_timeout(lambda: self.__execute_auto_report(), 1000)
 
     def __save_status(self, force):
@@ -411,7 +422,7 @@ class OverrideDiffThread(BackgroundWorkerThread):
 
         if not pkg_info or not override:
             self.diff = None
-            print("diff thread not given a package or override to diff")
+            _log("diff thread not given a package or override to diff")
             return
 
         self.diff = pkg_info.override_diff(override, context_lines,
@@ -573,10 +584,8 @@ class OverrideReportThread(ReportGenerationThread):
                 "expired " if self.args["only_expired"] else "")
 
     def _notify_empty(self):
-        msg = self._empty_msg()
+        _log(self._empty_msg(), status=True)
 
-        print(msg)
-        sublime.status_message(msg)
 
 ###----------------------------------------------------------------------------
 
@@ -597,7 +606,7 @@ class BulkDiffReportThread(ReportGenerationThread):
 
         if package is not None:
             if package not in pkg_list:
-                print("Cannot diff package; package not found")
+                _log("Cannot diff package; package not found")
                 return
 
             items = [package]
@@ -716,7 +725,7 @@ class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
     def _show_override_list(self, pkg_info):
         override_list = list(pkg_info.override_files())
         if not override_list:
-            print("Package '%s' has no overrides" % pkg_info.name)
+            _log("Package '%s' has no overrides" % pkg_info.name)
         self.window.show_quick_panel(
             items=override_list,
             on_select=lambda i: self._file_pick(pkg_info, override_list, i))
@@ -734,7 +743,7 @@ class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
         items = _packages_with_overrides(pkg_list)
 
         if not items:
-            print("No unignored packages have overrides")
+            _log("No unignored packages have overrides")
         self.window.show_quick_panel(
             items=items,
             on_select=lambda i: self._pkg_pick(pkg_list, items, i, bulk))
@@ -757,9 +766,9 @@ class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
                     if pkg_info.has_possible_overrides():
                         _thr_diff_override(self.window, pkg_info, file)
                     else:
-                        print("Package '%s' has no overrides to diff" % package)
+                        _log("Package '%s' has no overrides to diff" % package)
             else:
-                print("Unable to diff; no such package '%s'" % package)
+                _log("Unable to diff; no such package '%s'" % package)
 
     def run(self, package=None, file=None, bulk=False):
         # Shortcut for bulk diffing a single package
