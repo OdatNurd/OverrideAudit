@@ -59,12 +59,22 @@ familiar enough with the process to know how to do it properly.
 
 ## Usage ##
 
-OverrideAudit commands may be executed via the Command Palette as well as via
-the menu using options under the `Tools > OverrideAudit` sub-menu.
+OverrideAudit provides a series of commands to help you discover and inspect
+the package overrides that you currently have in place, see what is different
+between your override and the underlying package file, and most importantly the
+ability to detect when the file you are overriding has been updated by its
+author.
 
-In addition, some commands are available as context menu items when you open
-the context menu over a package name or override name in a report, or over a
-report in general.
+In addition to manually executing commands, OverrideAudit tries to keep you
+protected from *expired* overrides by
+[automatically checking](#automatic-reports-of-expired-overrides) for them
+every time you upgrade Sublime Text or a package.
+
+OverrideAudit commands may be executed via the Command Palette as well as via
+the menu using options under the `Tools > OverrideAudit` sub-menu. In addition,
+some commands are available as context menu items when you open the context
+menu over a package name or override name in a report, or over a report in
+general.
 
 The following lists the available commands as seen in the Command Palette; the
 menu items are similarly named.
@@ -237,6 +247,49 @@ be able to delete overrides without being prompted first.
 
 ---
 
+## Automatic Reports of Expired Overrides ##
+
+Although package overrides are vital to your ability to customize Sublime Text
+to your liking, Sublime will not warn you when you are overriding a file that
+has been changed since the time you first created your override.
+
+In such a situation, the updated source file is ignored and your override
+remains in place, which means that any bug fixes or enhancements that the
+original package author has made will be hidden from you and you will never
+know it.
+
+In order to help keep you protected from this happening without your realizing
+it, OverrideAudit will automatically try to generate a report to tell you if
+you have any *expired* overrides when it detects that something has been
+updated.
+
+The report generated is an [Override Report](#overrideaudit-override-report)
+that contains only information on expired overrides. The report is only
+displayed if there are any expired overrides so that OverrideAudit can keep out
+of your way if there are no potential problems.
+
+An automated report will be generated in the following circumstances:
+ * Whenever you start Sublime Text and the version number has changed from the
+   last time you ran it, indicating that you have upgraded Sublime Text to a
+   different version.
+ * Whenever a package is removed from the list of `ignored_packages` in your
+   preferences file. [Package Control](https://packagecontrol.io/) does this
+   whenever it is upgrading a package, for example.
+ * At Sublime startup if you restart sublime between upgrading a package and the
+   time that the automatic report is generated. This ensures that you stil get
+   warned of problems in this case.
+
+---
+***NOTE:*** If you upgrade a package manually without adding it to the list of
+`ignored_packages` or while Sublime is not running, OverrideAudit will be
+unable to detect that anything has changed and will not automatically generate
+a report for you.
+
+For this reason, it may be a good idea to manually run this report from the
+command palette as a part of your manual package upgrades.
+
+---
+
 ## Configuration ##
 
 The following configuration options are available for OverrideAudit. You can
@@ -289,7 +342,7 @@ OverrideAudit uses the `send2trash` library that ships with Sublime Text to
 perform file deletions.
 
 
-### `binary_file_patterns: Array (Default: from user settings) ###
+### `binary_file_patterns`: Array (Default: from user settings) ###
 
 This setting is identical to the Sublime Text setting of the same name and
 controls what files are considered to be binary for the purposes of performing
@@ -299,6 +352,27 @@ The default value for this operation is taken from your regular Sublime Text
 user settings, so you only need to specify a value in the *OverrideAudit*
 settings if you want to consider a different set of files binary for the
 purposes of diffs.
+
+### `report_on_unignore`: Number (Default: 300) ###
+
+OverrideAudit can
+[automatically generate a report](#automatic-reports-of-expired-overrides) to
+check for *expired* overrides every time a package is removed from the
+`ignored_packages` list in your *Preferences.sublime-settings* file.
+
+As well as happening when you manually decide to re-enable a package you have
+been ignoring, this is also an indication that
+[Package Control](https://packagecontrol.io/) has finished upgrading a package.
+
+The value of this setting specifies how long (in seconds) OverrideAudit should
+wait before generating the automatic report. If another package is removed from
+the list before this time expires, the timer is reset so that multiple reports
+are not generated back to back.
+
+The default setting is 300 seconds (5 minutes) which should be enough time to
+ensure that all package upgrades have completed before generating the report.
+
+Setting this value to `0` turns off automatic reports in this case.
 
 ---
 
