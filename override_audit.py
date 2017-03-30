@@ -38,7 +38,7 @@ def plugin_loaded():
         "diff_unchanged": "diff",
         "diff_context_lines": 3,
         "confirm_deletion": True,
-        "binary_file_patterns": None,
+        "binary_file_patterns": None, # Inherits from user preferences
         "report_on_unignore": True
     }
 
@@ -365,8 +365,12 @@ class OverrideDiffThread(BackgroundWorkerThread):
 
         if not pkg_info or not override:
             self.diff = None
-            _log("diff thread not given a package or override to diff")
-            return
+            return _log("diff thread not given a package or override to diff")
+
+        # Only need to do this if the user has a specific setting
+        binary_patterns = _oa_setting("binary_file_patterns")
+        if binary_patterns is not None:
+            pkg_info.set_binary_pattern(binary_patterns)
 
         self.diff = pkg_info.override_diff(override, context_lines,
                                            binary_result="<File is binary>")
@@ -559,6 +563,7 @@ class BulkDiffReportThread(ReportGenerationThread):
 
     def _diff_packages(self, names, pkg_list, single_package, force_reuse):
         context_lines = _oa_setting("diff_context_lines")
+        binary_patterns = _oa_setting("binary_file_patterns")
 
         result = []
         title = "Override Diff Report: "
@@ -575,6 +580,8 @@ class BulkDiffReportThread(ReportGenerationThread):
 
         for name in names:
             pkg_info = pkg_list[name]
+            if binary_patterns is not None:
+                pkg_info.set_binary_pattern(binary_patterns)
 
             result.append(_decorate_package_name(pkg_info))
             self._perform_diff(pkg_info, context_lines, result)

@@ -198,7 +198,7 @@ class PackageInfo():
         self.overrides = dict()
         self.expired_overrides = dict()
 
-        self.binary_patterns = None
+        self.binary_patterns = settings.get("binary_file_patterns", [])
 
     def __repr__(self):
         return "[name={0}, shipped={1}, installed={2}, unpacked={3}]".format(
@@ -291,13 +291,6 @@ class PackageInfo():
             return None
 
     def _override_is_binary(self, override_file):
-        if self.binary_patterns is None:
-            settings = sublime.load_settings("OverrideAudit.sublime-settings")
-            if not settings.has("binary_file_patterns"):
-                settings = sublime.load_settings("Preferences.sublime-settings")
-
-            self.binary_patterns = settings.get("binary_file_patterns", [])
-
         for pattern in self.binary_patterns:
             if fnmatch.fnmatch(override_file, pattern):
                 return True
@@ -425,6 +418,18 @@ class PackageInfo():
 
         self.expired_overrides[simple] = result
         return self.expired_overrides[simple]
+
+    def set_binary_pattern(self, pattern_list):
+        """
+        Set the list of file patterns that should be considered to be binary
+        during a diff. Any file that matches one of these patterns will not be
+        diffed.
+
+        The default is to use the "binary_file_patterns" setting from the
+        Preferences.sublime-settings file, so you only need to change this if
+        you want to alter that default.
+        """
+        self.binary_patterns = pattern_list
 
     def override_diff(self, override_file, context_lines, empty_result=None,
                       binary_result=None, indent=None):
