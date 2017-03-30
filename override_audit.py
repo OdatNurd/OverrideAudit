@@ -2,7 +2,6 @@ import sublime
 import sublime_plugin
 
 from bisect import bisect
-import threading
 import os
 
 import sys
@@ -11,14 +10,17 @@ from imp import reload
 
 # If our submodules have previously been loaded, reload them now before we
 # proceed to ensure everything is up to date.
-modules = ["OverrideAudit.lib.packages", "OverrideAudit.lib.output_view"]
-for module in modules:
+prefix = "OverrideAudit.lib."
+sub_modules = ["packages", "output_view", "threads"]
+for module in sub_modules:
+    module = prefix + module
     if module in sys.modules:
         reload(sys.modules[module])
 
 
 from .lib.packages import PackageInfo, PackageList, PackageFileSet
 from .lib.output_view import output_to_view
+from .lib.threads import BackgroundWorkerThread
 
 
 ###----------------------------------------------------------------------------
@@ -324,83 +326,6 @@ class AutoReportTrigger():
 ###----------------------------------------------------------------------------
 
 
-class Spinner():
-    """
-    A simple spinner that follows the active view in the provided window which
-    self terminates when the provided thread is no longer running.
-    """
-    spin_text = "|/-\\"
-
-    def __init__(self, window, thread, prefix):
-        self.window = window
-        self.thread = thread
-        self.prefix = prefix
-        self.tick_view = None
-
-        sublime.set_timeout(lambda: self.tick(0), 250)
-
-    def tick(self, position):
-        current_view = self.window.active_view()
-
-        if self.tick_view is not None and current_view != self.tick_view:
-            self.tick_view.erase_status("oa_spinner")
-            self.tick_view = None
-
-        if not self.thread.is_alive():
-            current_view.erase_status("oa_spinner")
-            return
-
-        text = "%s [%s]" % (self.prefix, self.spin_text[position])
-        position = (position + 1) % len(self.spin_text)
-
-        current_view.set_status("oa_spinner", text)
-        if self.tick_view is None:
-            self.tick_view = current_view
-
-        sublime.set_timeout(lambda: self.tick(position), 250)
-
-
-###----------------------------------------------------------------------------
-
-
-class BackgroundWorkerThread(threading.Thread):
-    """
-    A thread for performing a task in the background, optionally executing a
-    callback in the main thread when processing has completed.
-
-    If given, the callback is invoked in the main thread after processing has
-    completed, with the thread instance as a parameter so that results can be
-    collected.
-    """
-    def __init__(self, window, spinner_text, callback, **kwargs):
-        super().__init__()
-
-        self.window = window
-        self.spinner_text = spinner_text
-        self.callback = callback
-        self.args = kwargs
-
-    def _check_result(self):
-        if self.is_alive():
-            sublime.set_timeout(lambda: self._check_result(), 100)
-            return
-
-        if self.callback is not None:
-            self.callback(self)
-
-    def _process(self):
-        pass
-
-    def run(self):
-        Spinner(self.window, self, self.spinner_text)
-        sublime.set_timeout(lambda: self._check_result(), 10)
-
-        self._process()
-
-
-###----------------------------------------------------------------------------
-
-
 class PackageListCollectionThread(BackgroundWorkerThread):
     """
     Collect the list of packages (and optionally also overrides) in the
@@ -438,18 +363,20 @@ class OverrideDiffThread(BackgroundWorkerThread):
 ###----------------------------------------------------------------------------
 
 
-class ReportGenerationThread(threading.Thread):
+class ReportGenerationThread(BackgroundWorkerThread):
     """
     Helper base class for generating a report in a background thread.
     """
-    def __init__(self, window, prefix, **kwargs):
-        super().__init__()
+    def __init__(self, window, spinner_text, **kwargs):
+        super().__init__(window, spinner_text,
+                         lambda thread: self._display_report(thread),
+                         **kwargs)
 
-        self.window = window
-        self.args = kwargs
-        Spinner(self.window, self, prefix)
+    def _display_report(self, thread):
+        # Some reports don't call _set_content if they are empty
+        if not hasattr(self, "content"):
+            return
 
-    def _display_report(self):
         settings = sublime.load_settings("OverrideAudit.sublime-settings")
         force_reuse = self.args.get("force_reuse", False)
 
@@ -466,7 +393,6 @@ class ReportGenerationThread(threading.Thread):
         self.report_type = report_type
         self.syntax = syntax
 
-        sublime.set_timeout(self._display_report(), 10)
 
 ###----------------------------------------------------------------------------
 
@@ -475,7 +401,7 @@ class PackageReportThread(ReportGenerationThread):
     """
     Generate a tabular report of all installed packages and their state.
     """
-    def run(self):
+    def _process(self):
         pkg_list = PackageList()
         pkg_counts = pkg_list.package_counts()
 
@@ -515,7 +441,7 @@ class OverrideReportThread(ReportGenerationThread):
     if any. The report always includes expired packages and overrides, but the
     optional paramter filters to only show expired results.
     """
-    def run(self):
+    def _process(self):
         pkg_list = PackageList()
 
         settings = sublime.load_settings("OverrideAudit.sublime-settings")
@@ -604,7 +530,7 @@ class BulkDiffReportThread(ReportGenerationThread):
     This is invoked from OverrideAuditDiffOverride when you invoke that command
     with the bulk argument set to true.
     """
-    def run(self):
+    def _process(self):
         pkg_list = PackageList()
 
         package = self.args["package"]
