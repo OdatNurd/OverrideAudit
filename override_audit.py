@@ -33,13 +33,15 @@ def plugin_loaded():
     _oa_setting.obj = sublime.load_settings("OverrideAudit.sublime-settings")
     _oa_setting.default = {
         "reuse_views": True,
-        "clear_existing": False,
+        "clear_existing": True,
         "ignore_overrides_in": [],
         "diff_unchanged": "diff",
         "diff_context_lines": 3,
         "confirm_deletion": True,
-        "binary_file_patterns": None, # Inherits from user preferences
-        "report_on_unignore": True
+        "report_on_unignore": True,
+
+        # Inherits from user preferences
+        "binary_file_patterns": None
     }
 
     PackageInfo.init()
@@ -98,27 +100,22 @@ def _packages_with_overrides(pkg_list, name_list=None):
     return items
 
 
-def _pkg_display_name(pkg_info):
-    """
-    Return the name to be used to display a package in reports, which is the
-    base package name potentially modified to include the visual distinctions
-    that indicate if it is disabled or a dependency.
-    """
-    if pkg_info.is_disabled:
-        return "[%s]" % pkg_info.name
-    elif pkg_info.is_dependency:
-        return "<%s>" % pkg_info.name
-    else:
-        return pkg_info.name
-
-
-def _decorate_package_name(pkg_info):
+def _decorate_pkg_name(pkg_info, name_only=False):
     """
     Decorate the name of the provided package with a prefix that describes its
     status and optionally also a suffix if it is a complete override or is
     expired.
     """
     suffix = ""
+    pkg_name = pkg_info.name
+
+    if pkg_info.is_disabled:
+        pkg_name = "[%s]" % pkg_name
+    elif pkg_info.is_dependency:
+        pkg_name = "<%s>" % pkg_name
+
+    if name_only:
+        return pkg_name
 
     if pkg_info.has_possible_overrides(simple=False):
         suffix += " <Complete Override>"
@@ -130,7 +127,7 @@ def _decorate_package_name(pkg_info):
                "S" if pkg_info.shipped_path is not None else " ",
                "I" if pkg_info.installed_path is not None else " ",
                "U" if pkg_info.unpacked_path is not None else " ",
-               _pkg_display_name(pkg_info),
+               pkg_name,
                suffix)
 
 
@@ -437,7 +434,7 @@ class PackageReportThread(ReportGenerationThread):
         for pkg_name, pkg_info in pkg_list:
             result.append(
                 "| {:<40} | [{:1}] | [{:1}] | [{:1}] |".format(
-                    _pkg_display_name(pkg_info),
+                    _decorate_pkg_name(pkg_info, name_only=True),
                     "S" if pkg_info.shipped_path is not None else " ",
                     "I" if pkg_info.installed_path is not None else " ",
                     "U" if pkg_info.unpacked_path is not None else " "))
@@ -505,7 +502,7 @@ class OverrideReportThread(ReportGenerationThread):
         if only_expired and not expired_overrides and not expired_pkg:
             return False
 
-        result.append(_decorate_package_name(pkg_info))
+        result.append(_decorate_pkg_name(pkg_info))
 
         self._output_overrides(result, normal_overrides,
                                expired_overrides, only_expired)
@@ -583,7 +580,7 @@ class BulkDiffReportThread(ReportGenerationThread):
             if binary_patterns is not None:
                 pkg_info.set_binary_pattern(binary_patterns)
 
-            result.append(_decorate_package_name(pkg_info))
+            result.append(_decorate_pkg_name(pkg_info))
             self._perform_diff(pkg_info, context_lines, result)
 
         self._set_content(title, result, report_type, _oa_syntax("OA-Diff"))
