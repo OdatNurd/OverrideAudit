@@ -30,6 +30,18 @@ def plugin_loaded():
     """
     Initialize plugin state.
     """
+    _oa_setting.obj = sublime.load_settings("OverrideAudit.sublime-settings")
+    _oa_setting.default = {
+        "reuse_views": True,
+        "clear_existing": False,
+        "ignore_overrides_in": [],
+        "diff_unchanged": "diff",
+        "diff_context_lines": 3,
+        "confirm_deletion": True,
+        "binary_file_patterns": None,
+        "report_on_unignore": True
+    }
+
     PackageInfo.init()
     AutoReportTrigger()
 
@@ -51,11 +63,20 @@ def _log(message, *args, status=False):
     if status:
         sublime.active_window().status_message(message)
 
+
 def _oa_syntax(file):
     """
     Return the full name of an Override Audit syntax based on the short name.
     """
     return "Packages/OverrideAudit/syntax/%s.sublime-syntax" % file
+
+
+def _oa_setting(key):
+    """
+    Get an OverrideAudit setting from a cached settings object.
+    """
+    default = _oa_setting.default.get(key, None)
+    return _oa_setting.obj.get(key, default)
 
 
 def _packages_with_overrides(pkg_list, name_list=None):
@@ -67,9 +88,7 @@ def _packages_with_overrides(pkg_list, name_list=None):
     Optionally, if name_list is provided, the list of package names will be
     filtered to only include packages whose name also exists in the name list.
     """
-    settings = sublime.load_settings("OverrideAudit.sublime-settings")
-    ignored = settings.get("ignore_overrides_in", [])
-
+    ignored = _oa_setting("ignore_overrides_in")
     items = [name for name, pkg in pkg_list if len(pkg.override_files()) > 0
                                                and name not in ignored]
 
@@ -156,8 +175,7 @@ def _delete_override_file(window, pkg_name, override):
     # Import send2trash on demand; see Default/side_bar.py.
     import Default.send2trash as send2trash
 
-    settings = sublime.load_settings("OverrideAudit.sublime-settings")
-    confirm = settings.get("confirm_deletion", True)
+    confirm = _oa_setting("confirm_deletion")
 
     relative_name = os.path.join(pkg_name, override)
     full_name = os.path.join(sublime.packages_path(), relative_name)
@@ -176,16 +194,14 @@ def _thr_diff_override(window, pkg_info, override,
     """
     Generate a diff for the given package and override in a background thread,
     """
-    settings = sublime.load_settings("OverrideAudit.sublime-settings")
-    context_lines = settings.get("diff_context_lines", 3)
-
-    action = "diff" if diff_only else settings.get("diff_unchanged", "diff")
+    context_lines = _oa_setting("diff_context_lines")
+    action = "diff" if diff_only else _oa_setting("diff_unchanged")
 
     if force_reuse:
         reuse, clear = True, True
     else:
-        reuse = settings.get("reuse_views", True)
-        clear = settings.get("clear_existing", True)
+        reuse = _oa_setting("reuse_views")
+        clear = _oa_setting("clear_existing")
 
     def _process_diff(thread):
         diff_info = thread.diff
@@ -303,10 +319,7 @@ class AutoReportTrigger():
         added = new_list - self.cached_ignored
         self.cached_ignored = new_list
 
-        oa_settings = sublime.load_settings("OverrideAudit.sublime-settings")
-        report = oa_settings.get("report_on_unignore", True)
-
-        if not report:
+        if not _oa_setting("report_on_unignore"):
             return
 
         self.removed |= removed
@@ -345,8 +358,7 @@ class OverrideDiffThread(BackgroundWorkerThread):
     Diff a specific package override in a background thread.
     """
     def _process(self):
-        settings = sublime.load_settings("OverrideAudit.sublime-settings")
-        context_lines = settings.get("diff_context_lines", 3)
+        context_lines = _oa_setting("diff_context_lines")
 
         pkg_info = self.args.get("pkg_info", None)
         override = self.args.get("override", None)
@@ -377,11 +389,10 @@ class ReportGenerationThread(BackgroundWorkerThread):
         if not hasattr(self, "content"):
             return
 
-        settings = sublime.load_settings("OverrideAudit.sublime-settings")
         force_reuse = self.args.get("force_reuse", False)
 
-        reuse = True if force_reuse else settings.get("reuse_views", True)
-        clear = True if force_reuse else settings.get("clear_existing", True)
+        reuse = True if force_reuse else _oa_setting("reuse_views")
+        clear = True if force_reuse else _oa_setting("clear_existing")
 
         view = output_to_view(self.window, self.caption, self.content,
                               reuse, clear, self.syntax)
@@ -444,8 +455,7 @@ class OverrideReportThread(ReportGenerationThread):
     def _process(self):
         pkg_list = PackageList()
 
-        settings = sublime.load_settings("OverrideAudit.sublime-settings")
-        ignored = settings.get("ignore_overrides_in", [])
+        ignored = _oa_setting("ignore_overrides_in")
 
         only_expired = self.args["only_expired"]
         ignore_empty = self.args["ignore_empty"]
@@ -548,8 +558,7 @@ class BulkDiffReportThread(ReportGenerationThread):
         self._diff_packages(items, pkg_list, package is not None, force_reuse)
 
     def _diff_packages(self, names, pkg_list, single_package, force_reuse):
-        settings = sublime.load_settings("OverrideAudit.sublime-settings")
-        context_lines = settings.get("diff_context_lines", 3)
+        context_lines = _oa_setting("diff_context_lines")
 
         result = []
         title = "Override Diff Report: "
