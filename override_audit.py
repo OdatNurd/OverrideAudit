@@ -1,6 +1,7 @@
 import sublime
 import sublime_plugin
 
+from datetime import datetime
 from bisect import bisect
 import os
 
@@ -371,6 +372,9 @@ class ReportGenerationThread(BackgroundWorkerThread):
                          lambda thread: self._display_report(thread),
                          **kwargs)
 
+    def _generation_time(self):
+        return datetime.now().strftime("Report Generated: %Y-%m-%d %H:%M:%S\n")
+
     def _display_report(self, thread):
         # Some reports don't call _set_content if they are empty
         if not hasattr(self, "content"):
@@ -416,7 +420,7 @@ class PackageReportThread(ReportGenerationThread):
         row = "| {:<40} | {:3} | {:3} | {:<3} |".format("", "", "", "")
         r_sep = "-" * len(row)
 
-        result = [title, t_sep, "", stats, r_sep]
+        result = [title, t_sep, "", self._generation_time(), stats, r_sep]
         for pkg_name, pkg_info in pkg_list:
             result.append(
                 "| {:<40} | [{:1}] | [{:1}] | [{:1}] |".format(
@@ -458,6 +462,7 @@ class OverrideReportThread(ReportGenerationThread):
         if only_expired:
             result.append("WARNING: Showing only expired overrides!\n"
                           "WARNING: Non-expired overrides may exist!\n")
+        result.append(self._generation_time())
 
         displayed = 0
         for pkg_name, pkg_info in pkg_list:
@@ -560,6 +565,8 @@ class BulkDiffReportThread(ReportGenerationThread):
         else:
             title += "All Packages"
             result.append(description + " {} packages\n".format(len(names)))
+
+        result.append(self._generation_time())
 
         for name in names:
             pkg_info = pkg_list[name]
