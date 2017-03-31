@@ -11,7 +11,7 @@ from imp import reload
 # If our submodules have previously been loaded, reload them now before we
 # proceed to ensure everything is up to date.
 prefix = "OverrideAudit.lib."
-sub_modules = ["packages", "output_view", "threads"]
+sub_modules = ["packages", "output_view", "threads", "utils"]
 for module in sub_modules:
     module = prefix + module
     if module in sys.modules:
@@ -21,6 +21,18 @@ for module in sub_modules:
 from .lib.packages import PackageInfo, PackageList, PackageFileSet
 from .lib.output_view import output_to_view
 from .lib.threads import BackgroundWorkerThread
+from .lib.utils import SettingsGroup
+
+
+###----------------------------------------------------------------------------
+
+
+# A group of view settings that indicate that a view is either an override or a
+# diff of one. The settings indicate what package and override the contents of
+# the buffer represents.
+override_group = SettingsGroup("override_audit_package",
+                               "override_audit_override",
+                               "override_audit_diff")
 
 
 ###----------------------------------------------------------------------------
@@ -131,33 +143,7 @@ def _decorate_pkg_name(pkg_info, name_only=False):
                suffix)
 
 
-def _apply_override_settings(view, pkg_name, override, is_diff):
-    """
-    Apply view settings marking the view as an override view.
-    """
-    view.settings().set("override_audit_package", pkg_name)
-    view.settings().set("override_audit_override", override)
-    view.settings().set("override_audit_diff", is_diff)
-
-
-def _remove_override_settings(view):
-    """
-    Remove view settings marking the view as an override view.
-    """
-    view.settings().erase("override_audit_package")
-    view.settings().erase("override_audit_override")
-    view.settings().erase("override_audit_diff")
-
-
-def _apply_report_settings(view, report_type):
-    """
-    Apply view settings marking the view as a report view.
-    """
-    view.settings().set("override_audit_report", True)
-    view.settings().set("override_audit_report_type", report_type)
-
-
-def _open_override_file(window, pkg_name, override):
+def _open_override(window, pkg_name, override):
     """
     Open the provided override from the given package name.
     """
@@ -165,7 +151,7 @@ def _open_override_file(window, pkg_name, override):
     window.open_file(filename)
 
 
-def _delete_override_file(window, pkg_name, override):
+def _delete_override(window, pkg_name, override):
     """
     Delete the provided override from the given package name.
     """
@@ -209,7 +195,7 @@ def _thr_diff_override(window, pkg_info, override,
             sublime.status_message("No changes detected in override")
 
             if action == "open":
-                return _open_override_file(window, pkg_info.name, override)
+                return _open_override(window, pkg_info.name, override)
 
             elif action == "ignore":
                 return
@@ -219,7 +205,7 @@ def _thr_diff_override(window, pkg_info, override,
         view = output_to_view(window, title, content, reuse, clear,
                               "Packages/Diff/Diff.sublime-syntax")
 
-        _apply_override_settings(view, pkg_info.name, override, True)
+        override_group.apply(view, pkg_info.name, override, True)
 
     callback = lambda thread: _process_diff(thread)
     OverrideDiffThread(window, "Diffing Override", callback,
@@ -397,7 +383,7 @@ class ReportGenerationThread(BackgroundWorkerThread):
 
         view = output_to_view(self.window, self.caption, self.content,
                               reuse, clear, self.syntax)
-        _apply_report_settings(view, self.report_type)
+        view.settings().set("override_audit_report_type", self.report_type)
 
     def _set_content(self, caption, content, report_type, syntax):
         self.caption = caption
@@ -768,10 +754,7 @@ class ContextHelper():
 
     def _report_type(self, **kwargs):
         target = self.view_target(self.view, **kwargs)
-        if target.settings().get("override_audit_report", False) is True:
-            return target.settings().get("override_audit_report_type")
-
-        return None
+        return target.settings().get("override_audit_report_type")
 
     def view_target(self, view, group=-1, index=-1, **kwargs):
         """
@@ -787,8 +770,6 @@ class ContextHelper():
         do not apply or cannot be determined by the current command state.
 
         If view is none, view_target is invoked to determine it.
-
-        Some/all members of the tuple may be None.
         """
         if view is None:
             view = self.view_target(self.view, **kwargs)
@@ -798,13 +779,8 @@ class ContextHelper():
         is_diff = None
 
         # Favor settings if they exist
-        settings = view.settings()
-        if (settings.has("override_audit_package") and
-                settings.has("override_audit_override")):
-
-            pkg_name = view.settings().get("override_audit_package")
-            override = view.settings().get("override_audit_override")
-            is_diff  = view.settings().get("override_audit_diff", None)
+        if override_group.has(view):
+            pkg_name, override, is_diff = override_group.get(view)
 
         # Check for context clicks on a package or override name
         elif event is not None:
@@ -844,10 +820,10 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
             self._context_diff(target.window(), pkg_name, override)
 
         elif action == "edit":
-            _open_override_file(target.window(), pkg_name, override)
+            _open_override(target.window(), pkg_name, override)
 
         elif action == "delete":
-            _delete_override_file(target.window(), pkg_name, override)
+            _delete_override(target.window(), pkg_name, override)
 
         else:
             print("Error: unknown action for override context")
@@ -967,9 +943,9 @@ class OverrideAuditEventListener(sublime_plugin.EventListener):
 
         result = PackageInfo.check_potential_override(filename)
         if result is not None:
-            _apply_override_settings(view, result[0], result[1], False)
+            override_group.apply(view, result[0], result[1], False)
         else:
-            _remove_override_settings(view)
+            override_group.remove(view)
 
     def on_post_save_async(self, view):
         # Will remove existing settings if the view is no longer an override
@@ -985,8 +961,7 @@ class OverrideAuditEventListener(sublime_plugin.EventListener):
         if key != "override_audit_override_view":
             return None
 
-        return (view.settings().has("override_audit_package") and
-                view.settings().has("override_audit_override"))
+        return override_group.has(view)
 
 
 ###----------------------------------------------------------------------------
