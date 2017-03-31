@@ -10,13 +10,11 @@
     },
 
     // Refresh the current OverrideAudit report
-    //
-    // Copy to your user key bindings and uncomment to activate.
-    // {
-    //     "keys": ["f5"],
-    //     "command": "override_audit_context_report",
-    //     "context": [
-    //         { "key": "override_audit_report_view" }
-    //     ]
-    // }
+    {
+        "keys": ["f5"],
+        "command": "override_audit_context_report",
+        "context": [
+            { "key": "override_audit_report_view" }
+        ]
+    }
 ]
