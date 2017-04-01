@@ -545,8 +545,8 @@ class BulkDiffReportThread(ReportGenerationThread):
 
         if package is not None:
             if package not in pkg_list:
-                _log("Cannot diff package; package not found")
-                return
+                return _log("Cannot diff package '%s'; not found" % package,
+                            status=True, dialog=True)
 
             items = [package]
         else:
@@ -567,6 +567,9 @@ class BulkDiffReportThread(ReportGenerationThread):
             title += names[0]
             result.append(description + " {}\n".format(names[0]))
             report_type = names[0]
+        elif len(names) == 0:
+            title += "All Packages"
+            result.append("No packages with overrides found to diff\n")
         else:
             title += "All Packages"
             result.append(description + " {} packages\n".format(len(names)))
@@ -603,7 +606,12 @@ class BulkDiffReportThread(ReportGenerationThread):
             result.extend([diff, ""])
 
         if len(override_list) == 0:
-            result.append("    [No simple overrides found]")
+            if pkg_info.has_possible_overrides(simple=True):
+                result.append("    [No simple overrides found]")
+            else:
+                reason = ("no sublime-package" if pkg_info.is_unpacked() else
+                          "no unpacked files")
+                result.append("    [No overrides possible; %s]" % reason)
         result.append("")
 
 
