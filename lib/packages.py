@@ -274,7 +274,14 @@ class PackageInfo():
 
                 return (content, source, mtime)
 
-        except (KeyError, UnicodeDecodeError, FileNotFoundError):
+        except (KeyError, FileNotFoundError):
+            print("Error loading %s:%s; cannot find file in sublime-package" %
+                  (self.package_file(), override_file))
+            return None
+
+        except UnicodeDecodeError:
+            print("Error loading %s:%s; unable to decode file contents" %
+                  (self.package_file(), override_file))
             return None
 
     def _get_unpacked_override_contents(self, override_file):
@@ -287,7 +294,13 @@ class PackageInfo():
             source = os.path.join("Packages", self.name, override_file)
 
             return (content, source, mtime.strftime("%Y-%m-%d %H:%M:%S"))
-        except (UnicodeDecodeError, FileNotFoundError):
+
+        except FileNotFoundError:
+            print("Error loading %s; cannot find file" % name)
+            return None
+
+        except UnicodeDecodeError:
+            print("Error loading %s; unabble to decode file contents" % name)
             return None
 
     def _override_is_binary(self, override_file):
