@@ -78,21 +78,21 @@ class BackgroundWorkerThread(threading.Thread):
         self.callback = callback
         self.args = kwargs
 
-    def _check_result(self):
-        if self.is_alive():
-            return sublime.set_timeout(lambda: self._check_result(), 100)
-
-        if self.callback is not None:
-            self.callback(self)
-
     def _process(self):
         pass
 
     def run(self):
         Spinner(self.window, self, self.spinner_text)
-        sublime.set_timeout(lambda: self._check_result(), 10)
 
         self._process()
+
+        if self.callback is not None:
+            # Make sure we don't make a circular reference to ourselves or we
+            # will leak when the thread terminates.
+            callback = self.callback
+            del self.callback
+
+            sublime.set_timeout(lambda: callback(self), 1)
 
 
 ###----------------------------------------------------------------------------
