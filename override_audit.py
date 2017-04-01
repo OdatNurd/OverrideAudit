@@ -848,7 +848,7 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
             _delete_override(target.window(), pkg_name, override)
 
         else:
-            print("Error: unknown action for override context")
+            _log("Error: unknown action for override context: %s", action)
 
     def _context_diff(self, window, package, override):
         callback = lambda thr: self._pkg_loaded(thr, window, package, override)
