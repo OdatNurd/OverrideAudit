@@ -192,7 +192,10 @@ def _thr_diff_override(window, pkg_info, override,
     def _process_diff(thread):
         diff_info = thread.diff
         if diff_info is None:
-            return
+            return _log("Unable to diff %s/%s\n\n"
+                        "Error loading file contents of one or both files.\n"
+                        "Check the console for more information",
+                        pkg_info.name, override, dialog=True)
 
         if diff_info == "":
             sublime.status_message("No changes detected in override")
