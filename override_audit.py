@@ -68,7 +68,7 @@ def plugin_unloaded():
     AutoReportTrigger.unregister()
 
 
-def _log(message, *args, status=False):
+def _log(message, *args, status=False, dialog=False):
     """
     Simple logging method; writes to the console and optionally also the status
     message as well.
@@ -77,6 +77,8 @@ def _log(message, *args, status=False):
     print("OverrideAudit:", message)
     if status:
         sublime.active_window().status_message(message)
+    if dialog:
+        sublime.message_dialog(message)
 
 
 def _oa_syntax(file):
