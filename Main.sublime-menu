@@ -37,53 +37,63 @@
                         "children":
                         [
                             {
-                                "command": "override_audit_edit_settings",
+                                "caption": "README",
+                                "command": "open_file",
                                 "args": {
-                                    "base_file": "${packages}/OverrideAudit/OverrideAudit.sublime-settings",
-                                    "default": "{\n\t$0\n}\n"
-                                },
-                                "caption": "Settings"
-                            },
-                            {
-                                "command": "override_audit_open_file",
-                                "args": {
-                                    "file": "${packages}/OverrideAudit/OverrideAudit.sublime-settings"
-                                },
-                                "caption": "Settings – Default"
-                            },
-                            {
-                                "command": "override_audit_open_file",
-                                "args": {
-                                    "file": "${packages}/User/OverrideAudit.sublime-settings",
-                                    "contents": "{\n\t$0\n}\n"
-                                },
-                                "caption": "Settings – User"
+                                    "file": "${packages}/OverrideAudit/README.md"
+                                }
                             },
 
                             { "caption": "-" },
 
                             {
+                                "caption": "Settings",
+                                "command": "override_audit_edit_settings",
+                                "args": {
+                                    "base_file": "${packages}/OverrideAudit/OverrideAudit.sublime-settings",
+                                    "default": "{\n\t$0\n}\n"
+                                }
+                            },
+                            {
+                                "caption": "Settings – Default",
+                                "command": "override_audit_open_file",
+                                "args": {
+                                    "file": "${packages}/OverrideAudit/OverrideAudit.sublime-settings"
+                                }
+                            },
+                            {
+                                "caption": "Settings – User",
+                                "command": "override_audit_open_file",
+                                "args": {
+                                    "file": "${packages}/User/OverrideAudit.sublime-settings",
+                                    "contents": "{\n\t$0\n}\n"
+                                }
+                            },
+
+                            { "caption": "-" },
+
+                            {
+                                "caption": "Key Bindings",
                                 "command": "override_audit_edit_settings",
                                 "args": {
                                     "base_file": "${packages}/OverrideAudit/Default ($platform).sublime-keymap",
                                     "default": "[\n\t$0\n]\n"
-                                },
-                                "caption": "Key Bindings"
+                                }
                             },
                             {
+                                "caption": "Key Bindings – Default",
                                 "command": "override_audit_open_file",
                                 "args": {
                                     "file": "${packages}/OverrideAudit/Default ($platform).sublime-keymap"
-                                },
-                                "caption": "Key Bindings – Default"
+                                }
                             },
                             {
+                                "caption": "Key Bindings – User",
                                 "command": "override_audit_open_file",
                                 "args": {
                                     "file": "${packages}/User/Default ($platform).sublime-keymap",
                                     "contents": "[\n\t$0\n]\n"
-                                },
-                                "caption": "Key Bindings – User"
+                                }
                             }
                         ]
                     }

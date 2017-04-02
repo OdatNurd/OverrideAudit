@@ -1,5 +1,12 @@
 [
     {
+        "caption": "OverrideAudit: View README",
+        "command": "open_file",
+        "args": {
+            "file": "${packages}/OverrideAudit/README.md"
+        }
+    },
+    {
         "caption": "Preferences: OverrideAudit Settings",
         "command": "override_audit_edit_settings",
         "args": {
