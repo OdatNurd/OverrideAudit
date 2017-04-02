@@ -21,6 +21,10 @@
     // do nothing, "diff" to open a view and indicate that there are no changes
     // or "open" to open the override as a regular file, allowing you to view or
     // modify it.
+    //
+    // This setting only applies to the Diff Single Override option; when
+    // performing a diff via a context menu, OverrideAudit acts as if this
+    // is set to "diff".
     "diff_unchanged": "diff",
 
     // The number of lines of context to show before and after each different

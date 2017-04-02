@@ -198,7 +198,8 @@ def _thr_diff_override(window, pkg_info, override,
                         pkg_info.name, override, dialog=True)
 
         if diff_info == "":
-            sublime.status_message("No changes detected in override")
+            _log("No changes detected in %s/%s", pkg_info.name, override,
+                 status=True)
 
             if action == "open":
                 return _open_override(window, pkg_info.name, override)
