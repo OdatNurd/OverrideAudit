@@ -1,48 +1,27 @@
 OverrideAudit
 =============
 
----
+OverrideAudit is a package for Sublime Text 3 that helps you detect and work
+with your package overrides, allowing you to easily see a list of files that
+you are overriding, see what changes your override provides, and most
+importantly to  provide warnings to you when the file you are overriding has
+been changed by its author so you can determine what course of action to take.
 
-**NOTE:** This package is still under active development, so things are still
-in a state of flux and not all planned features are currently implemented,
-although everything currently listed in this README is in a usable state.
 
-I endeavor not to push any breaking changes but it is entirely possible that
-commands or their operation may slightly change out from under you between
-updates.
+-------------------------------------------------------------------------------
 
-Suggestions/improvements are also quite welcomed!
-
----
-
-OverrideAudit is a plugin for Sublime Text 3 which helps you detect and work
-with your package overrides. This allows you to easily see a list of files that
-you are overriding, see what changes you have made, and provide warnings to you
-when the file you are overriding has been changed.
-
----
 
 ## Installation ##
 
 ### Package Control ###
 
-The best way to install the plugin is via PackageControl, as this will take
-care of ensuring that the plugin is kept up to date without your having to do
+The best way to install the package is via PackageControl, as this will take
+care of ensuring that the package is kept up to date without your having to do
 anything at all.
 
-OverrideAudit is currently not listed in Package Control because it's not
-officially released yet. In order to install via Package Control, open the
-Command Palette and select the command `Package Control: Add Repository` and
-then paste in the URL to this repository (https://github.com/OdatNurd/OverrideAudit).
-
-Once this is done, you will be able to install the package via the command
-palette using the command `Package Control: Install Package` and searching for
-`OverrideAudit`.
-
-<!--
 To install via Package Control, open the Command Palette and select the command
 `Package Control: Install Package` and search for `OverrideAudit`.
--->
+
 
 ### Manual Installation ###
 
@@ -55,7 +34,9 @@ responsible for manually keeping everything up to date. You should only use
 manual installation if you have a very compelling reason to do so and are
 familiar enough with the process to know how to do it properly.
 
----
+
+-------------------------------------------------------------------------------
+
 
 ## Usage ##
 
@@ -183,6 +164,7 @@ You can also access a bulk diff of a single package via a context menu on the
 name of a package in a `Package Report`, `Override Report` or a `Bulk Diff`
 report.
 
+
 ### `OverrideAudit: Refresh Report` ###
 
 This command is available from within all OverrideAudit report views (`Package
@@ -194,7 +176,8 @@ When a report is refreshed, OverrideAudit ignores the current values of the
 to `true` so that the existing report will be replaced.
 
 This command is also available as a context menu entry from within a report
-view or its associated editor tab.
+view or its associated editor tab and via the <kbd>F5</kbd> key, although you
+can change this binding to a key of your liking.
 
 
 ### `OverrideAudit: Swap Diff/Override View` ###
@@ -217,9 +200,10 @@ this override will be switched to directly. In the case of a diff view, the
 diff will be recalculated, allowing any *saved* changes to be immediately
 reflected.
 
-This command ignores the current values of the `reuse_view` and
-`clear_existing` settings and operates as if they are both set to `true` in
-order to ensure that you don't end up with a large number of duplicate views.
+This command ignores the current values of the `reuse_view`, `clear_existing`
+and `diff_unchanged` settings and operates as if they are set to `true`, `true`
+and `diff` respectively in order to ensure that you don't end up with a large
+number of duplicate views.
 
 
 ### `OverrideAudit: Delete Override` ###
@@ -245,7 +229,8 @@ The configuration setting `confirm_delete` can be set to `false` if you want to
 be able to delete overrides without being prompted first.
 
 
----
+-------------------------------------------------------------------------------
+
 
 ## Automatic Reports of Expired Overrides ##
 
@@ -276,7 +261,10 @@ An automated report will be generated in the following circumstances:
    preferences file. [Package Control](https://packagecontrol.io/) does this
    whenever it is upgrading a package, for example.
 
----
+
+-------------------------------------------------------------------------------
+
+
 ***NOTE:*** If you upgrade a package manually without adding it to the list of
 `ignored_packages` or while Sublime is not running, OverrideAudit will be
 unable to detect that anything has changed and will not automatically generate
@@ -285,13 +273,16 @@ a report for you.
 For this reason, it may be a good idea to manually run this report from the
 command palette as a part of your manual package upgrades.
 
----
+
+-------------------------------------------------------------------------------
+
 
 ## Configuration ##
 
 The following configuration options are available for OverrideAudit. You can
 see the default settings as well as your own custom settings under the
-`Preferences > Package Settings > OverrideAudit` menu entries. On MacOS, the
+`Preferences > Package Settings > OverrideAudit` menu entries or via the
+command palette with `Preferences: OverrideAudit Settings`. On MacOS, the
 `Preferences` menu is under `Sublime Text` in the menu.
 
 
@@ -301,6 +292,8 @@ OverrideAudit generally creates an output view to show you the results of
 operations. When this option is enabled (the default), OA will try to find the
 view created last time and reuse it for the new command. When disabled, a new
 view is created every time.
+
+Some OverrideAudit commands may ignore this setting.
 
 
 ### `clear_existing`: true/false (Default: true) ###
@@ -322,6 +315,8 @@ This does not affect packages displayed in the general package list; it only
 hides packages from lists that show packages with overrides, such as the
 Override Report or the commands that find and diff overrides.
 
+**NOTE:** Any overrides you create in packages in this list will be masked from
+you, so be very careful about what you add to the list.
 
 ### `diff_context_lines`: Number (Default: 3) ###
 
@@ -350,6 +345,7 @@ user settings, so you only need to specify a value in the *OverrideAudit*
 settings if you want to consider a different set of files binary for the
 purposes of diffs.
 
+
 ### `report_on_unignore`: Boolean (Default: true) ###
 
 OverrideAudit can
@@ -363,7 +359,9 @@ been ignoring, this is also an indication that
 
 When enabled, the report will only be shown if any expired overrides are found.
 
----
+
+-------------------------------------------------------------------------------
+
 
 ## Terminology ##
 
@@ -404,7 +402,7 @@ stored in a special location alongside the Sublime executable.This makes them
 common to all users of Sublime on the same computer.
 
 > The shipped package `Default.sublime-package` provides the set of default key
-> bindings, settings, menu entries and so on that all other plugins modify.
+> bindings, settings, menu entries and so on that all other packages modify.
 
 
 ### Installed Package ###
@@ -475,7 +473,9 @@ The tools in OverrideAudit are designed to help warn you when this is happening
 and allow you to easily see what has changed so you can decide how best to
 address the situation.
 
----
+
+-------------------------------------------------------------------------------
+
 
 ## License ##
 
