@@ -5,10 +5,13 @@ import sublime_plugin
 ###----------------------------------------------------------------------------
 
 
-def find_view(window, title):
+def find_view(window, title, current_view=None):
     """
     Attempt to find a view with the given title (name) in the given window
     """
+    if current_view is not None and current_view.name() == title:
+        return current_view
+
     for view in window.views():
         if view.name() == title:
             return view
@@ -76,11 +79,14 @@ def output_to_view(window,
                    reuse=True,
                    clear=True,
                    syntax=None,
-                   settings=None):
+                   settings=None,
+                   current_view=None):
     """
     Add the content provided to a view in the given window, which has the title
     provided. This will create a new view unless one with the title provided
-    already exists and resuse is true.
+    already exists and resuse is true. In the latter case current_view is
+    checked first to see if it is the appropriate view before scanning, so that
+    multiple views with the same title can be distinguished by the caller.
 
     If an existing view is used, clear indicates if the current content should
     be cleared or not before adding the new data.
@@ -100,7 +106,7 @@ def output_to_view(window,
     if not isinstance(content, str):
         content = "\n".join(content)
 
-    view = find_view(window, title) if (reuse) else None
+    view = find_view(window, title, current_view) if (reuse) else None
 
     if view is None:
         view = new_scratch_view(window, title, syntax)

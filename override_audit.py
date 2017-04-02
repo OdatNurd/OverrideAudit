@@ -373,10 +373,11 @@ class ReportGenerationThread(BackgroundWorkerThread):
     """
     Helper base class for generating a report in a background thread.
     """
-    def __init__(self, window, spinner_text, **kwargs):
+    def __init__(self, window, spinner_text, current_view, **kwargs):
         super().__init__(window, spinner_text,
                          lambda thread: self._display_report(thread),
                          **kwargs)
+        self.current_view = current_view
 
     def _generation_time(self):
         return datetime.now().strftime("Report Generated: %Y-%m-%d %H:%M:%S\n")
@@ -392,7 +393,8 @@ class ReportGenerationThread(BackgroundWorkerThread):
         clear = True if force_reuse else _oa_setting("clear_existing")
 
         view = output_to_view(self.window, self.caption, self.content,
-                              reuse, clear, self.syntax)
+                              reuse, clear, self.syntax,
+                              current_view=self.current_view)
         view.settings().set("override_audit_report_type", self.report_type)
 
     def _set_content(self, caption, content, report_type, syntax):
@@ -625,6 +627,7 @@ class OverrideAuditPackageReportCommand(sublime_plugin.WindowCommand):
     """
     def run(self, force_reuse=False):
         PackageReportThread(self.window, "Generating Package Report",
+                            self.window.active_view(),
                             force_reuse=force_reuse).start()
 
 
@@ -639,6 +642,7 @@ class OverrideAuditOverrideReportCommand(sublime_plugin.WindowCommand):
     """
     def run(self, force_reuse=False, only_expired=False, ignore_empty=False):
         OverrideReportThread(self.window, "Generating Override Report",
+                             self.window.active_view(),
                              force_reuse=force_reuse,
                              only_expired=only_expired,
                              ignore_empty=ignore_empty).start()
@@ -657,6 +661,7 @@ class OverrideAuditDiffPackageCommand(sublime_plugin.WindowCommand):
     """
     def run(self, package=None, force_reuse=False):
         BulkDiffReportThread(self.window, "Generating Bulk Diff",
+                             self.window.active_view(),
                              package=package, force_reuse=force_reuse).start()
 
 
@@ -918,7 +923,8 @@ class OverrideAuditContextReportCommand(ContextHelper,sublime_plugin.TextCommand
     Offer to refresh existing reports after manual changes have been made.
     """
     def run(self, edit, **kwargs):
-        window = self.view_target(self.view, **kwargs).window()
+        target_view = self.view_target(self.view, **kwargs)
+        window = target_view.window()
         report_type = self._report_type(**kwargs)
 
         command = {
@@ -933,6 +939,7 @@ class OverrideAuditContextReportCommand(ContextHelper,sublime_plugin.TextCommand
         elif report_type == ":overrides_expired":
             args["only_expired"] = True
 
+        window.focus_view(target_view)
         window.run_command(command, args)
 
     def description(self, **kwargs):
