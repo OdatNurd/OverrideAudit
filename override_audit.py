@@ -76,7 +76,7 @@ def _log(message, *args, status=False, dialog=False):
     message = message % args
     print("OverrideAudit:", message)
     if status:
-        sublime.active_window().status_message(message)
+        sublime.status_message(message)
     if dialog:
         sublime.message_dialog(message)
 
