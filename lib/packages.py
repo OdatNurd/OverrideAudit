@@ -257,10 +257,29 @@ class PackageInfo():
 
         return result
 
+    def __find_override_entry(self, zip, override_file):
+        """
+        Implement ZipFile.getinfo() as case insensitive for systems with a case
+        insensitive file system so that looking up overrides will work the same
+        as it does in the Sublime core.
+        """
+        try:
+            return zip.getinfo(override_file)
+
+        except KeyError:
+            if _wrap("ABC") == _wrap("abc"):
+                override_file = _wrap(override_file)
+                entry_list = zip.infolist()
+                for entry in entry_list:
+                    if _wrap(entry.filename) == override_file:
+                        return entry
+
+            raise
+
     def _get_packed_pkg_file_contents(self, override_file):
         try:
             with zipfile.ZipFile(self.package_file()) as zip:
-                info = zip.getinfo(override_file)
+                info = self.__find_override_entry(zip, override_file)
                 file = codecs.EncodedFile(zip.open(info, mode="rU"), "utf-8")
                 content = io.TextIOWrapper(file, encoding="utf-8").readlines()
 
