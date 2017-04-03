@@ -210,7 +210,7 @@ def _thr_diff_override(window, pkg_info, override,
         title = "Override of %s" % os.path.join(pkg_info.name, override)
         content = "No differences found" if diff_info == "" else diff_info
         view = output_to_view(window, title, content, reuse, clear,
-                              "Packages/Diff/Diff.sublime-syntax")
+                              "Packages/Diff/Diff.tmLanguage")
 
         override_group.apply(view, pkg_info.name, override, True)
 
