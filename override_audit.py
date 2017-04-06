@@ -167,7 +167,8 @@ def _delete_override(window, pkg_name, override):
     full_name = os.path.join(sublime.packages_path(), relative_name)
     if os.path.isfile(full_name):
         if confirm:
-            msg = "Confirm deletion:\n\n{}".format(relative_name)
+            msg = "Confirm deletion:\n\n{}".format(
+                PackageInfo.override_display(relative_name))
 
         if (confirm is False or
                 sublime.yes_no_cancel_dialog(msg) == sublime.DIALOG_YES):
@@ -207,7 +208,8 @@ def _thr_diff_override(window, pkg_info, override,
             elif action == "ignore":
                 return
 
-        title = "Override of %s" % os.path.join(pkg_info.name, override)
+        title = "Override of %s" % PackageInfo.override_display(
+            os.path.join(pkg_info.name, override))
         content = "No differences found" if diff_info == "" else diff_info
         view = output_to_view(window, title, content, reuse, clear,
                               "Packages/Diff/Diff.tmLanguage")

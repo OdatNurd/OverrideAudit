@@ -175,6 +175,19 @@ class PackageInfo():
 
         return None
 
+    @classmethod
+    def override_display(cls, override_file, pkg_name=None):
+    	"""
+    	Format an override name for display, optionally prefixing it with a
+        package name.
+
+    	Ensures that all overrides displayed use the forward slash style of path
+        separator that Sublime uses internally.
+    	"""
+    	if pkg_name is not None:
+    		override_file = "%s/%s" % (pkg_name, override_file)
+    	return _fixPath(override_file)
+
     def __init__(self, name):
         settings = sublime.load_settings("Preferences.sublime-settings")
         ignored_list = settings.get("ignored_packages", [])
@@ -288,10 +301,9 @@ class PackageInfo():
                     source = "Installed Packages"
 
                 source = os.path.join(source, self.name, override_file)
-
                 mtime = datetime(*info.date_time).strftime("%Y-%m-%d %H:%M:%S")
 
-                return (content, source, mtime)
+                return (content, _fixPath(source), mtime)
 
         except (KeyError, FileNotFoundError):
             print("Error loading %s:%s; cannot find file in sublime-package" %
@@ -312,7 +324,7 @@ class PackageInfo():
             mtime = datetime.fromtimestamp(os.stat(name).st_mtime)
             source = os.path.join("Packages", self.name, override_file)
 
-            return (content, source, mtime.strftime("%Y-%m-%d %H:%M:%S"))
+            return (content, _fixPath(source), mtime.strftime("%Y-%m-%d %H:%M:%S"))
 
         except FileNotFoundError:
             print("Error loading %s; cannot find file" % name)
