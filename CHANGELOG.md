@@ -9,6 +9,8 @@ Changes in the next release
     with how Sublime represents package path fragments internally (#14).
   * The package report, Override report and and bulk diff reports now have word
     wrap turned off by default.
+  * Enhanced the checks performed at file load and save so to more correctly
+    determine if a file is actually an override or not
 
 Version 1.0.0 (2017-04-03)
 --------------------------

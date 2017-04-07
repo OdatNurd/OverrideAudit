@@ -129,22 +129,27 @@ class PackageInfo():
     @classmethod
     def _deep_scan(cls, path, filename):
         """
-        Scan the entire folder under the given path for the provided file
+        Scan the entire folder under the given path for the provided file. If
+        found, the full path to the file is returned; otherwise the return is
+        None.
         """
         # See PackageList.__get_package_list
         for (path, dirs, files) in os.walk(path, followlinks=True):
             if filename in files:
-                return True
+                return os.path.join(path, filename)
 
-        return False
+        return None
 
     @classmethod
-    def check_potential_override(cls, filename):
+    def check_potential_override(cls, filename, deep=False):
         """
         Given a filename path, check and see if this could conceivably be a
-        reference to an override; i.e. that there is a shipped package with the
-        name given in the filename. Note: No check is done that the shipped
-        package actually HAS such a member.
+        reference to an override; i.e. that there is a shipped or installed
+        package with the name given in the filename.
+
+        When deep is False, this only checks that the file could potentially be
+        an override. Set deep to True to actually look inside of the package
+        itself to see if this really represents an override or not.
 
         The filename provided must be either absolute(and point to the Packages
         path) or relative (in which case it is assumed to point there).
@@ -165,13 +170,22 @@ class PackageInfo():
         pkg_name = parts[0]
         pkg_file = pkg_name + ".sublime-package"
 
-        if (os.path.isfile(os.path.join(cls.shipped_packages_path, pkg_file)) or
-                cls._deep_scan(sublime.installed_packages_path(), pkg_file)):
+        shipped = os.path.join(cls.shipped_packages_path, pkg_file)
+        installed = cls._deep_scan(sublime.installed_packages_path(), pkg_file)
 
+        if os.path.isfile(shipped) or installed is not None:
             # Always use Unix path separator even on windows; this is how the
-            # sublime-package would represent the override path.
+            # sublime-package would represent the override path internally.
             override = "/".join(parts[1:])
-            return (pkg_name, override)
+            if not deep:
+                return (pkg_name, override)
+
+            try:
+                with zipfile.ZipFile(installed or shipped) as zFile:
+                    info = cls.__find_override_entry(zFile, override)
+                    return (pkg_name, info.filename)
+            except:
+                pass
 
         return None
 
@@ -270,7 +284,8 @@ class PackageInfo():
 
         return result
 
-    def __find_override_entry(self, zip, override_file):
+    @classmethod
+    def __find_override_entry(cls, zip, override_file):
         """
         Implement ZipFile.getinfo() as case insensitive for systems with a case
         insensitive file system so that looking up overrides will work the same

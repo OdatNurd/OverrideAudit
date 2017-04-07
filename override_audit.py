@@ -973,7 +973,7 @@ class OverrideAuditEventListener(sublime_plugin.EventListener):
         if filename is None or not os.path.isfile(filename):
             return
 
-        result = PackageInfo.check_potential_override(filename)
+        result = PackageInfo.check_potential_override(filename, deep=True)
         if result is not None:
             override_group.apply(view, result[0], result[1], False)
         else:
