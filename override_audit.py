@@ -208,7 +208,7 @@ def _thr_diff_override(window, pkg_info, override,
             elif action == "ignore":
                 return
 
-        title = "Override of %s" % PackageInfo.override_display(
+        title = "Diff of %s" % PackageInfo.override_display(
             os.path.join(pkg_info.name, override))
         content = "No differences found" if diff_info == "" else diff_info
         view = output_to_view(window, title, content, reuse, clear,

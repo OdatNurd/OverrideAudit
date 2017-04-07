@@ -83,7 +83,7 @@
         "command": "override_audit_context_report"
     },
     {
-        "caption": "OverrideAudit: Swap Diff/Override View",
+        "caption": "OverrideAudit: Swap Diff/Edit View",
         "command": "override_audit_context_override",
         "args": { "action": "toggle" }
     },

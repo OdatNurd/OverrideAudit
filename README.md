@@ -182,7 +182,7 @@ view or its associated editor tab and via the <kbd>F5</kbd> key, although you
 can change this binding to a key of your liking.
 
 
-### `OverrideAudit: Swap Diff/Override View` ###
+### `OverrideAudit: Swap Diff/Edit View` ###
 
 This command is only available in the Command Palette while the current file is
 either an edit session for an override or a diff of an override.
@@ -320,6 +320,21 @@ Override Report or the commands that find and diff overrides.
 
 **NOTE:** Any overrides you create in packages in this list will be masked from
 you, so be very careful about what you add to the list.
+
+
+### `diff_unchanged`: String (Default: "diff") ###
+
+When using the `Diff Single Override` command, this setting controls what
+happens when the selected override has no differences from the underlying file.
+
+The possible values of this setting are:
+
+  * `"diff"` to open a tab with the empty diff in it
+  * `"ignore"` to ignore the command; the status line will indicate the lack of
+    changes
+  * `"open"` to open the file for editing, allowing you to see its contents or
+    make new modifications.
+
 
 ### `diff_context_lines`: Number (Default: 3) ###
 

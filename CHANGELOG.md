@@ -11,6 +11,8 @@ Changes in the next release
     wrap turned off by default.
   * Enhanced the checks performed at file load and save so to more correctly
     determine if a file is actually an override or not
+  * Rename the "Swap Diff/Override View" command to "Swap Diff/Edit View" in the
+    command palette and change the associated text used in Diff tabs.
 
 Version 1.0.0 (2017-04-03)
 --------------------------
