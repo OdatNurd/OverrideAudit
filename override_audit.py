@@ -50,6 +50,7 @@ def plugin_loaded():
         "ignore_overrides_in": [],
         "diff_unchanged": "diff",
         "diff_context_lines": 3,
+        "save_on_diff": False,
         "confirm_deletion": True,
         "report_on_unignore": True,
 
@@ -842,11 +843,10 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
         if action == "toggle":
             action = "diff" if not is_diff else "edit"
 
-        # TODO: May be a good idea to check around here to see if the settings
-        # are defunct and need to be removed if that's not already happening
-        # elsewhere.
-
         if action == "diff":
+            if (_oa_setting("save_on_diff") and target.is_dirty() and
+                    os.path.isfile(target.file_name())):
+                target.run_command("save")
             self._context_diff(target.window(), pkg_name, override)
 
         elif action == "edit":

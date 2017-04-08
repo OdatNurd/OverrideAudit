@@ -13,6 +13,9 @@ Changes in the next release
     determine if a file is actually an override or not
   * Rename the "Swap Diff/Override View" command to "Swap Diff/Edit View" in the
     command palette and change the associated text used in Diff tabs.
+  * Add a configuration option `save_on_diff` (defaults to false) to control if
+    the contents of an edited override should be persisted to disk before
+    performing a diff on it.
 
 Version 1.0.0 (2017-04-03)
 --------------------------

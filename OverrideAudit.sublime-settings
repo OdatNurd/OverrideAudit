@@ -31,6 +31,14 @@
     // in the diff view.
     "diff_context_lines": 3,
 
+    // When set to true, switching from an edit of an override to a diff of it
+    // will make sure that any unsaved changes are saved to disk before the
+    // diff is created or refreshed.
+    //
+    // This option will not save a file that no longer exists on disk but still
+    // has a buffer open.
+    "save_on_diff": false,
+
     // Should the user be asked to confirm before OverrideAudit deletes any
     // files?
     "confirm_deletion": true,

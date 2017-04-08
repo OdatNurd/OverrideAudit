@@ -200,7 +200,8 @@ file view.
 Regardless of how you trigger the command, any existing edit or diff view for
 this override will be switched to directly. In the case of a diff view, the
 diff will be recalculated, allowing any *saved* changes to be immediately
-reflected.
+reflected. The configuration option `save_on_diff` can be enabled to ensure
+that unsaved changes in the file are persisted first, if desired.
 
 This command ignores the current values of the `reuse_view`, `clear_existing`
 and `diff_unchanged` settings and operates as if they are set to `true`, `true`
@@ -341,6 +342,18 @@ The possible values of this setting are:
 When displaying a diff for an override, this specifies how many unchanged lines
 before and after each difference are displayed to provide better context for
 the changes.
+
+
+### `save_on_diff`: true/false (Default: false) ###
+
+This setting controls whether or not OverrideAudit will make sure any unsaved
+changes are persisted to disk when switching from an edit of an override to a
+diff of it, so that your changes will be reflected in the diff.
+
+This option has no effect for a buffer with unsaved changes that represents a
+file that no longer exists on disk (i.e. you have opened the override and then
+deleted it) to ensure that you don't accidentally resurrect a deleted file by
+saving it again.
 
 
 ### `confirm_deletion` : true/false (Default: true) ###
