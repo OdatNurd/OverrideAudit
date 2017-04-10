@@ -1,27 +1,60 @@
 OverrideAudit
 =============
 
-OverrideAudit helps you keep track of all of your package overrides, easily
-allowing you to see what overrides are in place, how they're different from the
-file they're overriding and (most importantly) warning you when the file being
-overridden has been updated by it's author.
+OverrideAudit is the missing tool for working with and managing your
+package overrides in Sublime Text 3. From simply helping you remember
+what files you've overridden to warning you of potential problems,
+OverrideAudit has you covered.
 
-An automated check for overrides that have "expired" in this manner is performed
-every time you start Sublime text after upgrading it, as well as any time a
-package is upgraded or installed. If any expired overrides are found, you'll be
-told about it so you make sure everything is still OK.
+Quick Start
+-----------
 
-One of these checks is performed when OverrideAudit is installed, so if you see
-an extra tab telling you about expired overrides, Don't Panic! This is
-OverrideAudit warning you that you have an override that might need your
-attention.
+All commands are available in the command palette or in the menu under
+OverrideAudit. OverrideAudit also makes heavy use of context sensitive
+commands; try Right Clicking (Control+Click on MacOS) on the names of
+Packages, Override files, and inside of views to see what options are
+available.
 
-You can view the README file for more information by selecting the appropriate
-command from the Command Palette or from the OverrideAudit Preferences menu. The
-README contains full information on OverrideAudit, including not only the list
-of commands and configuration options available, but also a helpful terminology
-reference.
+To get started, try viewing a Package Report to get a sense of the
+packages you have installed. If you see any packages in the report
+that have more than one of the [S], [I] or [U] marks at the same time,
+context click on its name and diff it to see if you have any overrides
+and what they are.
 
-If you encounter any problems, please log an issue with the OverrideAudit
-repository:
+See the README for more information on all of the commands and
+configuration options available. You can find a command to view it in
+the command palette.
+
+What's this "Expired Override Report" thing?
+--------------------------------------------
+
+In the immortal words of Douglas Adams, "Don't Panic!".
+
+One of the core features of OverrideAudit is the ability to tell you
+when a package author has updated a package file that you have
+overridden, so you can tell if you need to incorporate any changes.
+
+One of these checks is performed every time you upgrade Sublime Text
+or a package. If you're seeing one of those reports right now, it
+means that this has already happened to you and you didn't know about
+it.
+
+Using the tools that OverrideAudit provides, you can get a better
+picture of what's happened so you can resolve the issue quickly and
+easily.
+
+Having Problems?
+----------------
+
+If you encounter any problems with OverrideAudit, or think that it can
+be improved to make your work easier, please log an issue with the
+OverrideAudit issue tracker:
+
     https://github.com/OdatNurd/OverrideAudit
+
+Get in Touch
+------------
+
+OverrideAudit is developed by Terence Martin, a.k.a @OdatNurd on
+twitter and the official Sublime Text forum. Please feel free to ping
+me with any comments and thoughts!
