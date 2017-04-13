@@ -88,3 +88,14 @@ WARNING: Text
 #    ^^^ meta.override.expired
 #        ^^^^^^^^^^^^^^^^^^^^^^^ entity.name.filename.override.expired
 #                               ^ text.override-audit
+  `- .gitignore
+# ^^ punctuation.override.begin
+#    ^ text.override-audit
+#     ^^^^^^^^^ entity.name.filename.override
+#              ^ text.override-audit
+  `- [X] .gitignore
+# ^^ punctuation.override.begin
+#   ^ text.override-audit
+#    ^^^ meta.override.expired
+#        ^^^^^^^^^^ entity.name.filename.override.expired
+#                  ^ text.override-audit

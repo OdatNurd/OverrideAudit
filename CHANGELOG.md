@@ -1,6 +1,12 @@
 OverrideAudit ChangeLog
 =======================
 
+Next Version (????-??-??)
+-------------------------
+
+  * Fix a problem with overrides starting with a period not being
+    correctly recognized as an override (#24).
+
 Version 1.0.1 (2017-04-10)
 --------------------------
 

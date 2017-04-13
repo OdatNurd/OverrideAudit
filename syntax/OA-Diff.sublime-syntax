@@ -18,13 +18,13 @@ contexts:
       push: package_name
 
   diff:
-    - match: '^    (\w.*)'
-      captures:
-        1: entity.name.filename.override
-    - match: '^    (\[X]) (\w.*)'
+    - match: '^    (\[X]) (.*)'
       captures:
         1: meta.override.expired keyword.control.expired
         2: entity.name.filename.override.expired
+    - match: '^    (\S.*)'
+      captures:
+        1: entity.name.filename.override
 
     - match: '^        ((\*{15})|(={67})|(-{3}))$\n?'
       scope: meta.separator.diff

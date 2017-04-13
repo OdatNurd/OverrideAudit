@@ -31,3 +31,23 @@
 #                        ^ storage.modifier
     [No simple overrides found]
 #   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ text.override-audit
+
+[S U] [Vintage]
+#     ^^^^^^^^^ comment
+
+[ IU] OverrideAudit
+    lib/packages.py
+#   ^^^^^^^^^^^^^^^ entity.name.filename.override
+
+    [X] lib/threads.py
+#   ^^^ meta.override.expired
+#       ^^^^^^^^^^^^^^ entity.name.filename.override.expired
+
+    .github/CONTRIBUTING.md
+#   ^^^^^^^^^^^^^^^^^^^^^^^ entity.name.filename.override
+
+    [X] .github/ISSUE_TEMPLATE.md
+#   ^^^ meta.override.expired
+#       ^^^^^^^^^^^^^^^^^^^^^^^^^ entity.name.filename.override.expired
+
+
