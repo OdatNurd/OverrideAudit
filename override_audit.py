@@ -50,6 +50,7 @@ def plugin_loaded():
         "ignore_overrides_in": [],
         "diff_unchanged": "diff",
         "diff_context_lines": 3,
+        "diff_empty_hdr": False,
         "save_on_diff": False,
         "confirm_deletion": True,
         "report_on_unignore": True,
@@ -184,6 +185,7 @@ def _thr_diff_override(window, pkg_info, override,
     """
     context_lines = _oa_setting("diff_context_lines")
     action = "diff" if diff_only else _oa_setting("diff_unchanged")
+    empty_diff_hdr = _oa_setting("diff_empty_hdr")
 
     if force_reuse:
         reuse, clear = True, True
@@ -192,14 +194,14 @@ def _thr_diff_override(window, pkg_info, override,
         clear = _oa_setting("clear_existing")
 
     def _process_diff(thread):
-        diff_info = thread.diff
-        if diff_info is None:
+        diff = thread.diff
+        if diff is None:
             return _log("Unable to diff %s/%s\n\n"
                         "Error loading file contents of one or both files.\n"
                         "Check the console for more information",
                         pkg_info.name, override, dialog=True)
 
-        if diff_info == "":
+        if diff.is_empty:
             _log("No changes detected in %s/%s", pkg_info.name, override,
                  status=True)
 
@@ -211,7 +213,11 @@ def _thr_diff_override(window, pkg_info, override,
 
         title = "Diff of %s" % PackageInfo.override_display(
             os.path.join(pkg_info.name, override))
-        content = "No differences found" if diff_info == "" else diff_info
+
+        result = diff.result
+        prefix = diff.hdr if diff.is_empty and empty_diff_hdr else ""
+        content = prefix + "No differences found" if result == "" else result
+
         view = output_to_view(window, title, content, reuse, clear,
                               "Packages/Diff/Diff.tmLanguage")
 
@@ -595,6 +601,7 @@ class BulkDiffReportThread(ReportGenerationThread):
     def _perform_diff(self, pkg_info, context_lines, result):
         override_list = pkg_info.override_files(simple=True)
         expired_list = pkg_info.expired_override_files(simple=True)
+        empty_diff_hdr = _oa_setting("diff_empty_hdr")
 
         for file in override_list:
             if file in expired_list:
@@ -606,10 +613,15 @@ class BulkDiffReportThread(ReportGenerationThread):
                                           empty_result="No differences found",
                                           binary_result="<File is binary>",
                                           indent=8)
+
             if diff is None:
-                diff = (" " * 8) + ("Error opening or decoding file;"
-                                    " is it UTF-8 or Binary?")
-            result.extend([diff, ""])
+                content = (" " * 8) + ("Error opening or decoding file;"
+                                       " is it UTF-8 or Binary?")
+            else:
+                prefix = diff.hdr if diff.is_empty and empty_diff_hdr else ""
+                content = prefix + diff.result
+
+            result.extend([content, ""])
 
         if len(override_list) == 0:
             if pkg_info.has_possible_overrides(simple=True):

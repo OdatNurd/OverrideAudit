@@ -31,6 +31,12 @@
     // in the diff view.
     "diff_context_lines": 3,
 
+    // Normally when a diff is performed and two files compare as equal, the
+    // diff result contains only text to tell you this. This option controls
+    // whether, in this situation, a diff header should be applied to the result
+    // of the diff even when the diff is empty.
+    "diff_empty_hdr": false,
+
     // When set to true, switching from an edit of an override to a diff of it
     // will make sure that any unsaved changes are saved to disk before the
     // diff is created or refreshed.

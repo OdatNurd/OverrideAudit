@@ -344,6 +344,13 @@ before and after each difference are displayed to provide better context for
 the changes.
 
 
+### `diff_empty_hdr`: Boolean (Default: false) ###
+
+When enabled, this allows you to see the source files and related time stamps
+of both files that participated in the diff even when there are no changes to
+display.
+
+
 ### `save_on_diff`: true/false (Default: false) ###
 
 This setting controls whether or not OverrideAudit will make sure any unsaved

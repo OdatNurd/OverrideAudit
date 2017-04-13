@@ -98,6 +98,40 @@ class PackageFileSet(MutableSet):
 ###----------------------------------------------------------------------------
 
 
+class OverrideDiffResult():
+    """
+    Wraps the results of an override diff operation.
+
+    For a binary diff, result is the message to use to indicate the diff is
+    binary, or None to return an empty string. Otherwise the result is the
+    result of the diff, which may be replaced with empty_msg if given and the
+    diff result is None.
+
+    The optional indent value will be used to indent all values.
+    """
+    def __init__(self, packed, unpacked, result, is_binary=False,
+                 empty_msg=None, indent=None):
+        if packed is not None and unpacked is not None:
+            self.hdr =  indent + "--- %s    %s\n" % (packed[1], packed[2])
+            self.hdr += indent + "+++ %s    %s\n" % (unpacked[1], unpacked[2])
+        else:
+            self.hdr = ""
+
+        self.is_binary = is_binary
+        if is_binary:
+            self.is_empty = True
+            self.result = "" if result is None else indent + result
+
+        else:
+            self.result = result
+            self.is_empty = (result == "")
+            if empty_msg is not None and result == "":
+                self.result = indent + empty_msg
+
+
+###----------------------------------------------------------------------------
+
+
 class PackageInfo():
     """
     Holds meta information on an installed Sublime Text Package
@@ -191,16 +225,16 @@ class PackageInfo():
 
     @classmethod
     def override_display(cls, override_file, pkg_name=None):
-    	"""
-    	Format an override name for display, optionally prefixing it with a
+        """
+        Format an override name for display, optionally prefixing it with a
         package name.
 
-    	Ensures that all overrides displayed use the forward slash style of path
+        Ensures that all overrides displayed use the forward slash style of path
         separator that Sublime uses internally.
-    	"""
-    	if pkg_name is not None:
-    		override_file = "%s/%s" % (pkg_name, override_file)
-    	return _fixPath(override_file)
+        """
+        if pkg_name is not None:
+            override_file = "%s/%s" % (pkg_name, override_file)
+        return _fixPath(override_file)
 
     def __init__(self, name):
         settings = sublime.load_settings("Preferences.sublime-settings")
@@ -500,7 +534,8 @@ class PackageInfo():
         indent = "" if indent is None else " " * indent
 
         if self._override_is_binary(override_file):
-            return "" if binary_result is None else indent + binary_result
+            return OverrideDiffResult(None, None, binary_result,
+                                      is_binary=True, indent=indent)
 
         packed = self._get_packed_pkg_file_contents(override_file)
         unpacked = self._get_unpacked_override_contents(override_file)
@@ -514,10 +549,8 @@ class PackageInfo():
                                     context_lines)
 
         result = u"".join(indent + line for line in diff)
-        if empty_result is not None and result == "":
-            result = indent + empty_result
-
-        return result
+        return OverrideDiffResult(packed, unpacked, result,
+                                  empty_msg=empty_result, indent=indent)
 
 
 ###----------------------------------------------------------------------------

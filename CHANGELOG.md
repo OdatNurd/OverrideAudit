@@ -6,6 +6,8 @@ Next Version (????-??-??)
 
   * Fix a problem with overrides starting with a period not being
     correctly recognized as an override (#24).
+  * Implement the ability to show the diff header even if a diff is
+    empty (#18)
 
 Version 1.0.1 (2017-04-10)
 --------------------------
