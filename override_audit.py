@@ -789,16 +789,21 @@ class ContextHelper():
             return None
 
         point = self.view.window_to_text((event["x"], event["y"]))
+        scope = "text.override-audit " + scope
         if not self.view.match_selector(point, scope):
             return None
 
         return self.view.substr(self.view.extract_scope(point))
 
     def _package_at_point(self, event):
-        return self._extract("text.override-audit entity.name.package", event)
+        return self._extract("entity.name.package", event)
 
-    def _override_at_point(self, event):
-        return self._extract("text.override-audit entity.name.filename.override", event)
+    def _override_at_point(self, event, expired=False):
+        scope="entity.name.filename.override"
+        if expired:
+            scope += ".expired"
+
+        return self._extract(scope, event)
 
     def _package_for_override_at(self, event):
         if event is not None:
@@ -824,13 +829,14 @@ class ContextHelper():
         window = view.window()
         return view if group == -1 else window.views_in_group(group)[index]
 
-    def view_context(self, view, event=None, **kwargs):
+    def view_context(self, view, expired, event=None, **kwargs):
         """
         Return a tuple of (pkg_name, override_name, is_diff) for the provided
         view and possible event. Some members of the tuple will be None if they
         do not apply or cannot be determined by the current command state.
 
-        If view is none, view_target is invoked to determine it.
+        If view is none, view_target is invoked to determine it. Additionally,
+        expired indicates if the override found needs to be expired or not.
         """
         if view is None:
             view = self.view_target(self.view, **kwargs)
@@ -847,7 +853,7 @@ class ContextHelper():
         elif event is not None:
             pkg_name = self._package_at_point(event)
             if pkg_name is None:
-                override = self._override_at_point(event)
+                override = self._override_at_point(event, expired)
                 if override is not None:
                     pkg_name = self._package_for_override_at(event)
 
@@ -899,7 +905,7 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
                            diff_only=True, force_reuse=True)
 
     def description(self, action, **kwargs):
-        pkg_name, override, is_diff = self.view_context(None, **kwargs)
+        pkg_name, override, is_diff = self.view_context(None, False, **kwargs)
 
         if action == "toggle":
             action = "diff" if is_diff is False else "edit"
@@ -907,7 +913,7 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
         return "OverrideAudit: %s Override '%s'" % (action.title(), override)
 
     def is_visible(self, action, **kwargs):
-        pkg_name, override, is_diff = self.view_context(None, **kwargs)
+        pkg_name, override, is_diff = self.view_context(None, False, **kwargs)
 
         if action == "toggle":
             return True if is_diff is not None else False
