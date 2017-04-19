@@ -406,11 +406,17 @@ class ReportGenerationThread(BackgroundWorkerThread):
                               current_view=self.current_view)
         view.settings().set("override_audit_report_type", self.report_type)
 
-    def _set_content(self, caption, content, report_type, syntax):
+        if self.settings is not None:
+            for setting in self.settings:
+                view.settings().set(setting, self.settings[setting])
+
+    def _set_content(self, caption, content, report_type, syntax,
+                     settings=None):
         self.caption = caption
         self.content = content
         self.report_type = report_type
         self.syntax = syntax
+        self.settings = settings
 
 
 ###----------------------------------------------------------------------------
@@ -458,7 +464,7 @@ class OverrideReportThread(ReportGenerationThread):
     """
     Generate a report on all packages which have overrides and what they are,
     if any. The report always includes expired packages and overrides, but the
-    optional paramter filters to only show expired results.
+    optional parameter filters to only show expired results.
     """
     def _process(self):
         pkg_list = PackageList()
@@ -653,7 +659,7 @@ class OverrideAuditOverrideReportCommand(sublime_plugin.WindowCommand):
     """
     Generate a report on all packages which have overrides and what they are,
     if any. The report always includes expired packages and overrides, but the
-    optional paramter filters to only show expired results.
+    optional parameter filters to only show expired results.
     """
     def run(self, force_reuse=False, only_expired=False, ignore_empty=False):
         OverrideReportThread(self.window, "Generating Override Report",
