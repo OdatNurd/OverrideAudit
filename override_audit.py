@@ -481,6 +481,7 @@ class OverrideReportThread(ReportGenerationThread):
             title = "OverrideAudit: Override Report"
             report_type = ":overrides"
 
+        expired_pkgs = []
         result = []
         if only_expired:
             result.append("WARNING: Showing only expired overrides!\n"
@@ -490,7 +491,8 @@ class OverrideReportThread(ReportGenerationThread):
         displayed = 0
         for pkg_name, pkg_info in pkg_list:
             if pkg_name not in ignored:
-                if self._output_package(result, pkg_info, only_expired):
+                if self._output_package(result, pkg_info, only_expired,
+                                        expired_pkgs):
                     displayed += 1
 
         if displayed == 0:
@@ -500,9 +502,10 @@ class OverrideReportThread(ReportGenerationThread):
             result.append(self._empty_msg())
 
         self._set_content(title, result, report_type,
-                          _oa_syntax("OA-OverrideReport"))
+                          _oa_syntax("OA-OverrideReport"),
+                          {"override_audit_expired_pkgs": expired_pkgs})
 
-    def _output_package(self, result, pkg_info, only_expired):
+    def _output_package(self, result, pkg_info, only_expired, expired_pkgs):
         shipped_override = pkg_info.has_possible_overrides(simple=False)
         normal_overrides = pkg_info.override_files(simple=True)
 
@@ -515,6 +518,9 @@ class OverrideReportThread(ReportGenerationThread):
 
         if only_expired and not expired_overrides and not expired_pkg:
             return False
+
+        if expired_overrides:
+            expired_pkgs.append(pkg_info.name)
 
         result.append(_decorate_pkg_name(pkg_info))
 
@@ -580,6 +586,7 @@ class BulkDiffReportThread(ReportGenerationThread):
         title = "Override Diff Report: "
         description = "Bulk Diff Report for overrides in"
         report_type = ":bulk_all"
+        expired_pkgs = []
 
         if len(names) == 1 and single_package:
             title += names[0]
@@ -600,14 +607,19 @@ class BulkDiffReportThread(ReportGenerationThread):
                 pkg_info.set_binary_pattern(binary_patterns)
 
             result.append(_decorate_pkg_name(pkg_info))
-            self._perform_diff(pkg_info, context_lines, result)
+            self._perform_diff(pkg_info, context_lines, result,
+                               expired_pkgs)
 
-        self._set_content(title, result, report_type, _oa_syntax("OA-Diff"))
+        self._set_content(title, result, report_type, _oa_syntax("OA-Diff"),
+                          {"override_audit_expired_pkgs": expired_pkgs})
 
-    def _perform_diff(self, pkg_info, context_lines, result):
+    def _perform_diff(self, pkg_info, context_lines, result, expired_pkgs):
         override_list = pkg_info.override_files(simple=True)
         expired_list = pkg_info.expired_override_files(simple=True)
         empty_diff_hdr = _oa_setting("diff_empty_hdr")
+
+        if expired_list:
+            expired_pkgs.append(pkg_info.name)
 
         for file in override_list:
             if file in expired_list:
