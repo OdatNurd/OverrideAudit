@@ -372,6 +372,16 @@ OverrideAudit uses the `send2trash` library that ships with Sublime Text to
 perform file deletions.
 
 
+### `confirm_freshen` : true/false (Default: true) ###
+
+When freshening expired override files, this setting controls whether
+OverrideAUdit will prompt you to confirm the operation before it happens or
+not.
+
+Although this operation is not destructive, freshening an expired override will
+stop OverrideAudit from warning you that it's expired.
+
+
 ### `binary_file_patterns`: Array (Default: from user settings) ###
 
 This setting is identical to the Sublime Text setting of the same name and

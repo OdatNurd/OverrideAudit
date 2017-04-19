@@ -53,6 +53,7 @@ def plugin_loaded():
         "diff_empty_hdr": False,
         "save_on_diff": False,
         "confirm_deletion": True,
+        "confirm_freshen": True,
         "report_on_unignore": True,
 
         # Inherits from user preferences
@@ -176,6 +177,26 @@ def _delete_override(window, pkg_name, override):
                 sublime.yes_no_cancel_dialog(msg) == sublime.DIALOG_YES):
             send2trash.send2trash(full_name)
             _log("Deleted %s", relative_name, status=True)
+
+
+def _thr_freshen_override(view, pkg_name, override=None):
+    """
+    Touch either the explicitly specified override in the provided package or
+    all expired overrides in the package.
+    """
+    if _oa_setting("confirm_freshen"):
+        target = "Expired overrides in '%s'" % pkg_name
+        if override is not None:
+            relative_name = os.path.join(pkg_name, override)
+            target = PackageInfo.override_display(relative_name)
+
+        msg = "Confirm freshen:\n\n{}".format(target)
+        if sublime.yes_no_cancel_dialog(msg) != sublime.DIALOG_YES:
+            return
+
+    callback = lambda thread: _log(thread.result, status=True)
+    OverrideFreshenThread(view.window(), "Freshening Files", callback,
+                       pkg_name=pkg_name, override=override, view=view).start()
 
 
 def _thr_diff_override(window, pkg_info, override,
@@ -373,6 +394,71 @@ class OverrideDiffThread(BackgroundWorkerThread):
 
         self.diff = pkg_info.override_diff(override, context_lines,
                                            binary_result="<File is binary>")
+
+
+###----------------------------------------------------------------------------
+
+
+class OverrideFreshenThread(BackgroundWorkerThread):
+    """
+    Touch either the explicitly specified override in the provided package or
+    all expired overrides in the package.
+    """
+    def _touch_override(self, pkg_name, override):
+        fname = os.path.join(sublime.packages_path(), pkg_name, override)
+        try:
+            with os.fdopen(os.open(fname, os.O_RDONLY)) as f:
+                os.utime(f.fileno() if os.utime in os.supports_fd else fname)
+            return True
+        except:
+            return False
+
+    def _msg(self, pkg_name, override, success):
+        prefix = "Freshened" if success else "Unable to freshen"
+        return "%s '%s/%s'" % (prefix, pkg_name, override)
+
+    def _handle_single(self, pkg_name, override):
+        result = self._touch_override(pkg_name, override)
+        return self._msg(pkg_name, override, result)
+
+    def _handle_pkg(self, view, pkg_name):
+        pkg_list = PackageList()
+        if pkg_name not in pkg_list:
+            return "Unable to freshen '%s'; no such package" % pkg_name
+
+        count = 0
+        expired_list = pkg_list[pkg_name].expired_override_files(simple=True)
+
+        for expired_name in expired_list:
+            result = self._touch_override(pkg_name, expired_name)
+            _log(self._msg(pkg_name, expired_name, result))
+            if result:
+                count += 1
+
+        if count == len(expired_list):
+            prefix = "All"
+
+            # None left; remove from the view setting now
+            pkg_list = view.settings().get("override_audit_expired_pkgs", [])
+            pkg_list.remove(pkg_name)
+            view.settings().set("override_audit_expired_pkgs", pkg_list)
+        else:
+            prefix = "%d of %d" % (count, len(expired_list))
+
+        return "%s expired overrides freshened in '%s'" % (prefix, pkg_name)
+
+    def _process(self):
+        view = self.args.get("view", None)
+        pkg_name = self.args.get("pkg_name", None)
+        override = self.args.get("override", None)
+        if not view or not pkg_name:
+            self.result = "Nothing done; missing parameters"
+            return _log("freshen thread not given a view or package")
+
+        if override is not None:
+            self.result = self._handle_single(pkg_name, override)
+        else:
+            self.result = self._handle_pkg(view, pkg_name)
 
 
 ###----------------------------------------------------------------------------
@@ -874,7 +960,7 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
     """
     def run(self, edit, action, **kwargs):
         target = self.view_target(self.view, **kwargs)
-        pkg_name, override, is_diff = self.view_context(target, **kwargs)
+        pkg_name, override, is_diff = self.view_context(target, False, **kwargs)
 
         if action == "toggle":
             action = "diff" if not is_diff else "edit"
