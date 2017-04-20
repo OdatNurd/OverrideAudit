@@ -380,8 +380,14 @@ class PackageInfo():
             return None
 
         except UnicodeDecodeError:
-            print("Error loading %s; unabble to decode file contents" % name)
+            print("Error loading %s; unable to decode file contents" % name)
             return None
+
+        except PermissionError:
+            print("Error loading %s; permission denied" % name)
+
+        except:
+            print("Error loading %s; unknown error" % name)
 
     def _override_is_binary(self, override_file):
         for pattern in self.binary_patterns:
