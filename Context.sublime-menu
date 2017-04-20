@@ -1,24 +1,24 @@
 [
     { "caption": "-" },
 
-    // Visible only within a view that represents a diff or override; toggles
+    // Toggle between an open override and a diff of it
     { "command": "override_audit_context_override", "args": { "action": "toggle" } },
 
-    // Visible only within an override report/bulk diff
+    // Core operations for an override being referenced by name in a report.
     { "command": "override_audit_context_override", "args": { "action": "edit" } },
     { "command": "override_audit_context_override", "args": { "action": "diff" } },
-
     { "command": "override_audit_context_override", "args": { "action": "delete" } },
 
-    // Visible only within reports that contain package names
+    // Bulk diffing of a single package in a report
     { "command": "override_audit_context_package", "args": { "action": "diff" } },
 
-    // Visible only within reports
+    // Refresh an existing report window
     { "command": "override_audit_context_report" },
 
     { "caption": "-" },
 
-    // Freshen actions
+    // Freshen actions for a single override or for a package with overrides
+    { "command": "override_audit_context_override", "args": { "action": "freshen" } },
     { "command": "override_audit_context_package", "args": { "action": "freshen" } },
 
     { "caption": "-" },

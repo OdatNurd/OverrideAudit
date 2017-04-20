@@ -8,6 +8,8 @@ Next Version (????-??-??)
     correctly recognized as an override (#24).
   * Implement the ability to show the diff header even if a diff is
     empty (#18)
+  * Implement the ability to "freshen" a single expired override or
+    all within a package (#15)
 
 Version 1.0.1 (2017-04-10)
 --------------------------

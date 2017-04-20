@@ -982,6 +982,9 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
         elif action == "delete":
             _delete_override(target.window(), pkg_name, override)
 
+        elif action == "freshen":
+            _thr_freshen_override(target, pkg_name, override)
+
         else:
             _log("Error: unknown action for override context: %s", action)
 
@@ -1004,7 +1007,11 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
         return "OverrideAudit: %s Override '%s'" % (action.title(), override)
 
     def is_visible(self, action, **kwargs):
-        pkg_name, override, is_diff = self.view_context(None, False, **kwargs)
+        expired = (action == "freshen")
+        pkg_name, override, is_diff = self.view_context(None, expired, **kwargs)
+
+        if action == "freshen":
+            return True if override is not None else False
 
         if action == "toggle":
             return True if is_diff is not None else False
