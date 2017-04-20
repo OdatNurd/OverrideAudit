@@ -908,6 +908,11 @@ class ContextHelper():
         target = self.view_target(self.view, **kwargs)
         return target.settings().get("override_audit_report_type")
 
+    def _pkg_contains_expired(self, pkg_name, **kwargs):
+        target = self.view_target(self.view, **kwargs)
+        expired = target.settings().get("override_audit_expired_pkgs", [])
+        return pkg_name in expired
+
     def view_target(self, view, group=-1, index=-1, **kwargs):
         """
         Get target view specified by group and index, if needed.
@@ -1021,22 +1026,33 @@ class OverrideAuditContextPackageCommand(ContextHelper,sublime_plugin.TextComman
     The menu item is visible only in context menus which present a package name
     such as the global package list, override list or existing diff report.
     """
-    def run(self, edit, event):
+    def run(self, edit, action, event):
+        pkg_name = self._package_at_point(event)
+        if action == "diff":
+            self.view.window().run_command("override_audit_diff_package",
+                                           {"package": pkg_name})
+        elif action == "freshen":
+            _thr_freshen_override(self.view, pkg_name)
+        else:
+            _log("Error: unknown action for package context: %s", action)
+
+    def description(self, action, event, **kwargs):
         pkg_name = self._package_at_point(event)
 
-        self.view.window().run_command("override_audit_diff_package",
-                                       {"package": pkg_name})
+        if action == "diff":
+            return "OverrideAudit: Bulk Diff Package '%s'" % pkg_name
+        elif action == "freshen":
+            return "OverrideAudit: Freshen Expired Overrides in '%s'" % pkg_name
 
-    def description(self, event, **kwargs):
+    def is_visible(self, action, event, **kwargs):
         pkg_name = self._package_at_point(event)
-
-        return "OverrideAudit: Bulk Diff Package '%s'" % pkg_name
-
-    def is_visible(self, event, **kwargs):
-        pkg_name = self._package_at_point(event)
-        if pkg_name is not None and self._report_type(**kwargs) == pkg_name:
+        if pkg_name is None:
             return False
-        return pkg_name is not None
+
+        if action == "freshen":
+            return self._pkg_contains_expired(pkg_name, **kwargs)
+
+        return not self._report_type(**kwargs) == pkg_name
 
 
 ###----------------------------------------------------------------------------

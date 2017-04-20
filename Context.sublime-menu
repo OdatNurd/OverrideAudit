@@ -11,10 +11,15 @@
     { "command": "override_audit_context_override", "args": { "action": "delete" } },
 
     // Visible only within reports that contain package names
-    { "command": "override_audit_context_package" },
+    { "command": "override_audit_context_package", "args": { "action": "diff" } },
 
     // Visible only within reports
     { "command": "override_audit_context_report" },
+
+    { "caption": "-" },
+
+    // Freshen actions
+    { "command": "override_audit_context_package", "args": { "action": "freshen" } },
 
     { "caption": "-" },
 ]
