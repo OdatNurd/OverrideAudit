@@ -452,17 +452,21 @@ class OverrideFreshenThread(BackgroundWorkerThread):
         prefix = "Freshened" if success else "Unable to freshen"
         return "%s '%s/%s'" % (prefix, pkg_name, override)
 
-    def _handle_single(self, view, pkg_name, override):
-        result = self._touch_override(view, pkg_name, override)
-        return self._msg(pkg_name, override, result)
+    def _clean_package(self, view, pkg_name):
+        pkg_list = view.settings().get("override_audit_expired_pkgs", [])
+        pkg_list.remove(pkg_name)
+        view.settings().set("override_audit_expired_pkgs", pkg_list)
 
-    def _handle_pkg(self, view, pkg_name):
-        pkg_list = PackageList()
-        if pkg_name not in pkg_list:
-            return "Unable to freshen '%s'; no such package" % pkg_name
+    def _handle_single(self, view, pkg_info, override):
+        result = self._touch_override(view, pkg_info.name, override)
+        if result and not pkg_info.expired_override_files(simple=True):
+            self._clean_package(view, pkg_info.name)
+        return self._msg(pkg_info.name, override, result)
 
+    def _handle_pkg(self, view, pkg_info):
         count = 0
-        expired_list = pkg_list[pkg_name].expired_override_files(simple=True)
+        pkg_name = pkg_info.name
+        expired_list = pkg_info.expired_override_files(simple=True)
 
         for expired_name in expired_list:
             result = self._touch_override(view, pkg_name, expired_name)
@@ -472,11 +476,7 @@ class OverrideFreshenThread(BackgroundWorkerThread):
 
         if count == len(expired_list):
             prefix = "All"
-
-            # None left; remove from the view setting now
-            pkg_list = view.settings().get("override_audit_expired_pkgs", [])
-            pkg_list.remove(pkg_name)
-            view.settings().set("override_audit_expired_pkgs", pkg_list)
+            self._clean_package(view, pkg_name)
         else:
             prefix = "%d of %d" % (count, len(expired_list))
 
@@ -486,14 +486,22 @@ class OverrideFreshenThread(BackgroundWorkerThread):
         view = self.args.get("view", None)
         pkg_name = self.args.get("pkg_name", None)
         override = self.args.get("override", None)
+
         if not view or not pkg_name:
             self.result = "Nothing done; missing parameters"
             return _log("freshen thread not given a view or package")
 
+        pkg_list = PackageList()
+        if pkg_name not in pkg_list:
+            self.result = "Unable to freshen '%s'; no such package" % pkg_name
+            return _log("freshen failed, package '%s' not found", pkg_name)
+
+        pkg_info = pkg_list[pkg_name]
+
         if override is not None:
-            self.result = self._handle_single(view, pkg_name, override)
+            self.result = self._handle_single(view, pkg_info, override)
         else:
-            self.result = self._handle_pkg(view, pkg_name)
+            self.result = self._handle_pkg(view, pkg_info)
 
 
 ###----------------------------------------------------------------------------
