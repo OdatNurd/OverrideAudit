@@ -249,6 +249,35 @@ def _thr_diff_override(window, pkg_info, override,
                        pkg_info=pkg_info, override=override).start()
 
 
+def _find_override(view, pkg_name, override):
+    """
+    Given a report view, return the bounds of the override belonging to the
+    given package. Returns None if the position cannot be located.
+    """
+    if not view.match_selector(0, "text.override-audit"):
+        return None
+
+    bounds = None
+    packages = view.find_by_selector("entity.name.package")
+    for index, pkg_pos in enumerate(packages):
+        if view.substr(pkg_pos) == pkg_name:
+            end_pos = view.size()
+            if index + 1 < len(packages):
+                end_pos = packages[index + 1].begin() - 1
+
+            bounds = sublime.Region(pkg_pos.end() + 1, end_pos)
+            break
+
+    if bounds is None:
+        return
+
+    overrides = view.find_by_selector("entity.name.filename.override")
+    for file_pos in overrides:
+        if bounds.contains(file_pos) and view.substr(file_pos) == override:
+            return file_pos
+
+    return None
+
 ###----------------------------------------------------------------------------
 
 
@@ -404,11 +433,17 @@ class OverrideFreshenThread(BackgroundWorkerThread):
     Touch either the explicitly specified override in the provided package or
     all expired overrides in the package.
     """
-    def _touch_override(self, pkg_name, override):
+    def _touch_override(self, view, pkg_name, override):
         fname = os.path.join(sublime.packages_path(), pkg_name, override)
         try:
             with os.fdopen(os.open(fname, os.O_RDONLY)) as f:
                 os.utime(f.fileno() if os.utime in os.supports_fd else fname)
+
+            view.run_command("override_audit_modify_mark", {
+                "pkg_name": pkg_name,
+                "override": override
+            })
+
             return True
         except:
             return False
@@ -417,8 +452,8 @@ class OverrideFreshenThread(BackgroundWorkerThread):
         prefix = "Freshened" if success else "Unable to freshen"
         return "%s '%s/%s'" % (prefix, pkg_name, override)
 
-    def _handle_single(self, pkg_name, override):
-        result = self._touch_override(pkg_name, override)
+    def _handle_single(self, view, pkg_name, override):
+        result = self._touch_override(view, pkg_name, override)
         return self._msg(pkg_name, override, result)
 
     def _handle_pkg(self, view, pkg_name):
@@ -430,7 +465,7 @@ class OverrideFreshenThread(BackgroundWorkerThread):
         expired_list = pkg_list[pkg_name].expired_override_files(simple=True)
 
         for expired_name in expired_list:
-            result = self._touch_override(pkg_name, expired_name)
+            result = self._touch_override(view, pkg_name, expired_name)
             _log(self._msg(pkg_name, expired_name, result))
             if result:
                 count += 1
@@ -456,7 +491,7 @@ class OverrideFreshenThread(BackgroundWorkerThread):
             return _log("freshen thread not given a view or package")
 
         if override is not None:
-            self.result = self._handle_single(pkg_name, override)
+            self.result = self._handle_single(view, pkg_name, override)
         else:
             self.result = self._handle_pkg(view, pkg_name)
 
@@ -857,6 +892,39 @@ class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
         callback = lambda thread: self._loaded(thread, package, override, bulk)
         PackageListCollectionThread(self.window, "Collecting Package List",
                                     callback, get_overrides=True).start()
+
+
+###----------------------------------------------------------------------------
+
+
+class OverrideAuditModifyMarkCommand(sublime_plugin.TextCommand):
+    """
+    Modify the mark assigned to an override in a report. An override only
+    supports a single mark, if any. Passing a mark of None removes any mark.
+    """
+    def run(self, edit, pkg_name, override, mark=None):
+        pos = _find_override(self.view, pkg_name, override)
+        if pos is None:
+            return
+
+        mark_pos = sublime.Region(pos.begin() - 4, pos.begin())
+        current_mark = self.view.substr(mark_pos)
+
+        if mark is None and current_mark[0] == " ":
+            return
+
+        new_mark = ""
+        if mark is not None:
+            new_mark = '[%s] ' % mark
+            if current_mark[0] == " ":
+                mark_pos = sublime.Region(pos.begin(), pos.begin())
+
+        self.view.set_read_only(False)
+        self.view.replace(edit, mark_pos, new_mark)
+        self.view.set_read_only(True)
+
+    def is_enabled(self, pkg_name, override, mark=None):
+        return self.view.settings().has("override_audit_report_type")
 
 
 ###----------------------------------------------------------------------------
