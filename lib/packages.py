@@ -91,6 +91,55 @@ def override_display(override_file, pkg_name=None):
     return _fixPath(override_file)
 
 
+def check_potential_override(filename, deep=False):
+    """
+    Given a filename path, check and see if this could conceivably be a
+    reference to an override; i.e. that there is a shipped or installed
+    package with the name given in the filename.
+
+    When deep is False, this only checks that the file could potentially be
+    an override. Set deep to True to actually look inside of the package
+    itself to see if this really represents an override or not.
+
+    The filename provided must be either absolute(and point to the Packages
+    path) or relative (in which case it is assumed to point there).
+
+    Returns None if not a potential override or a tuple of the package name
+    and the override name (relative to the package).
+    """
+    if os.path.basename(filename) == "":
+        return None
+
+    if os.path.isabs(filename):
+        if not filename.startswith(sublime.packages_path()):
+            return None
+        filename = os.path.relpath(filename, sublime.packages_path())
+
+    # Get only the first path component, which will be a package name.
+    parts = filename.split(os.path.sep)
+    pkg_name = parts[0]
+    pkg_file = pkg_name + ".sublime-package"
+
+    shipped = os.path.join(PackageInfo.shipped_packages_path, pkg_file)
+    installed = PackageInfo._deep_scan(sublime.installed_packages_path(), pkg_file)
+
+    if os.path.isfile(shipped) or installed is not None:
+        # Always use Unix path separator even on windows; this is how the
+        # sublime-package would represent the override path internally.
+        override = "/".join(parts[1:])
+        if not deep:
+            return (pkg_name, override)
+
+        try:
+            with zipfile.ZipFile(installed or shipped) as zFile:
+                info = _find_zip_entry(zFile, override)
+                return (pkg_name, info.filename)
+        except:
+            pass
+
+    return None
+
+
 ###----------------------------------------------------------------------------
 
 
@@ -208,55 +257,6 @@ class PackageInfo():
         for (path, dirs, files) in os.walk(path, followlinks=True):
             if filename in files:
                 return os.path.join(path, filename)
-
-        return None
-
-    @classmethod
-    def check_potential_override(cls, filename, deep=False):
-        """
-        Given a filename path, check and see if this could conceivably be a
-        reference to an override; i.e. that there is a shipped or installed
-        package with the name given in the filename.
-
-        When deep is False, this only checks that the file could potentially be
-        an override. Set deep to True to actually look inside of the package
-        itself to see if this really represents an override or not.
-
-        The filename provided must be either absolute(and point to the Packages
-        path) or relative (in which case it is assumed to point there).
-
-        Returns None if not a potential override or a tuple of the package name
-        and the override name (relative to the package).
-        """
-        if os.path.basename(filename) == "":
-            return None
-
-        if os.path.isabs(filename):
-            if not filename.startswith(sublime.packages_path()):
-                return None
-            filename = os.path.relpath(filename, sublime.packages_path())
-
-        # Get only the first path component, which will be a package name.
-        parts = filename.split(os.path.sep)
-        pkg_name = parts[0]
-        pkg_file = pkg_name + ".sublime-package"
-
-        shipped = os.path.join(cls.shipped_packages_path, pkg_file)
-        installed = cls._deep_scan(sublime.installed_packages_path(), pkg_file)
-
-        if os.path.isfile(shipped) or installed is not None:
-            # Always use Unix path separator even on windows; this is how the
-            # sublime-package would represent the override path internally.
-            override = "/".join(parts[1:])
-            if not deep:
-                return (pkg_name, override)
-
-            try:
-                with zipfile.ZipFile(installed or shipped) as zFile:
-                    info = _find_zip_entry(zFile, override)
-                    return (pkg_name, info.filename)
-            except:
-                pass
 
         return None
 

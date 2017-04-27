@@ -20,7 +20,7 @@ for module in sub_modules:
 
 
 from .lib.packages import PackageInfo, PackageList, PackageFileSet
-from .lib.packages import override_display
+from .lib.packages import override_display, check_potential_override
 from .lib.output_view import output_to_view
 from .lib.threads import BackgroundWorkerThread
 from .lib.utils import SettingsGroup
@@ -1195,7 +1195,7 @@ class OverrideAuditEventListener(sublime_plugin.EventListener):
         if filename is None or not os.path.isfile(filename):
             return
 
-        result = PackageInfo.check_potential_override(filename, deep=True)
+        result = check_potential_override(filename, deep=True)
         if result is not None:
             override_group.apply(view, result[0], result[1], False)
         else:
