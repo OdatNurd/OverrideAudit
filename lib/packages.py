@@ -624,18 +624,19 @@ class PackageInfo():
 
 class PackageList():
     """
-    Holds a complete list of all known packages in all known locations.
+    Holds a list of packages and all of their relevant information. This can
+    be either a complete list of all known packages, or a sub list of only
+    certain packages by name.
 
-    For most intents and purposes this is a dictionary object with keys that
-    are package names and values that are PackageInfo instances. This includes
-    standard dictionary functionality such as iteration and content testing.
+    The class implements a dictionary interface for callers and iterates over
+    known packages in their Sublime text load order.
 
     On case insensitive file systems, the names of packages are not case
     sensitive. In the event that different packages provide different cases of
     package name, the first name seen (i.e. either shipped or installed) will
     be the "de facto" case for that package.
     """
-    def __init__(self):
+    def __init__(self, name_list=None):
         self._list = dict()
         self._disabled = 0
         self._dependencies = 0
@@ -644,9 +645,16 @@ class PackageList():
         # systems.
         self._case_list = dict() if _wrap("ABC") == _wrap("abc") else None
 
-        self._shipped = self.__find_pkgs(PackageInfo.shipped_packages_path, shipped=True)
-        self._installed = self.__find_pkgs(sublime.installed_packages_path())
-        self._unpacked = self.__find_pkgs(sublime.packages_path(), packed=False)
+        if name_list is not None:
+            if isinstance(name_list, str):
+                name_list = [name_list]
+
+            if _wrap("Abc") == _wrap("abc"):
+                name_list = [_wrap(name) for name in name_list]
+
+        self._shipped = self.__find_pkgs(PackageInfo.shipped_packages_path, name_list, shipped=True)
+        self._installed = self.__find_pkgs(sublime.installed_packages_path(), name_list)
+        self._unpacked = self.__find_pkgs(sublime.packages_path(), name_list, packed=False)
 
     def package_counts(self):
         """
@@ -720,17 +728,23 @@ class PackageList():
         if pkg.is_dependency:
             self._dependencies += 1
 
-    def __find_pkgs(self, location, packed=True, shipped=False):
+    def __find_pkgs(self, location, name_list, packed=True, shipped=False):
         count = 0
         # Follow symlinks since we're stopping after one level anyway except in
         # the Installed Packages\ folder. Maybe an issue if someone goes crazy
         # in there?
         for (path, dirs, files) in os.walk(location, followlinks=True):
             if packed:
+                if name_list:
+                    files = [f for f in files if os.path.splitext(_wrap(f))[0] in name_list]
+
                 for name in [f for f in files if f.endswith(".sublime-package")]:
                     self.__packed_package(path, name, shipped)
                     count += 1
             else:
+                if name_list:
+                    dirs = [d for d in dirs if _wrap(d) in name_list]
+
                 for name in dirs:
                     self.__unpacked_package(path, name, shipped)
                     count += 1

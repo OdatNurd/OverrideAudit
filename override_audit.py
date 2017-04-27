@@ -391,11 +391,12 @@ class AutoReportTrigger():
 
 class PackageListCollectionThread(BackgroundWorkerThread):
     """
-    Collect the list of packages (and optionally also overrides) in the
-    background.
+    Collect the list of packages in a background thread. The collection can
+    optionally filter the list returned to only a set of names given and can
+    also optionally pre-fetch the list of overrides in found packages.
     """
     def _process(self):
-        self.pkg_list = PackageList()
+        self.pkg_list = PackageList(self.args.get("name_list", None))
         if self.args.get("get_overrides", False) is True:
             _packages_with_overrides(self.pkg_list)
 
