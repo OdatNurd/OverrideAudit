@@ -636,17 +636,17 @@ class PackageList():
     be the "de facto" case for that package.
     """
     def __init__(self):
-        self.list = dict()
+        self._list = dict()
         self._disabled = 0
         self._dependencies = 0
 
         # Maps lower cased package names to listed packages on case insensitive
         # systems.
-        self.case_list = dict() if _wrap("ABC") == _wrap("abc") else None
+        self._case_list = dict() if _wrap("ABC") == _wrap("abc") else None
 
-        self._shipped = self.__get_package_list(PackageInfo.shipped_packages_path, shipped=True)
-        self._installed = self.__get_package_list(sublime.installed_packages_path())
-        self._unpacked = self.__get_package_list(sublime.packages_path(), packed=False)
+        self._shipped = self.__find_pkgs(PackageInfo.shipped_packages_path, shipped=True)
+        self._installed = self.__find_pkgs(sublime.installed_packages_path())
+        self._unpacked = self.__find_pkgs(sublime.packages_path(), packed=False)
 
     def package_counts(self):
         """
@@ -664,48 +664,48 @@ class PackageList():
         Return the de facto key (package name) for the given key; returns the
         key untouched on case sensitive systems or when the key is not known.
        """
-        if self.case_list is not None:
+        if self._case_list is not None:
             case_key = key.lower()
-            if case_key in self.case_list:
-                return self.case_list[case_key]
+            if case_key in self._case_list:
+                return self._case_list[case_key]
         return key
 
     def __len__(self):
-        return len(self.list)
+        return len(self._list)
 
     def __getitem__(self, key):
-        return self.list[self.__key(key)]
+        return self._list[self.__key(key)]
 
     def __contains__(self, key):
-        return self.__key(key) in self.list
+        return self.__key(key) in self._list
 
     # Iterate packages in (roughly) load order
     def __iter__(self):
-        if "Default" in self.list:
-            yield "Default", self.list["Default"]
+        if "Default" in self._list:
+            yield "Default", self._list["Default"]
 
-        for pkg in sorted(self.list):
+        for pkg in sorted(self._list):
             if pkg in ["User", "Default"]:
                 continue
-            yield pkg, self.list[pkg]
+            yield pkg, self._list[pkg]
 
-        if "User" in self.list:
-            yield "User", self.list["User"]
+        if "User" in self._list:
+            yield "User", self._list["User"]
 
     def __get_pkg(self, name):
         """
         Get or create package by name during initial package scan
         """
         name = self.__key(name)
-        if name not in self.list:
-            self.list[name] = PackageInfo(name)
-            if self.case_list is not None:
-                self.case_list[name.lower()] = name
+        if name not in self._list:
+            self._list[name] = PackageInfo(name)
+            if self._case_list is not None:
+                self._case_list[name.lower()] = name
 
-            if self.list[name].is_disabled:
+            if self._list[name].is_disabled:
                 self._disabled += 1
 
-        return self.list[name]
+        return self._list[name]
 
     def __packed_package(self, path, name, shipped):
         pkg_file = os.path.join(path, name)
@@ -720,7 +720,7 @@ class PackageList():
         if pkg.is_dependency:
             self._dependencies += 1
 
-    def __get_package_list(self, location, packed=True, shipped=False):
+    def __find_pkgs(self, location, packed=True, shipped=False):
         count = 0
         # Follow symlinks since we're stopping after one level anyway except in
         # the Installed Packages\ folder. Maybe an issue if someone goes crazy
