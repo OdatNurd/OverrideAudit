@@ -57,6 +57,27 @@ _fixPath = (lambda value: value.replace("\\", "/")) if sublime.platform() == "wi
 
 ###----------------------------------------------------------------------------
 
+
+def _find_zip_entry(zFile, override_file):
+    """
+    Implement ZipFile.getinfo() as case insensitive for systems with a case
+    insensitive file system so that looking up overrides will work the same
+    as it does in the Sublime core.
+    """
+    try:
+        return zFile.getinfo(override_file)
+
+    except KeyError:
+        if _wrap("ABC") == _wrap("abc"):
+            override_file = _wrap(override_file)
+            entry_list = zFile.infolist()
+            for entry in entry_list:
+                if _wrap(entry.filename) == override_file:
+                    return entry
+
+        raise
+
+
 def override_display(override_file, pkg_name=None):
     """
     Format an override name for display, optionally prefixing it with a
@@ -68,6 +89,7 @@ def override_display(override_file, pkg_name=None):
     if pkg_name is not None:
         override_file = "%s/%s" % (pkg_name, override_file)
     return _fixPath(override_file)
+
 
 ###----------------------------------------------------------------------------
 
@@ -165,8 +187,9 @@ class PackageInfo():
     when looking up overriden file contents.
     """
 
-    # The location of packages that ship with sublime live; this is set up at
-    # the time the plugin is fully loaded and derived from the executable path.
+    # The location where packages that ship with sublime live; you must call
+    # the init() class method at plugin load time to set this or things will
+    # not work.
     shipped_packages_path = None
 
     @classmethod
@@ -230,7 +253,7 @@ class PackageInfo():
 
             try:
                 with zipfile.ZipFile(installed or shipped) as zFile:
-                    info = cls.__find_override_entry(zFile, override)
+                    info = _find_zip_entry(zFile, override)
                     return (pkg_name, info.filename)
             except:
                 pass
@@ -319,31 +342,11 @@ class PackageInfo():
 
         return result
 
-    @classmethod
-    def __find_override_entry(cls, zip, override_file):
-        """
-        Implement ZipFile.getinfo() as case insensitive for systems with a case
-        insensitive file system so that looking up overrides will work the same
-        as it does in the Sublime core.
-        """
-        try:
-            return zip.getinfo(override_file)
-
-        except KeyError:
-            if _wrap("ABC") == _wrap("abc"):
-                override_file = _wrap(override_file)
-                entry_list = zip.infolist()
-                for entry in entry_list:
-                    if _wrap(entry.filename) == override_file:
-                        return entry
-
-            raise
-
     def _get_packed_pkg_file_contents(self, override_file):
         try:
-            with zipfile.ZipFile(self.package_file()) as zip:
-                info = self.__find_override_entry(zip, override_file)
-                file = codecs.EncodedFile(zip.open(info, mode="rU"), "utf-8")
+            with zipfile.ZipFile(self.package_file()) as zFile:
+                info = _find_zip_entry(zFile, override_file)
+                file = codecs.EncodedFile(zFile.open(info, mode="rU"), "utf-8")
                 content = io.TextIOWrapper(file, encoding="utf-8").readlines()
 
                 source = "Shipped Packages"
