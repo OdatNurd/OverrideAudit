@@ -11,16 +11,6 @@ import fnmatch
 
 ###----------------------------------------------------------------------------
 
-# TODO: The PackageInfo() class should take an extra parameter that lets you
-# give it the name of a package and it will try to find its paths. This is a
-# little complicated by the fact that packages can be installed in sub folders
-# of the InstalledPackages path.
-#
-# Probably a little refactoring of the code here might be nice? I'm not sure at
-# the moment what the nicest way to go about that would be, but it seems like
-# for some upcoming commands you might want to just create a PackageInfo() for
-# a named package and see what happens rather than always grab the list.
-#
 # TODO: The PackageFileSet() class assumes that Linux is case sensitive for
 # filenames and MacOS and Windows are not. In theory sublime or the user folder
 # may conceivably be placed on a case-insensitive file system, or a Mac user
@@ -265,7 +255,7 @@ class PackageInfo():
         exe_path = os.path.dirname(sublime.executable_path())
         cls.shipped_packages_path = os.path.join(exe_path, "Packages")
 
-    def __init__(self, name):
+    def __init__(self, name, scan=False):
         settings = sublime.load_settings("Preferences.sublime-settings")
         ignored_list = settings.get("ignored_packages", [])
 
@@ -290,6 +280,9 @@ class PackageInfo():
 
         self.binary_patterns = settings.get("binary_file_patterns", [])
 
+        if scan:
+            self.__scan()
+
     def __repr__(self):
         name = self.name
         if self.is_dependency:
@@ -302,6 +295,55 @@ class PackageInfo():
             "S" if bool(self.shipped_path) else " ",
             "I" if bool(self.installed_path) else " ",
             "U" if bool(self.unpacked_path) else " ")
+
+    def __verify_pkg_name(self, pathname):
+        """
+        Verify on case insensitive platforms that the package name follows the
+        same case as the files that are used to contain it.
+        """
+        del self.verify_name
+
+        pathname = os.path.basename(pathname)
+        if pathname.endswith(".sublime-package"):
+            pathname = os.path.splitext(pathname)[0]
+
+        self.name = pathname
+
+    def _add_package(self, filename, is_shipped=False):
+        if filename is not None and os.path.isfile(filename):
+            mtime = os.path.getmtime(filename)
+
+            if is_shipped:
+                self.shipped_path, self.shipped_mtime = filename, mtime
+            else:
+                self.installed_path, self.installed_mtime = filename, mtime
+
+            if hasattr(self, "verify_name"):
+                self.__verify_pkg_name(filename)
+
+    def _add_path(self, pkg_path):
+        if os.path.isdir(pkg_path):
+            self.unpacked_path = pkg_path
+
+            metadata = os.path.join(pkg_path, "dependency-metadata.json")
+            if os.path.isfile(metadata):
+                self.is_dependency = True
+
+            if hasattr(self, "verify_name"):
+                self.__verify_pkg_name(pkg_path)
+
+    def __scan(self):
+        if _wrap("Abc") == _wrap("abc"):
+            self.verify_name = True
+
+        pkg_filename = "%s.sublime-package" % self.name
+        pkg_path = os.path.join(sublime.packages_path(), self.name)
+
+        # Scan for the shipped package so we can collect the proper case on
+        # case insensitive systems.
+        self._add_package(_pkg_scan(self.shipped_packages_path, pkg_filename), True)
+        self._add_package(_pkg_scan(sublime.installed_packages_path(), pkg_filename, True))
+        self._add_path(pkg_path)
 
     def __get_sublime_pkg_zip_list(self, pkg_filename):
         if pkg_filename in self.zip_list:
@@ -409,6 +451,9 @@ class PackageInfo():
             if fnmatch.fnmatch(override_file, pattern):
                 return True
         return False
+
+    def exists(self):
+        return bool(self.shipped_path or self.installed_path or self.unpacked_path)
 
     def package_file(self):
         return self.installed_path or self.shipped_path
@@ -663,23 +708,16 @@ class PackageList():
         return self.list[name]
 
     def __packed_package(self, path, name, shipped):
-        package_path = os.path.join(path, name)
-        package_mtime = os.path.getmtime(package_path)
+        pkg_file = os.path.join(path, name)
         pkg = self.__get_pkg(os.path.splitext(name)[0])
-        if shipped:
-            pkg.shipped_path = package_path
-            pkg.shipped_mtime = package_mtime
-        else:
-            pkg.installed_path = package_path
-            pkg.installed_mtime = package_mtime
+        pkg._add_package(pkg_file, shipped)
 
     def __unpacked_package(self, path, name, shipped):
+        pkg_path = os.path.join(path, name)
         pkg = self.__get_pkg(name)
-        pkg.unpacked_path = os.path.join(path, name)
+        pkg._add_path(pkg_path)
 
-        metadata = os.path.join(pkg.unpacked_path, "dependency-metadata.json")
-        if os.path.isfile(metadata):
-            pkg.is_dependency = True
+        if pkg.is_dependency:
             self._dependencies += 1
 
     def __get_package_list(self, location, packed=True, shipped=False):
