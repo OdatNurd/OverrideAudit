@@ -691,10 +691,10 @@ class BulkDiffReportThread(ReportGenerationThread):
     with the bulk argument set to true.
     """
     def _process(self):
-        pkg_list = PackageList()
-
         package = self.args["package"]
         force_reuse = self.args["force_reuse"]
+
+        pkg_list = PackageList(package)
 
         if package is not None:
             if package not in pkg_list:
@@ -1067,7 +1067,7 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
     def _context_diff(self, window, package, override):
         callback = lambda thr: self._pkg_loaded(thr, window, package, override)
         PackageListCollectionThread(window, "Collecting Package List",
-                                    callback).start()
+                                    callback, name_list=package).start()
 
     def _pkg_loaded(self, thread, window, pkg_name, override):
         pkg_list = thread.pkg_list
