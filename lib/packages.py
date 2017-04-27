@@ -58,6 +58,25 @@ _fixPath = (lambda value: value.replace("\\", "/")) if sublime.platform() == "wi
 ###----------------------------------------------------------------------------
 
 
+def _pkg_scan(path, filename, recurse=False):
+    """
+    Scan the given path for a filename with the name provided. If found, the
+    full path to the file is returned.
+
+    recurse controls if the search will also scan subfolders of the provided
+    path.
+    """
+    for (path, dirs, files) in os.walk(path, followlinks=True):
+        for name in files:
+            if _wrap(name) == _wrap(filename):
+                return os.path.join(path, name)
+
+        if not recurse:
+            break
+
+    return None
+
+
 def _find_zip_entry(zFile, override_file):
     """
     Implement ZipFile.getinfo() as case insensitive for systems with a case
@@ -121,7 +140,7 @@ def check_potential_override(filename, deep=False):
     pkg_file = pkg_name + ".sublime-package"
 
     shipped = os.path.join(PackageInfo.shipped_packages_path, pkg_file)
-    installed = PackageInfo._deep_scan(sublime.installed_packages_path(), pkg_file)
+    installed = _pkg_scan(sublime.installed_packages_path(), pkg_file, True)
 
     if os.path.isfile(shipped) or installed is not None:
         # Always use Unix path separator even on windows; this is how the
@@ -245,20 +264,6 @@ class PackageInfo():
     def init(cls):
         exe_path = os.path.dirname(sublime.executable_path())
         cls.shipped_packages_path = os.path.join(exe_path, "Packages")
-
-    @classmethod
-    def _deep_scan(cls, path, filename):
-        """
-        Scan the entire folder under the given path for the provided file. If
-        found, the full path to the file is returned; otherwise the return is
-        None.
-        """
-        # See PackageList.__get_package_list
-        for (path, dirs, files) in os.walk(path, followlinks=True):
-            if filename in files:
-                return os.path.join(path, filename)
-
-        return None
 
     def __init__(self, name):
         settings = sublime.load_settings("Preferences.sublime-settings")
@@ -459,7 +464,7 @@ class PackageInfo():
         if zipinfo is not None:
             return zipinfo
 
-        if _wrap("AbC") == "abc":
+        if _wrap("AbC") == _wrap("abc"):
             zip_list = self.__get_sublime_pkg_zip_list(source_pkg)
             for entry in zip_list:
                 if _wrap(entry.filename) == override_file:
@@ -592,7 +597,7 @@ class PackageList():
 
         # Maps lower cased package names to listed packages on case insensitive
         # systems.
-        self.case_list = dict() if _wrap("ABC") == "abc" else None
+        self.case_list = dict() if _wrap("ABC") == _wrap("abc") else None
 
         self._shipped = self.__get_package_list(PackageInfo.shipped_packages_path, shipped=True)
         self._installed = self.__get_package_list(sublime.installed_packages_path())
