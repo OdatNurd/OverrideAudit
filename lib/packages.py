@@ -57,6 +57,20 @@ _fixPath = (lambda value: value.replace("\\", "/")) if sublime.platform() == "wi
 
 ###----------------------------------------------------------------------------
 
+def override_display(override_file, pkg_name=None):
+    """
+    Format an override name for display, optionally prefixing it with a
+    package name.
+
+    Ensures that all overrides displayed use the forward slash style of path
+    separator that Sublime uses internally.
+    """
+    if pkg_name is not None:
+        override_file = "%s/%s" % (pkg_name, override_file)
+    return _fixPath(override_file)
+
+###----------------------------------------------------------------------------
+
 
 class PackageFileSet(MutableSet):
     """
@@ -222,19 +236,6 @@ class PackageInfo():
                 pass
 
         return None
-
-    @classmethod
-    def override_display(cls, override_file, pkg_name=None):
-        """
-        Format an override name for display, optionally prefixing it with a
-        package name.
-
-        Ensures that all overrides displayed use the forward slash style of path
-        separator that Sublime uses internally.
-        """
-        if pkg_name is not None:
-            override_file = "%s/%s" % (pkg_name, override_file)
-        return _fixPath(override_file)
 
     def __init__(self, name):
         settings = sublime.load_settings("Preferences.sublime-settings")

@@ -20,6 +20,7 @@ for module in sub_modules:
 
 
 from .lib.packages import PackageInfo, PackageList, PackageFileSet
+from .lib.packages import override_display
 from .lib.output_view import output_to_view
 from .lib.threads import BackgroundWorkerThread
 from .lib.utils import SettingsGroup
@@ -171,7 +172,7 @@ def _delete_override(window, pkg_name, override):
     if os.path.isfile(full_name):
         if confirm:
             msg = "Confirm deletion:\n\n{}".format(
-                PackageInfo.override_display(relative_name))
+                override_display(relative_name))
 
         if (confirm is False or
                 sublime.yes_no_cancel_dialog(msg) == sublime.DIALOG_YES):
@@ -188,7 +189,7 @@ def _thr_freshen_override(view, pkg_name, override=None):
         target = "Expired overrides in '%s'" % pkg_name
         if override is not None:
             relative_name = os.path.join(pkg_name, override)
-            target = PackageInfo.override_display(relative_name)
+            target = override_display(relative_name)
 
         msg = "Confirm freshen:\n\n{}".format(target)
         if sublime.yes_no_cancel_dialog(msg) != sublime.DIALOG_YES:
@@ -232,7 +233,7 @@ def _thr_diff_override(window, pkg_info, override,
             elif action == "ignore":
                 return
 
-        title = "Diff of %s" % PackageInfo.override_display(
+        title = "Diff of %s" % override_display(
             os.path.join(pkg_info.name, override))
 
         result = diff.result
