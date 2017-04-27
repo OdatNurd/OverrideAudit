@@ -286,11 +286,17 @@ class PackageInfo():
         self.binary_patterns = settings.get("binary_file_patterns", [])
 
     def __repr__(self):
-        return "[name={0}, shipped={1}, installed={2}, unpacked={3}]".format(
-            self.name,
-            self.shipped_path,
-            self.installed_path,
-            self.unpacked_path)
+        name = self.name
+        if self.is_dependency:
+            name = "<%s>" % self.name
+        elif self.is_disabled:
+            name = "[%s]" % self.name
+
+        return "([{1}{2}{3}] {0})".format(
+            name,
+            "S" if bool(self.shipped_path) else " ",
+            "I" if bool(self.installed_path) else " ",
+            "U" if bool(self.unpacked_path) else " ")
 
     def __get_sublime_pkg_zip_list(self, pkg_filename):
         if pkg_filename in self.zip_list:
