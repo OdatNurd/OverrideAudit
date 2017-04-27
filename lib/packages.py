@@ -255,7 +255,7 @@ class PackageInfo():
         exe_path = os.path.dirname(sublime.executable_path())
         cls.shipped_packages_path = os.path.join(exe_path, "Packages")
 
-    def __init__(self, name, scan=False):
+    def __init__(self, name, scan=True):
         settings = sublime.load_settings("Preferences.sublime-settings")
         ignored_list = settings.get("ignored_packages", [])
 
@@ -698,7 +698,7 @@ class PackageList():
         """
         name = self.__key(name)
         if name not in self._list:
-            self._list[name] = PackageInfo(name)
+            self._list[name] = PackageInfo(name, scan=False)
             if self._case_list is not None:
                 self._case_list[name.lower()] = name
 
