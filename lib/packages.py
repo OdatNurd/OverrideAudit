@@ -67,7 +67,7 @@ def _pkg_scan(path, filename, recurse=False):
     return None
 
 
-def _find_zip_entry(zFile, override_file):
+def find_zip_entry(zFile, override_file):
     """
     Implement ZipFile.getinfo() as case insensitive for systems with a case
     insensitive file system so that looking up overrides will work the same
@@ -141,7 +141,7 @@ def check_potential_override(filename, deep=False):
 
         try:
             with zipfile.ZipFile(installed or shipped) as zFile:
-                info = _find_zip_entry(zFile, override)
+                info = find_zip_entry(zFile, override)
                 return (pkg_name, info.filename)
         except:
             pass
@@ -398,7 +398,7 @@ class PackageInfo():
     def _get_packed_pkg_file_contents(self, override_file):
         try:
             with zipfile.ZipFile(self.package_file()) as zFile:
-                info = _find_zip_entry(zFile, override_file)
+                info = find_zip_entry(zFile, override_file)
                 file = codecs.EncodedFile(zFile.open(info, mode="rU"), "utf-8")
                 content = io.TextIOWrapper(file, encoding="utf-8").readlines()
 
@@ -457,6 +457,9 @@ class PackageInfo():
 
     def package_file(self):
         return self.installed_path or self.shipped_path
+
+    def package_mtime(self):
+        return self.installed_mtime if self.installed_path else self.shipped_mtime
 
     def is_unpacked(self):
         return True if self.unpacked_path is not None else False
