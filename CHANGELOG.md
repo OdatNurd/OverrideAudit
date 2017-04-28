@@ -10,6 +10,11 @@ Next Version (????-??-??)
     empty (#18)
   * Implement the ability to "freshen" a single expired override or
     all within a package (#15)
+  * Fix a file case issue on Windows/MacOS where opening an override
+    from a package folder with an incorrect case would not enable
+    the commands to edit or diff the override.
+  * Performance enhancements for some package operations for users
+    with a large number of installed packages.
 
 Version 1.0.1 (2017-04-10)
 --------------------------
