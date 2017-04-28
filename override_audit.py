@@ -2,7 +2,9 @@ import sublime
 import sublime_plugin
 
 from datetime import datetime
+from time import time
 from bisect import bisect
+from zipfile import ZipFile
 import os
 
 import sys
@@ -21,6 +23,7 @@ for module in sub_modules:
 
 from .lib.packages import PackageInfo, PackageList, PackageFileSet
 from .lib.packages import override_display, check_potential_override
+from .lib.packages import find_zip_entry
 from .lib.output_view import output_to_view
 from .lib.threads import BackgroundWorkerThread
 from .lib.utils import SettingsGroup
@@ -435,12 +438,26 @@ class OverrideFreshenThread(BackgroundWorkerThread):
     Touch either the explicitly specified override in the provided package or
     all expired overrides in the package.
     """
-    def _touch_override(self, view, pkg_name, override):
+    def _touch_override(self, view, zFile, pkg_name, override):
+        new_mtime = None
+        now = time()
         fname = os.path.join(sublime.packages_path(), pkg_name, override)
-        try:
-            with os.fdopen(os.open(fname, os.O_RDONLY)) as f:
-                os.utime(f.fileno() if os.utime in os.supports_fd else fname)
 
+        try:
+            entry = find_zip_entry(zFile, override)
+            zTime = datetime(*entry.date_time).timestamp()
+
+            if zTime > now:
+                _log("Warning: The packaged '%s/%s' file is from the future" ,
+                     pkg_name, override)
+                new_mtime = (now, zTime + 1)
+
+            with os.fdopen(os.open(fname, os.O_RDONLY)) as f:
+                os.utime(f.fileno() if os.utime in os.supports_fd else fname,
+                         new_mtime)
+
+            # TODO: This command could take a list of overrides in the package
+            # and handle them all at once.
             view.run_command("override_audit_modify_mark", {
                 "pkg_name": pkg_name,
                 "override": override
@@ -459,19 +476,19 @@ class OverrideFreshenThread(BackgroundWorkerThread):
         pkg_list.remove(pkg_name)
         view.settings().set("override_audit_expired_pkgs", pkg_list)
 
-    def _handle_single(self, view, pkg_info, override):
-        result = self._touch_override(view, pkg_info.name, override)
+    def _single(self, view, zFile, pkg_info, override):
+        result = self._touch_override(view, zFile, pkg_info.name, override)
         if result and not pkg_info.expired_override_files(simple=True):
             self._clean_package(view, pkg_info.name)
         return self._msg(pkg_info.name, override, result)
 
-    def _handle_pkg(self, view, pkg_info):
+    def _pkg(self, view, zFile, pkg_info):
         count = 0
         pkg_name = pkg_info.name
         expired_list = pkg_info.expired_override_files(simple=True)
 
         for expired_name in expired_list:
-            result = self._touch_override(view, pkg_name, expired_name)
+            result = self._touch_override(view, zFile, pkg_name, expired_name)
             _log(self._msg(pkg_name, expired_name, result))
             if result:
                 count += 1
@@ -496,13 +513,20 @@ class OverrideFreshenThread(BackgroundWorkerThread):
         pkg_info = PackageInfo(pkg_name)
         if not pkg_info.exists():
             self.result = "Unable to freshen '%s'; no such package" % pkg_name
-            return _log("freshen failed, package '%s' not found", pkg_name)
+            return
 
-        if override is not None:
-            self.result = self._handle_single(view, pkg_info, override)
-        else:
-            self.result = self._handle_pkg(view, pkg_info)
+        if not pkg_info.package_file():
+            self.result = "Unable to freshen '%s'; no overrides" % pkg_name
+            return
 
+        try:
+            with ZipFile(pkg_info.package_file()) as zFile:
+                if override is not None:
+                    self.result = self._single(view, zFile, pkg_info, override)
+                else:
+                    self.result = self._pkg(view, zFile, pkg_info)
+        except Exception as e:
+            self.result = "Error while freshening: %s" % str(e)
 
 ###----------------------------------------------------------------------------
 
