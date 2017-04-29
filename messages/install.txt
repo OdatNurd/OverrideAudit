@@ -1,6 +1,3 @@
-OverrideAudit
-=============
-
 OverrideAudit is the missing tool for working with and managing your
 package overrides in Sublime Text 3. From simply helping you remember
 what files you've overridden to warning you of potential problems,

@@ -1,20 +1,21 @@
 OverrideAudit ChangeLog
 =======================
 
-Next Version (????-??-??)
--------------------------
+Version 1.1.0 (2017-04-28)
+--------------------------
 
+  * Implement the ability to "freshen" a single expired override or
+    all within a package (#15) via a context menu option
+  * Implement the ability to show the diff header even if a diff is
+    empty (#18) controlled via `diff_empty_hdr` option
   * Fix a problem with overrides starting with a period not being
     correctly recognized as an override (#24).
-  * Implement the ability to show the diff header even if a diff is
-    empty (#18)
-  * Implement the ability to "freshen" a single expired override or
-    all within a package (#15)
   * Fix a file case issue on Windows/MacOS where opening an override
     from a package folder with an incorrect case would not enable
     the commands to edit or diff the override.
   * Performance enhancements for some package operations for users
     with a large number of installed packages.
+
 
 Version 1.0.1 (2017-04-10)
 --------------------------
@@ -38,6 +39,7 @@ Version 1.0.1 (2017-04-10)
   * Add a configuration option `save_on_diff` (defaults to false) to
     control if the contents of an edited override should be persisted
     to disk before performing a diff on it.
+
 
 Version 1.0.0 (2017-04-03)
 --------------------------
