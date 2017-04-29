@@ -59,6 +59,10 @@ some commands are available as context menu items when you open the context
 menu over a package name or override name in a report, or over a report in
 general.
 
+Some commands, such as the ability to "freshen" an expired override, are only
+available via context menu items so that you can directly target them at the
+package or override that you are interested in.
+
 The following lists the available commands as seen in the Command Palette; the
 menu items are similarly named.
 
@@ -269,6 +273,42 @@ An automated report will be generated in the following circumstances:
 -------------------------------------------------------------------------------
 
 
+## Freshening an Expired Override ##
+
+When an expired override is detected, it's a good idea to check and see what
+has changed between the source file and your override, so you can determine if
+you need to incorporate any changes into your override or possibly just remove
+it entirely if it is no longer needed.
+
+Due to the way that PackageControl updates packages, it is possible for
+OverrideAudit to report an override as expired without any actual content
+changes being made to the original file.
+
+In these cases, in order to stop the file from being reported as expired, its
+time stamp on disk needs to be changed to be more recent than the new package
+file. If you're opening your overrides to view their contents, this is as
+simple as just re-saving the file.
+
+If you have many overrides, either in a single package or spread across
+multiple packages, a better option might be one of the *Bulk Diff* operations,
+which  allows you to quickly scan for and see changes and only edit files that
+need special attention.
+
+In this case, opening and saving files would quickly become a hassle. For this
+reason, OverrideAudit makes available in the context menu a command to
+*Freshen* either a single override or all overrides in a package all at once.
+
+By default you are prompted that you want to do this before the command
+executes. You can modify the `confirm_freshen` configuration option to stop
+this from happening if desired.
+
+The freshen operation updates the last modification time of files to be the
+current date so that OverrideAudit knows that everything is up to date.
+
+
+-------------------------------------------------------------------------------
+
+
 ***NOTE:*** If you upgrade a package manually without adding it to the list of
 `ignored_packages` or while Sublime is not running, OverrideAudit will be
 unable to detect that anything has changed and will not automatically generate
@@ -349,6 +389,11 @@ the changes.
 When enabled, this allows you to see the source files and related time stamps
 of both files that participated in the diff even when there are no changes to
 display.
+
+This applies both to a bulk diff as well as a single file diff, but note that
+for a single file diff this option will only have an effect if `diff_unchanged`
+is set to `"diff"`, as otherwise no diff is displayed.
+
 
 
 ### `save_on_diff`: true/false (Default: false) ###
