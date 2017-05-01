@@ -1,6 +1,12 @@
 OverrideAudit ChangeLog
 =======================
 
+Version 1.1.1 (2017-05-01)
+--------------------------
+  * Remove a debug print statement that slipped through during some
+    last minute code testing prior to the last release.
+
+
 Version 1.1.0 (2017-04-28)
 --------------------------
 

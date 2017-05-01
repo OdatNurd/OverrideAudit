@@ -220,7 +220,6 @@ def _thr_diff_override(window, pkg_info, override,
 
     def _process_diff(thread):
         diff = thread.diff
-        print("_process_diff:", diff_only, diff.is_empty, action)
         if diff is None:
             return _log("Unable to diff %s/%s\n\n"
                         "Error loading file contents of one or both files.\n"

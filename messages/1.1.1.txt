@@ -1,0 +1,25 @@
+Version 1.1.1 (2017-05-01)
+--------------------------
+
+  * Remove a debug print statement that slipped through during some
+    last minute code testing prior to the last release.
+
+In addition to the above, the following changes were made in version
+1.1.0 on 2017-04-28 (3 days prior to this release), but a snafu
+during the release process stopped PackageControl from showing the
+changes when it upgraded the package.
+
+For those that may have missed it, these are the changes that were
+implemented in that version:
+
+  * Implement the ability to "freshen" a single expired override or
+    all within a package (#15) via a context menu option
+  * Implement the ability to show the diff header even if a diff is
+    empty (#18) controlled via `diff_empty_hdr` option
+  * Fix a problem with overrides starting with a period not being
+    correctly recognized as an override (#24).
+  * Fix a file case issue on Windows/MacOS where opening an override
+    from a package folder with an incorrect case would not enable
+    the commands to edit or diff the override.
+  * Performance enhancements for some package operations for users
+    with a large number of installed packages.
