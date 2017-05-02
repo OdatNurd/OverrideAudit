@@ -34,9 +34,9 @@ def loaded():
     """
     Initialize plugin state.
     """
-    _log("Initializing")
-    _oa_setting.obj = sublime.load_settings("OverrideAudit.sublime-settings")
-    _oa_setting.default = {
+    log("Initializing")
+    oa_setting.obj = sublime.load_settings("OverrideAudit.sublime-settings")
+    oa_setting.default = {
         "reuse_views": True,
         "clear_existing": True,
         "ignore_overrides_in": [],
@@ -57,14 +57,14 @@ def loaded():
 
 
 def unloaded():
-    _log("Shutting down")
+    log("Shutting down")
     """
     Clean up state before unloading.
     """
     AutoReportTrigger.unregister()
 
 
-def _log(message, *args, status=False, dialog=False):
+def log(message, *args, status=False, dialog=False):
     """
     Simple logging method; writes to the console and optionally also the status
     message as well.
@@ -77,22 +77,22 @@ def _log(message, *args, status=False, dialog=False):
         sublime.message_dialog(message)
 
 
-def _oa_syntax(file):
+def oa_syntax(file):
     """
     Return the full name of an Override Audit syntax based on the short name.
     """
     return "Packages/OverrideAudit/syntax/%s.sublime-syntax" % file
 
 
-def _oa_setting(key):
+def oa_setting(key):
     """
     Get an OverrideAudit setting from a cached settings object.
     """
-    default = _oa_setting.default.get(key, None)
-    return _oa_setting.obj.get(key, default)
+    default = oa_setting.default.get(key, None)
+    return oa_setting.obj.get(key, default)
 
 
-def _packages_with_overrides(pkg_list, name_list=None):
+def packages_with_overrides(pkg_list, name_list=None):
     """
     Collect a list of package names from the given package list for which there
     is at least a single (simple) override file and which is not in the list of
@@ -101,7 +101,7 @@ def _packages_with_overrides(pkg_list, name_list=None):
     Optionally, if name_list is provided, the list of package names will be
     filtered to only include packages whose name also exists in the name list.
     """
-    ignored = _oa_setting("ignore_overrides_in")
+    ignored = oa_setting("ignore_overrides_in")
     items = [name for name, pkg in pkg_list if len(pkg.override_files()) > 0
                                                and name not in ignored]
 
@@ -111,7 +111,7 @@ def _packages_with_overrides(pkg_list, name_list=None):
     return items
 
 
-def _decorate_pkg_name(pkg_info, name_only=False):
+def decorate_pkg_name(pkg_info, name_only=False):
     """
     Decorate the name of the provided package with a prefix that describes its
     status and optionally also a suffix if it is a complete override or is
@@ -142,7 +142,7 @@ def _decorate_pkg_name(pkg_info, name_only=False):
                suffix)
 
 
-def _open_override(window, pkg_name, override):
+def open_override(window, pkg_name, override):
     """
     Open the provided override from the given package name.
     """
@@ -150,14 +150,14 @@ def _open_override(window, pkg_name, override):
     window.open_file(filename)
 
 
-def _delete_override(window, pkg_name, override):
+def delete_override(window, pkg_name, override):
     """
     Delete the provided override from the given package name.
     """
     # Import send2trash on demand; see Default/side_bar.py.
     import Default.send2trash as send2trash
 
-    confirm = _oa_setting("confirm_deletion")
+    confirm = oa_setting("confirm_deletion")
 
     relative_name = os.path.join(pkg_name, override)
     full_name = os.path.join(sublime.packages_path(), relative_name)
@@ -169,15 +169,15 @@ def _delete_override(window, pkg_name, override):
         if (confirm is False or
                 sublime.yes_no_cancel_dialog(msg) == sublime.DIALOG_YES):
             send2trash.send2trash(full_name)
-            _log("Deleted %s", relative_name, status=True)
+            log("Deleted %s", relative_name, status=True)
 
 
-def _thr_freshen_override(view, pkg_name, override=None):
+def freshen_override(view, pkg_name, override=None):
     """
     Touch either the explicitly specified override in the provided package or
     all expired overrides in the package.
     """
-    if _oa_setting("confirm_freshen"):
+    if oa_setting("confirm_freshen"):
         target = "Expired overrides in '%s'" % pkg_name
         if override is not None:
             relative_name = os.path.join(pkg_name, override)
@@ -187,40 +187,40 @@ def _thr_freshen_override(view, pkg_name, override=None):
         if sublime.yes_no_cancel_dialog(msg) != sublime.DIALOG_YES:
             return
 
-    callback = lambda thread: _log(thread.result, status=True)
+    callback = lambda thread: log(thread.result, status=True)
     OverrideFreshenThread(view.window(), "Freshening Files", callback,
                        pkg_name=pkg_name, override=override, view=view).start()
 
 
-def _thr_diff_override(window, pkg_info, override,
-                       diff_only=False, force_reuse=False):
+def diff_override(window, pkg_info, override,
+                  diff_only=False, force_reuse=False):
     """
     Generate a diff for the given package and override in a background thread,
     """
-    context_lines = _oa_setting("diff_context_lines")
-    action = "diff" if diff_only else _oa_setting("diff_unchanged")
-    empty_diff_hdr = _oa_setting("diff_empty_hdr")
+    context_lines = oa_setting("diff_context_lines")
+    action = "diff" if diff_only else oa_setting("diff_unchanged")
+    empty_diff_hdr = oa_setting("diff_empty_hdr")
 
     if force_reuse:
         reuse, clear = True, True
     else:
-        reuse = _oa_setting("reuse_views")
-        clear = _oa_setting("clear_existing")
+        reuse = oa_setting("reuse_views")
+        clear = oa_setting("clear_existing")
 
     def _process_diff(thread):
         diff = thread.diff
         if diff is None:
-            return _log("Unable to diff %s/%s\n\n"
+            return log("Unable to diff %s/%s\n\n"
                         "Error loading file contents of one or both files.\n"
                         "Check the console for more information",
                         pkg_info.name, override, dialog=True)
 
         if diff.is_empty:
-            _log("No changes detected in %s/%s", pkg_info.name, override,
+            log("No changes detected in %s/%s", pkg_info.name, override,
                  status=True)
 
             if action == "open":
-                return _open_override(window, pkg_info.name, override)
+                return open_override(window, pkg_info.name, override)
 
             elif action == "ignore":
                 return
@@ -240,6 +240,36 @@ def _thr_diff_override(window, pkg_info, override,
     callback = lambda thread: _process_diff(thread)
     OverrideDiffThread(window, "Diffing Override", callback,
                        pkg_info=pkg_info, override=override).start()
+
+
+def find_override(view, pkg_name, override):
+    """
+    Given a report view, return the bounds of the override belonging to the
+    given package. Returns None if the position cannot be located.
+    """
+    if not view.match_selector(0, "text.override-audit"):
+        return None
+
+    bounds = None
+    packages = view.find_by_selector("entity.name.package")
+    for index, pkg_pos in enumerate(packages):
+        if view.substr(pkg_pos) == pkg_name:
+            end_pos = view.size()
+            if index + 1 < len(packages):
+                end_pos = packages[index + 1].begin() - 1
+
+            bounds = sublime.Region(pkg_pos.end() + 1, end_pos)
+            break
+
+    if bounds is None:
+        return
+
+    overrides = view.find_by_selector("entity.name.filename.override")
+    for file_pos in overrides:
+        if bounds.contains(file_pos) and view.substr(file_pos) == override:
+            return file_pos
+
+    return None
 
 
 ###----------------------------------------------------------------------------
@@ -291,7 +321,7 @@ class AutoReportTrigger():
                     pass
 
         if self.last_build == sublime.version() and self.force_report == False:
-            _log("Sublime version is unchanged; skipping automatic report")
+            log("Sublime version is unchanged; skipping automatic report")
             return
 
         if self.last_build != sublime.version():
@@ -302,7 +332,7 @@ class AutoReportTrigger():
         elif self.force_report:
             reason = "Sublime restarted during a package upgrade"
 
-        _log(reason + "; generating automatic report")
+        log(reason + "; generating automatic report")
         sublime.set_timeout(lambda: self.__execute_auto_report(), 1000)
 
     def __save_status(self, force):
@@ -332,7 +362,7 @@ class AutoReportTrigger():
         added = new_list - self.cached_ignored
         self.cached_ignored = new_list
 
-        if not _oa_setting("report_on_unignore"):
+        if not oa_setting("report_on_unignore"):
             return
 
         self.removed |= removed
@@ -361,7 +391,7 @@ class PackageListCollectionThread(BackgroundWorkerThread):
     def _process(self):
         self.pkg_list = PackageList(self.args.get("name_list", None))
         if self.args.get("get_overrides", False) is True:
-            _packages_with_overrides(self.pkg_list)
+            packages_with_overrides(self.pkg_list)
 
 
 ###----------------------------------------------------------------------------
@@ -372,17 +402,17 @@ class OverrideDiffThread(BackgroundWorkerThread):
     Diff a specific package override in a background thread.
     """
     def _process(self):
-        context_lines = _oa_setting("diff_context_lines")
+        context_lines = oa_setting("diff_context_lines")
 
         pkg_info = self.args.get("pkg_info", None)
         override = self.args.get("override", None)
 
         if not pkg_info or not override:
             self.diff = None
-            return _log("diff thread not given a package or override to diff")
+            return log("diff thread not given a package or override to diff")
 
         # Only need to do this if the user has a specific setting
-        binary_patterns = _oa_setting("binary_file_patterns")
+        binary_patterns = oa_setting("binary_file_patterns")
         if binary_patterns is not None:
             pkg_info.set_binary_pattern(binary_patterns)
 
@@ -408,7 +438,7 @@ class OverrideFreshenThread(BackgroundWorkerThread):
             zTime = datetime(*entry.date_time).timestamp()
 
             if zTime > now:
-                _log("Warning: The packaged '%s/%s' file is from the future" ,
+                log("Warning: The packaged '%s/%s' file is from the future" ,
                      pkg_name, override)
                 new_mtime = (now, zTime + 1)
 
@@ -450,7 +480,7 @@ class OverrideFreshenThread(BackgroundWorkerThread):
 
         for expired_name in expired_list:
             result = self._touch_override(view, zFile, pkg_name, expired_name)
-            _log(self._msg(pkg_name, expired_name, result))
+            log(self._msg(pkg_name, expired_name, result))
             if result:
                 count += 1
 
@@ -469,7 +499,7 @@ class OverrideFreshenThread(BackgroundWorkerThread):
 
         if not view or not pkg_name:
             self.result = "Nothing done; missing parameters"
-            return _log("freshen thread not given a view or package")
+            return log("freshen thread not given a view or package")
 
         pkg_info = PackageInfo(pkg_name)
         if not pkg_info.exists():
@@ -512,8 +542,8 @@ class ReportGenerationThread(BackgroundWorkerThread):
 
         force_reuse = self.args.get("force_reuse", False)
 
-        reuse = True if force_reuse else _oa_setting("reuse_views")
-        clear = True if force_reuse else _oa_setting("clear_existing")
+        reuse = True if force_reuse else oa_setting("reuse_views")
+        clear = True if force_reuse else oa_setting("clear_existing")
 
         view = output_to_view(self.window, self.caption, self.content,
                               reuse, clear, self.syntax,
@@ -561,14 +591,14 @@ class PackageReportThread(ReportGenerationThread):
         for pkg_name, pkg_info in pkg_list:
             result.append(
                 "| {:<40} | [{:1}] | [{:1}] | [{:1}] |".format(
-                    _decorate_pkg_name(pkg_info, name_only=True),
+                    decorate_pkg_name(pkg_info, name_only=True),
                     "S" if pkg_info.shipped_path is not None else " ",
                     "I" if pkg_info.installed_path is not None else " ",
                     "U" if pkg_info.unpacked_path is not None else " "))
         result.extend([r_sep, ""])
 
         self._set_content("OverrideAudit: Package Report", result, ":packages",
-                          _oa_syntax("OA-PkgReport"))
+                          oa_syntax("OA-PkgReport"))
 
 
 ###----------------------------------------------------------------------------
@@ -583,7 +613,7 @@ class OverrideReportThread(ReportGenerationThread):
     def _process(self):
         pkg_list = PackageList()
 
-        ignored = _oa_setting("ignore_overrides_in")
+        ignored = oa_setting("ignore_overrides_in")
 
         only_expired = self.args["only_expired"]
         ignore_empty = self.args["ignore_empty"]
@@ -616,7 +646,7 @@ class OverrideReportThread(ReportGenerationThread):
             result.append(self._empty_msg())
 
         self._set_content(title, result, report_type,
-                          _oa_syntax("OA-OverrideReport"),
+                          oa_syntax("OA-OverrideReport"),
                           {"override_audit_expired_pkgs": expired_pkgs})
 
     def _output_package(self, result, pkg_info, only_expired, expired_pkgs):
@@ -636,7 +666,7 @@ class OverrideReportThread(ReportGenerationThread):
         if expired_overrides:
             expired_pkgs.append(pkg_info.name)
 
-        result.append(_decorate_pkg_name(pkg_info))
+        result.append(decorate_pkg_name(pkg_info))
 
         self._output_overrides(result, normal_overrides,
                                expired_overrides, only_expired)
@@ -661,7 +691,7 @@ class OverrideReportThread(ReportGenerationThread):
                 "expired " if self.args["only_expired"] else "")
 
     def _notify_empty(self):
-        _log(self._empty_msg(), status=True)
+        log(self._empty_msg(), status=True)
 
 
 ###----------------------------------------------------------------------------
@@ -683,18 +713,18 @@ class BulkDiffReportThread(ReportGenerationThread):
 
         if package is not None:
             if package not in pkg_list:
-                return _log("Cannot diff package '%s'; not found" % package,
+                return log("Cannot diff package '%s'; not found" % package,
                             status=True, dialog=True)
 
             items = [package]
         else:
-            items = _packages_with_overrides(pkg_list)
+            items = packages_with_overrides(pkg_list)
 
         self._diff_packages(items, pkg_list, package is not None, force_reuse)
 
     def _diff_packages(self, names, pkg_list, single_package, force_reuse):
-        context_lines = _oa_setting("diff_context_lines")
-        binary_patterns = _oa_setting("binary_file_patterns")
+        context_lines = oa_setting("diff_context_lines")
+        binary_patterns = oa_setting("binary_file_patterns")
 
         result = []
         title = "Override Diff Report: "
@@ -720,17 +750,17 @@ class BulkDiffReportThread(ReportGenerationThread):
             if binary_patterns is not None:
                 pkg_info.set_binary_pattern(binary_patterns)
 
-            result.append(_decorate_pkg_name(pkg_info))
+            result.append(decorate_pkg_name(pkg_info))
             self._perform_diff(pkg_info, context_lines, result,
                                expired_pkgs)
 
-        self._set_content(title, result, report_type, _oa_syntax("OA-Diff"),
+        self._set_content(title, result, report_type, oa_syntax("OA-Diff"),
                           {"override_audit_expired_pkgs": expired_pkgs})
 
     def _perform_diff(self, pkg_info, context_lines, result, expired_pkgs):
         override_list = pkg_info.override_files(simple=True)
         expired_list = pkg_info.expired_override_files(simple=True)
-        empty_diff_hdr = _oa_setting("diff_empty_hdr")
+        empty_diff_hdr = oa_setting("diff_empty_hdr")
 
         if expired_list:
             expired_pkgs.append(pkg_info.name)
@@ -823,12 +853,12 @@ class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
     """
     def _file_pick(self, pkg_info, override_list, index):
         if index >= 0:
-            _thr_diff_override(self.window, pkg_info, override_list[index])
+            diff_override(self.window, pkg_info, override_list[index])
 
     def _show_override_list(self, pkg_info):
         override_list = list(pkg_info.override_files())
         if not override_list:
-            _log("Package '%s' has no overrides" % pkg_info.name,
+            log("Package '%s' has no overrides" % pkg_info.name,
                  status=True, dialog=True)
 
         self.window.show_quick_panel(
@@ -845,10 +875,10 @@ class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
                                         {"package": pkg_info.name})
 
     def _show_pkg_list(self, pkg_list, bulk):
-        items = _packages_with_overrides(pkg_list)
+        items = packages_with_overrides(pkg_list)
 
         if not items:
-            _log("No unignored packages have overrides",
+            log("No unignored packages have overrides",
                  status=True, dialog=True)
 
         self.window.show_quick_panel(
@@ -867,12 +897,12 @@ class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
                     self._show_override_list(pkg_info)
                 else:
                     if pkg_info.has_possible_overrides():
-                        _thr_diff_override(self.window, pkg_info, override)
+                        diff_override(self.window, pkg_info, override)
                     else:
-                        _log("Package '%s' has no overrides to diff" % package,
+                        log("Package '%s' has no overrides to diff" % package,
                              status=True, dialog=True)
             else:
-                _log("Unable to diff; no package '%s'" % package,
+                log("Unable to diff; no package '%s'" % package,
                      status=True, dialog=True)
 
     def run(self, package=None, override=None, bulk=False):
@@ -999,22 +1029,22 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
             action = "diff" if not is_diff else "edit"
 
         if action == "diff":
-            if (_oa_setting("save_on_diff") and target.is_dirty() and
+            if (oa_setting("save_on_diff") and target.is_dirty() and
                     os.path.isfile(target.file_name())):
                 target.run_command("save")
             self._context_diff(target.window(), pkg_name, override)
 
         elif action == "edit":
-            _open_override(target.window(), pkg_name, override)
+            open_override(target.window(), pkg_name, override)
 
         elif action == "delete":
-            _delete_override(target.window(), pkg_name, override)
+            delete_override(target.window(), pkg_name, override)
 
         elif action == "freshen":
-            _thr_freshen_override(target, pkg_name, override)
+            freshen_override(target, pkg_name, override)
 
         else:
-            _log("Error: unknown action for override context: %s", action)
+            log("Error: unknown action for override context: %s", action)
 
     def _context_diff(self, window, package, override):
         callback = lambda thr: self._pkg_loaded(thr, window, package, override)
@@ -1023,8 +1053,8 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
 
     def _pkg_loaded(self, thread, window, pkg_name, override):
         pkg_list = thread.pkg_list
-        _thr_diff_override(window, pkg_list[pkg_name], override,
-                           diff_only=True, force_reuse=True)
+        diff_override(window, pkg_list[pkg_name], override,
+                      diff_only=True, force_reuse=True)
 
     def description(self, action, **kwargs):
         pkg_name, override, is_diff = self.view_context(None, False, **kwargs)
@@ -1069,9 +1099,9 @@ class OverrideAuditContextPackageCommand(ContextHelper,sublime_plugin.TextComman
             self.view.window().run_command("override_audit_diff_package",
                                            {"package": pkg_name})
         elif action == "freshen":
-            _thr_freshen_override(self.view, pkg_name)
+            freshen_override(self.view, pkg_name)
         else:
-            _log("Error: unknown action for package context: %s", action)
+            log("Error: unknown action for package context: %s", action)
 
     def description(self, action, event, **kwargs):
         pkg_name = self._package_at_point(event)

@@ -1,6 +1,6 @@
 from ..bootstrap import reload
 
-reload("src", ["helpers", "override_audit", "settings_proxy"])
+reload("src", ["override_audit", "settings_proxy"])
 reload("src.commands")
 
 from . import override_audit
