@@ -7,26 +7,13 @@ from bisect import bisect
 from zipfile import ZipFile
 import os
 
-import sys
-from imp import reload
 
-
-# If our submodules have previously been loaded, reload them now before we
-# proceed to ensure everything is up to date.
-prefix = "OverrideAudit.lib."
-sub_modules = ["packages", "output_view", "threads", "utils"]
-for module in sub_modules:
-    module = prefix + module
-    if module in sys.modules:
-        reload(sys.modules[module])
-
-
-from .lib.packages import PackageInfo, PackageList, PackageFileSet
-from .lib.packages import override_display, check_potential_override
-from .lib.packages import find_zip_entry
-from .lib.output_view import output_to_view
-from .lib.threads import BackgroundWorkerThread
-from .lib.utils import SettingsGroup
+from ..lib.packages import PackageInfo, PackageList, PackageFileSet
+from ..lib.packages import override_display, check_potential_override
+from ..lib.packages import find_zip_entry
+from ..lib.output_view import output_to_view
+from ..lib.threads import BackgroundWorkerThread
+from ..lib.utils import SettingsGroup
 
 
 ###----------------------------------------------------------------------------
@@ -43,10 +30,11 @@ override_group = SettingsGroup("override_audit_package",
 ###----------------------------------------------------------------------------
 
 
-def plugin_loaded():
+def loaded():
     """
     Initialize plugin state.
     """
+    _log("Initializing")
     _oa_setting.obj = sublime.load_settings("OverrideAudit.sublime-settings")
     _oa_setting.default = {
         "reuse_views": True,
@@ -68,7 +56,8 @@ def plugin_loaded():
     AutoReportTrigger()
 
 
-def plugin_unloaded():
+def unloaded():
+    _log("Shutting down")
     """
     Clean up state before unloading.
     """
@@ -252,35 +241,6 @@ def _thr_diff_override(window, pkg_info, override,
     OverrideDiffThread(window, "Diffing Override", callback,
                        pkg_info=pkg_info, override=override).start()
 
-
-def _find_override(view, pkg_name, override):
-    """
-    Given a report view, return the bounds of the override belonging to the
-    given package. Returns None if the position cannot be located.
-    """
-    if not view.match_selector(0, "text.override-audit"):
-        return None
-
-    bounds = None
-    packages = view.find_by_selector("entity.name.package")
-    for index, pkg_pos in enumerate(packages):
-        if view.substr(pkg_pos) == pkg_name:
-            end_pos = view.size()
-            if index + 1 < len(packages):
-                end_pos = packages[index + 1].begin() - 1
-
-            bounds = sublime.Region(pkg_pos.end() + 1, end_pos)
-            break
-
-    if bounds is None:
-        return
-
-    overrides = view.find_by_selector("entity.name.filename.override")
-    for file_pos in overrides:
-        if bounds.contains(file_pos) and view.substr(file_pos) == override:
-            return file_pos
-
-    return None
 
 ###----------------------------------------------------------------------------
 
@@ -473,8 +433,9 @@ class OverrideFreshenThread(BackgroundWorkerThread):
 
     def _clean_package(self, view, pkg_name):
         pkg_list = view.settings().get("override_audit_expired_pkgs", [])
-        pkg_list.remove(pkg_name)
-        view.settings().set("override_audit_expired_pkgs", pkg_list)
+        if pkg_name in pkg_list:
+            pkg_list.remove(pkg_name)
+            view.settings().set("override_audit_expired_pkgs", pkg_list)
 
     def _single(self, view, zFile, pkg_info, override):
         result = self._touch_override(view, zFile, pkg_info.name, override)
@@ -924,39 +885,6 @@ class OverrideAuditDiffOverrideCommand(sublime_plugin.WindowCommand):
         callback = lambda thread: self._loaded(thread, package, override, bulk)
         PackageListCollectionThread(self.window, "Collecting Package List",
                                     callback, get_overrides=True).start()
-
-
-###----------------------------------------------------------------------------
-
-
-class OverrideAuditModifyMarkCommand(sublime_plugin.TextCommand):
-    """
-    Modify the mark assigned to an override in a report. An override only
-    supports a single mark, if any. Passing a mark of None removes any mark.
-    """
-    def run(self, edit, pkg_name, override, mark=None):
-        pos = _find_override(self.view, pkg_name, override)
-        if pos is None:
-            return
-
-        mark_pos = sublime.Region(pos.begin() - 4, pos.begin())
-        current_mark = self.view.substr(mark_pos)
-
-        if mark is None and current_mark[0] == " ":
-            return
-
-        new_mark = ""
-        if mark is not None:
-            new_mark = '[%s] ' % mark
-            if current_mark[0] == " ":
-                mark_pos = sublime.Region(pos.begin(), pos.begin())
-
-        self.view.set_read_only(False)
-        self.view.replace(edit, mark_pos, new_mark)
-        self.view.set_read_only(True)
-
-    def is_enabled(self, pkg_name, override, mark=None):
-        return self.view.settings().has("override_audit_report_type")
 
 
 ###----------------------------------------------------------------------------
