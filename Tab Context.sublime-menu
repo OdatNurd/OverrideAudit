@@ -1,8 +1,9 @@
 [
     { "caption": "-" },
 
-    { "command": "override_audit_context_override", "args": { "group": -1, "index": -1, "action": "toggle" } },
-    { "command": "override_audit_context_override", "args": { "group": -1, "index": -1, "action": "delete" } },
+    { "command": "override_audit_edit_override",   "args": { "group": -1, "index": -1 } },
+    { "command": "override_audit_diff_override",   "args": { "group": -1, "index": -1 } },
+    { "command": "override_audit_delete_override", "args": { "group": -1, "index": -1 } },
 
     { "command": "override_audit_context_report", "args": { "group": -1, "index": -1 } },
 

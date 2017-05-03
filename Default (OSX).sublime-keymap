@@ -2,8 +2,7 @@
     // Toggle between an override and its diff.
     {
         "keys": ["super+alt+up"],
-        "command": "override_audit_context_override",
-        "args": {"action": "toggle"},
+        "command": "override_audit_toggle_override",
         "context": [
             { "key": "override_audit_override_view" }
         ]

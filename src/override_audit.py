@@ -423,6 +423,8 @@ class OverrideDiffThread(BackgroundWorkerThread):
 ###----------------------------------------------------------------------------
 
 
+# TODO Maybe this shouldn't freshen things that are not currently expired?
+# Currently it will if you explicitly tell it to.
 class OverrideFreshenThread(BackgroundWorkerThread):
     """
     Touch either the explicitly specified override in the provided package or
@@ -640,11 +642,17 @@ class ContextHelper():
         override = None
         is_diff = None
 
-        # Favor settings if they exist
-        if override_group.has(view):
+        # Prioritize explicit arguments when present
+        if any(key in kwargs for key in ("pkg_name", "override")):
+            pkg_name = kwargs.get("pkg_name", None)
+            override = kwargs.get("override", None)
+            is_diff = kwargs.get("is_diff", None)
+
+        # Favor settings if they exist (only for non-expired)
+        elif override_group.has(view) and expired == False:
             pkg_name, override, is_diff = override_group.get(view)
 
-        # Check for context clicks on a package or override name
+        # Check for context clicks on a package or override name as a fallback
         elif event is not None:
             pkg_name = self._package_at_point(event)
             if pkg_name is None:
@@ -656,77 +664,6 @@ class ContextHelper():
 
     def want_event(self):
         return True
-
-###----------------------------------------------------------------------------
-
-
-class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextCommand):
-    """
-    Offer to diff, edit or delete an override via context menu selection.
-
-    Works as a view context menu (on an override), tab context menu or via the
-    command palette.
-    """
-    def run(self, edit, action, **kwargs):
-        target = self.view_target(self.view, **kwargs)
-        pkg_name, override, is_diff = self.view_context(target, False, **kwargs)
-
-        if action == "toggle":
-            action = "diff" if not is_diff else "edit"
-
-        if action == "diff":
-            if (oa_setting("save_on_diff") and target.is_dirty() and
-                    os.path.isfile(target.file_name())):
-                target.run_command("save")
-            self._context_diff(target.window(), pkg_name, override)
-
-        elif action == "edit":
-            open_override(target.window(), pkg_name, override)
-
-        elif action == "delete":
-            delete_override(target.window(), pkg_name, override)
-
-        elif action == "freshen":
-            freshen_override(target, pkg_name, override)
-
-        else:
-            log("Error: unknown action for override context: %s", action)
-
-    def _context_diff(self, window, package, override):
-        callback = lambda thr: self._pkg_loaded(thr, window, package, override)
-        PackageListCollectionThread(window, "Collecting Package List",
-                                    callback, name_list=package).start()
-
-    def _pkg_loaded(self, thread, window, pkg_name, override):
-        pkg_list = thread.pkg_list
-        diff_override(window, pkg_list[pkg_name], override,
-                      diff_only=True, force_reuse=True)
-
-    def description(self, action, **kwargs):
-        pkg_name, override, is_diff = self.view_context(None, False, **kwargs)
-
-        if action == "toggle":
-            action = "diff" if is_diff is False else "edit"
-
-        return "OverrideAudit: %s Override '%s'" % (action.title(), override)
-
-    def is_visible(self, action, **kwargs):
-        expired = (action == "freshen")
-        pkg_name, override, is_diff = self.view_context(None, expired, **kwargs)
-
-        if action == "freshen":
-            if override_group.has(self.view):
-                override = None
-            return True if override is not None else False
-
-        if action == "toggle":
-            return True if is_diff is not None else False
-
-        # Everything else requires package and override to be visible
-        if pkg_name is not None and override is not None:
-            return True if is_diff is None or action == "delete" else False
-
-        return False
 
 
 ###----------------------------------------------------------------------------
