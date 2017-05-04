@@ -1,6 +1,22 @@
 OverrideAudit ChangeLog
 =======================
 
+Next Version (????-??-??)
+-------------------------
+  * Massive internal refactoring to make it easier to add new
+    commands and functionality in the future.
+  * override_audit_diff_override command renamed to
+    override_audit_diff_single to better match its function of
+    diffing a single override or bulk diffing a single package.
+  * The override_audit_context_override command, which provided
+    all context specific commands for an override has been
+    split out into override_audit_BLAH_override, where BLAH is
+    one of toggle, diff, edit, delete or freshen.
+  * Fix a bug in save_on_diff handling whereby the buffer might
+    visually appear unsaved in some circumstances even though
+    the file was actually saved.
+
+
 Version 1.1.1 (2017-05-01)
 --------------------------
   * Remove a debug print statement that slipped through during some
