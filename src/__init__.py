@@ -29,7 +29,7 @@ __all__ = [
     # commands/*
     "OverrideAuditPackageReportCommand",
     "OverrideAuditOverrideReportCommand",
-    "OverrideAuditDiffPackageCommand",
+    "OverrideAuditDiffReportCommand",
     "OverrideAuditDiffSingleCommand",
     "OverrideAuditToggleOverrideCommand",
     "OverrideAuditDiffOverrideCommand",

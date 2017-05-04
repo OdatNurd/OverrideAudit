@@ -679,7 +679,7 @@ class OverrideAuditContextPackageCommand(ContextHelper,sublime_plugin.TextComman
     def run(self, edit, action, event):
         pkg_name = self._package_at_point(event)
         if action == "diff":
-            self.view.window().run_command("override_audit_diff_package",
+            self.view.window().run_command("override_audit_diff_report",
                                            {"package": pkg_name})
         elif action == "freshen":
             freshen_override(self.view, pkg_name)
@@ -721,7 +721,7 @@ class OverrideAuditContextReportCommand(ContextHelper,sublime_plugin.TextCommand
             ":packages":          "override_audit_package_report",
             ":overrides":         "override_audit_override_report",
             ":overrides_expired": "override_audit_override_report"
-        }.get(report_type, "override_audit_diff_package")
+        }.get(report_type, "override_audit_diff_report")
         args = {"force_reuse": True}
 
         if report_type[0] != ":":

@@ -34,7 +34,7 @@ class OverrideAuditDiffSingleCommand(sublime_plugin.WindowCommand):
             if not bulk:
                 self._show_override_list(pkg_info)
             else:
-                self.window.run_command("override_audit_diff_package",
+                self.window.run_command("override_audit_diff_report",
                                         {"package": pkg_info.name})
 
     def _show_pkg_list(self, pkg_list, bulk):
@@ -71,7 +71,7 @@ class OverrideAuditDiffSingleCommand(sublime_plugin.WindowCommand):
     def run(self, package=None, override=None, bulk=False):
         # Shortcut for bulk diffing a single package
         if bulk and package is not None:
-            self.window.run_command("override_audit_diff_package",
+            self.window.run_command("override_audit_diff_report",
                                     {"package": package})
             return
 

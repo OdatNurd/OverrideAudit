@@ -8,6 +8,9 @@ Next Version (????-??-??)
   * override_audit_diff_override command renamed to
     override_audit_diff_single to better match its function of
     diffing a single override or bulk diffing a single package.
+  * override_audit_diff_package command renamed to
+    override_audit_diff_report to indicate that what it actually
+    generates is a diff report.
   * The override_audit_context_override command, which provided
     all context specific commands for an override has been
     split out into override_audit_BLAH_override, where BLAH is

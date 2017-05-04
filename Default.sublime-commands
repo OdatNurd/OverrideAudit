@@ -76,7 +76,7 @@
     },
     {
         "caption": "OverrideAudit: Bulk Diff All Packages",
-        "command": "override_audit_diff_package"
+        "command": "override_audit_diff_report"
     },
     {
         "caption": "OverrideAudit: Refresh Report",

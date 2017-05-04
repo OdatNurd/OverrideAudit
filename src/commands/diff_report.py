@@ -110,7 +110,7 @@ class BulkDiffReportThread(ReportGenerationThread):
 ###----------------------------------------------------------------------------
 
 
-class OverrideAuditDiffPackageCommand(sublime_plugin.WindowCommand):
+class OverrideAuditDiffReportCommand(sublime_plugin.WindowCommand):
     """
     Perform a bulk diff of all overrides in either all packages or a single
     package, depending on the argument provided.
