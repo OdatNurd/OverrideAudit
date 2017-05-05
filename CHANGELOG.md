@@ -15,6 +15,10 @@ Next Version (????-??-??)
     all context specific commands for an override has been
     split out into override_audit_BLAH_override, where BLAH is
     one of toggle, diff, edit, delete or freshen.
+  * The override_audit_context_package command, which provided
+    all context specific commands for a package has been out
+    into override_audit_BLAH_package, where BLAH is one of
+    diff or freshen.
   * Fix a bug in save_on_diff handling whereby the buffer might
     visually appear unsaved in some circumstances even though
     the file was actually saved.

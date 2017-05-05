@@ -7,7 +7,7 @@
     { "command": "override_audit_delete_override" },
 
     // Bulk diffing of a single package in a report
-    { "command": "override_audit_context_package", "args": { "action": "diff" } },
+    { "command": "override_audit_diff_package" },
 
     // Refresh an existing report window
     { "command": "override_audit_context_report" },
@@ -16,7 +16,7 @@
 
     // Freshen actions for expired items
     { "command": "override_audit_freshen_override" },
-    { "command": "override_audit_context_package", "args": { "action": "freshen" } },
+    { "command": "override_audit_freshen_package" },
 
     { "caption": "-" },
 ]

@@ -19,7 +19,6 @@ __all__ = [
     "OverrideAuditEditSettingsCommand",
 
     # override_audit
-    "OverrideAuditContextPackageCommand",
     "OverrideAuditContextReportCommand",
 
     # events/contexts
@@ -36,5 +35,7 @@ __all__ = [
     "OverrideAuditEditOverrideCommand",
     "OverrideAuditDeleteOverrideCommand",
     "OverrideAuditFreshenOverrideCommand",
+    "OverrideAuditDiffPackageCommand",
+    "OverrideAuditFreshenPackageCommand",
     "OverrideAuditModifyMarkCommand"
 ]

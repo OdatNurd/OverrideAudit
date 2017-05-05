@@ -669,45 +669,6 @@ class ContextHelper():
 ###----------------------------------------------------------------------------
 
 
-class OverrideAuditContextPackageCommand(ContextHelper,sublime_plugin.TextCommand):
-    """
-    Offer to bulk diff an entire package based on a context menu selection.
-
-    The menu item is visible only in context menus which present a package name
-    such as the global package list, override list or existing diff report.
-    """
-    def run(self, edit, action, event):
-        pkg_name = self._package_at_point(event)
-        if action == "diff":
-            self.view.window().run_command("override_audit_diff_report",
-                                           {"package": pkg_name})
-        elif action == "freshen":
-            freshen_override(self.view, pkg_name)
-        else:
-            log("Error: unknown action for package context: %s", action)
-
-    def description(self, action, event, **kwargs):
-        pkg_name = self._package_at_point(event)
-
-        if action == "diff":
-            return "OverrideAudit: Bulk Diff Package '%s'" % pkg_name
-        elif action == "freshen":
-            return "OverrideAudit: Freshen Expired Overrides in '%s'" % pkg_name
-
-    def is_visible(self, action, event, **kwargs):
-        pkg_name = self._package_at_point(event)
-        if pkg_name is None:
-            return False
-
-        if action == "freshen":
-            return self._pkg_contains_expired(pkg_name, **kwargs)
-
-        return not self._report_type(**kwargs) == pkg_name
-
-
-###----------------------------------------------------------------------------
-
-
 class OverrideAuditContextReportCommand(ContextHelper,sublime_plugin.TextCommand):
     """
     Offer to refresh existing reports after manual changes have been made.
