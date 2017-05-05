@@ -25,9 +25,9 @@ class OverrideAuditFreshenPackageCommand(ContextHelper,sublime_plugin.TextComman
 
     def is_visible(self, **kwargs):
         target = self.view_target(self.view, **kwargs)
-        package, _o, _d = self.view_context(target, False, **kwargs)
+        package, override, _ = self.view_context(target, False, **kwargs)
 
-        if package is None:
+        if package is None or override is not None:
             return False
 
         return self._pkg_contains_expired(package, **kwargs)

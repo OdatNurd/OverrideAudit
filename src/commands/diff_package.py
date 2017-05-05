@@ -26,9 +26,9 @@ class OverrideAuditDiffPackageCommand(ContextHelper,sublime_plugin.TextCommand):
 
     def is_visible(self, **kwargs):
         target = self.view_target(self.view, **kwargs)
-        package, _o, _d = self.view_context(target, False, **kwargs)
+        package, override, _ = self.view_context(target, False, **kwargs)
 
-        if package is None:
+        if package is None or override is not None:
             return False
 
         return not self._report_type(**kwargs) == package
