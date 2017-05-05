@@ -10,7 +10,7 @@
     { "command": "override_audit_diff_package" },
 
     // Refresh an existing report window
-    { "command": "override_audit_context_report" },
+    { "command": "override_audit_refresh_report" },
 
     { "caption": "-" },
 

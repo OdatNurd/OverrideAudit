@@ -18,9 +18,6 @@ __all__ = [
     "OverrideAuditOpenFileCommand",
     "OverrideAuditEditSettingsCommand",
 
-    # override_audit
-    "OverrideAuditContextReportCommand",
-
     # events/contexts
     "OverrideAuditEventListener",
     "OverrideAuditContextListener",
@@ -29,7 +26,7 @@ __all__ = [
     "OverrideAuditPackageReportCommand",
     "OverrideAuditOverrideReportCommand",
     "OverrideAuditDiffReportCommand",
-    "OverrideAuditDiffSingleCommand",
+    "OverrideAuditRefreshReportCommand",
     "OverrideAuditToggleOverrideCommand",
     "OverrideAuditDiffOverrideCommand",
     "OverrideAuditEditOverrideCommand",
@@ -37,5 +34,6 @@ __all__ = [
     "OverrideAuditFreshenOverrideCommand",
     "OverrideAuditDiffPackageCommand",
     "OverrideAuditFreshenPackageCommand",
+    "OverrideAuditDiffSingleCommand",
     "OverrideAuditModifyMarkCommand"
 ]

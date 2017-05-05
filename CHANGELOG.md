@@ -3,25 +3,41 @@ OverrideAudit ChangeLog
 
 Next Version (????-??-??)
 -------------------------
-  * Massive internal refactoring to make it easier to add new
-    commands and functionality in the future.
-  * override_audit_diff_override command renamed to
-    override_audit_diff_single to better match its function of
-    diffing a single override or bulk diffing a single package.
-  * override_audit_diff_package command renamed to
-    override_audit_diff_report to indicate that what it actually
-    generates is a diff report.
-  * The override_audit_context_override command, which provided
-    all context specific commands for an override has been
-    split out into override_audit_BLAH_override, where BLAH is
-    one of toggle, diff, edit, delete or freshen.
-  * The override_audit_context_package command, which provided
-    all context specific commands for a package has been out
-    into override_audit_BLAH_package, where BLAH is one of
-    diff or freshen.
   * Fix a bug in save_on_diff handling whereby the buffer might
     visually appear unsaved in some circumstances even though
     the file was actually saved.
+
+  * Massive internal refactoring has been done to make it easier
+    to add in new commands and functionality. The primary target
+    of the refactor was in taking a few commands which were
+    overloaded and took an "action" parameter to select how they
+    worked and splitting them out into distinct commands.
+
+    This change will make it easier to add in new functionality
+    but it does mean that many commands have been renamed to
+    more descriptive names.
+
+    The full list of changes is:
+
+        override_audit_diff_override
+          -> override_audit_diff_single
+
+        override_audit_diff_package
+          -> override_audit_diff_report
+
+        override_audit_context_override
+          -> override_audit_toggle_override
+          -> override_audit_diff_override
+          -> override_audit_edit_override
+          -> override_audit_delete_override
+          -> override_audit_freshen_override
+
+        override_audit_context_package
+          -> override_audit_diff_package
+          -> override_audit_freshen_package
+
+        override_audit_context_report
+          -> override_audit_refresh_report
 
 
 Version 1.1.1 (2017-05-01)

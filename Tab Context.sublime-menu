@@ -5,7 +5,7 @@
     { "command": "override_audit_diff_override",   "args": { "group": -1, "index": -1 } },
     { "command": "override_audit_delete_override", "args": { "group": -1, "index": -1 } },
 
-    { "command": "override_audit_context_report", "args": { "group": -1, "index": -1 } },
+    { "command": "override_audit_refresh_report", "args": { "group": -1, "index": -1 } },
 
     { "caption": "-" },
 ]

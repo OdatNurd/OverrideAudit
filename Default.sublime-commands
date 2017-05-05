@@ -80,7 +80,7 @@
     },
     {
         "caption": "OverrideAudit: Refresh Report",
-        "command": "override_audit_context_report"
+        "command": "override_audit_refresh_report"
     },
     {
         "caption": "OverrideAudit: Swap Diff/Edit View",

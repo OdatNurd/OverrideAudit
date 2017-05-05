@@ -11,7 +11,7 @@
     // Refresh the current OverrideAudit report
     {
         "keys": ["f5"],
-        "command": "override_audit_context_report",
+        "command": "override_audit_refresh_report",
         "context": [
             { "key": "override_audit_report_view" }
         ]
