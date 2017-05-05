@@ -2,8 +2,8 @@ import sublime
 import sublime_plugin
 from os.path import isfile
 
-from ..override_audit import oa_setting, diff_override
-from ..override_audit import PackageListCollectionThread, ContextHelper
+from ..core import oa_setting, diff_override
+from ..core import PackageListCollectionThread, ContextHelper
 
 
 ###----------------------------------------------------------------------------

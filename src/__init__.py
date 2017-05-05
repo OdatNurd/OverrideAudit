@@ -1,18 +1,18 @@
-from ..bootstrap import reload
+from ..override_audit import reload
 
-reload("src", ["override_audit", "events", "contexts", "settings_proxy"])
+reload("src", ["core", "events", "contexts", "settings_proxy"])
 reload("src.commands")
 
-from . import override_audit
-from .override_audit import *
+from . import core
+from .core import *
 from .events import *
 from .contexts import *
 from .settings_proxy import *
 from .commands import *
 
 __all__ = [
-    # override_audit
-    "override_audit",
+    # core
+    "core",
 
     # settings_proxy
     "OverrideAuditOpenFileCommand",

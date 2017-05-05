@@ -2,7 +2,7 @@ import sublime
 import sublime_plugin
 import os
 
-from .override_audit import override_group
+from .core import override_group
 from ..lib.packages import check_potential_override
 
 

@@ -1,7 +1,7 @@
 import sublime
 import sublime_plugin
 
-from ..override_audit import ContextHelper, freshen_override
+from ..core import ContextHelper, freshen_override
 
 
 ###----------------------------------------------------------------------------

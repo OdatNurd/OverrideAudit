@@ -1,4 +1,4 @@
-from ..bootstrap import reload
+from ..override_audit import reload
 
 reload("lib", ["output_view", "packages", "threads", "utils"])
 

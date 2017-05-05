@@ -1,8 +1,8 @@
 import sublime
 import sublime_plugin
 
-from ..override_audit import diff_override, packages_with_overrides, log
-from ..override_audit import PackageListCollectionThread
+from ..core import diff_override, packages_with_overrides, log
+from ..core import PackageListCollectionThread
 
 
 ###----------------------------------------------------------------------------

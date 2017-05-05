@@ -1,4 +1,4 @@
-from ...bootstrap import reload
+from ...override_audit import reload
 
 reload("src.commands", ["package_report", "override_report", "diff_report",
        "refresh_report", "diff_single", "toggle_override", "diff_override",

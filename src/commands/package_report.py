@@ -1,8 +1,8 @@
 import sublime
 import sublime_plugin
 
-from ..override_audit import oa_syntax, decorate_pkg_name
-from ..override_audit import ReportGenerationThread
+from ..core import oa_syntax, decorate_pkg_name
+from ..core import ReportGenerationThread
 from ...lib.packages import PackageList
 
 ###----------------------------------------------------------------------------

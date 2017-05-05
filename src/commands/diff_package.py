@@ -1,7 +1,7 @@
 import sublime
 import sublime_plugin
 
-from ..override_audit import ContextHelper
+from ..core import ContextHelper
 
 
 ###----------------------------------------------------------------------------

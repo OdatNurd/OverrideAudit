@@ -27,11 +27,11 @@ from .src import *
 
 
 def plugin_loaded():
-    override_audit.loaded()
+    core.loaded()
 
 
 def plugin_unloaded():
-    override_audit.unloaded()
+    core.unloaded()
 
 
 ###----------------------------------------------------------------------------

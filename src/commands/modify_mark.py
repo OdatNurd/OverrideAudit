@@ -1,7 +1,7 @@
 import sublime
 import sublime_plugin
 
-from ..override_audit import find_override
+from ..core import find_override
 
 
 ###----------------------------------------------------------------------------
