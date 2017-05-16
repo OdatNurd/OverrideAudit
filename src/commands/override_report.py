@@ -105,7 +105,7 @@ class OverrideAuditOverrideReportCommand(sublime_plugin.WindowCommand):
     """
     Generate a report on all packages which have overrides and what they are,
     if any. The report always includes expired packages and overrides, but the
-    optional parameter filters to only show expired results.
+    optional parameter filters this to only show expired results if desired.
     """
     def run(self, force_reuse=False, only_expired=False, ignore_empty=False):
         OverrideReportThread(self.window, "Generating Override Report",
