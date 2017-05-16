@@ -643,8 +643,8 @@ class ContextHelper():
         is_diff = None
 
         # Prioritize explicit arguments when present
-        if any(key in kwargs for key in ("pkg_name", "override")):
-            pkg_name = kwargs.get("pkg_name", None)
+        if any(key in kwargs for key in ("pkg_name", "package", "override")):
+            pkg_name = kwargs.get("pkg_name", kwargs.get("package", None))
             override = kwargs.get("override", None)
             is_diff = kwargs.get("is_diff", None)
 
