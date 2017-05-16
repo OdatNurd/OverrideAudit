@@ -15,9 +15,9 @@ class OverrideAuditToggleOverrideCommand(ContextHelper,sublime_plugin.TextComman
     """
     def run(self, edit, **kwargs):
         target = self.view_target(self.view, **kwargs)
-        pkg_name, override, is_diff = self.view_context(target, False, **kwargs)
+        package, override, is_diff = self.view_context(target, False, **kwargs)
 
-        args = {"pkg_name": pkg_name, "override": override}
+        args = {"package": package, "override": override}
         if is_diff is not None:
             args["is_diff"] = is_diff
 
@@ -28,18 +28,24 @@ class OverrideAuditToggleOverrideCommand(ContextHelper,sublime_plugin.TextComman
 
     def description(self, **kwargs):
         target = self.view_target(self.view, **kwargs)
-        pkg_name, override, _ = self.view_context(target, False, **kwargs)
+        package, override, _ = self.view_context(target, False, **kwargs)
 
         return "OverrideAudit: Toggle Override '%s'" % override
 
     def is_visible(self, **kwargs):
         target = self.view_target(self.view, **kwargs)
-        pkg_name, override, is_diff = self.view_context(target, False, **kwargs)
+        package, override, is_diff = self.view_context(target, False, **kwargs)
 
-        if pkg_name is not None and override is not None:
+        if package is not None and override is not None:
             return True if is_diff is not None else False
 
         return False
+
+    def is_enabled(self, **kwargs):
+        target = self.view_target(self.view, **kwargs)
+        package, override, is_diff = self.view_context(target, False, **kwargs)
+
+        return package is not None and override is not None
 
 
 ###----------------------------------------------------------------------------

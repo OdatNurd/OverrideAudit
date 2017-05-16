@@ -13,20 +13,27 @@ class OverrideAuditFreshenOverrideCommand(ContextHelper,sublime_plugin.TextComma
     """
     def run(self, edit, **kwargs):
         target = self.view_target(self.view, **kwargs)
-        pkg_name, override, _ = self.view_context(target, True, **kwargs)
+        package, override, _ = self.view_context(target, True, **kwargs)
 
-        freshen_override(target, pkg_name, override)
+        freshen_override(target, package, override)
 
     def description(self, **kwargs):
         target = self.view_target(self.view, **kwargs)
-        pkg_name, override, _ = self.view_context(target, True, **kwargs)
+        package, override, _ = self.view_context(target, True, **kwargs)
 
         return "OverrideAudit: Freshen Override '%s'" % override
 
     def is_visible(self, **kwargs):
         target = self.view_target(self.view, **kwargs)
-        pkg_name, override, _ = self.view_context(target, True, **kwargs)
+        package, override, _ = self.view_context(target, True, **kwargs)
 
-        return pkg_name is not None and override is not None
+        return package is not None and override is not None
+
+    def is_enabled(self, **kwargs):
+        target = self.view_target(self.view, **kwargs)
+        package, override, _ = self.view_context(target, True, **kwargs)
+
+        return package is not None and override is not None
+
 
 ###----------------------------------------------------------------------------

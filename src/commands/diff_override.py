@@ -52,5 +52,11 @@ class OverrideAuditDiffOverrideCommand(ContextHelper,sublime_plugin.TextCommand)
 
         return False
 
+    def is_enabled(self, **kwargs):
+        target = self.view_target(self.view, **kwargs)
+        package, override, _ = self.view_context(target, False, **kwargs)
+
+        return package is not None and override is not None
+
 
 ###----------------------------------------------------------------------------
