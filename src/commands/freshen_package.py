@@ -10,6 +10,8 @@ from ..core import ContextHelper, freshen_override
 class OverrideAuditFreshenPackageCommand(ContextHelper,sublime_plugin.TextCommand):
     """
     Freshen the given package on disk so it is no longer considered expired.
+    This will touch all expired overrides and also remove their expiration
+    remark (if invoked from within an override report).
     """
     def run(self, edit, **kwargs):
         target = self.view_target(self.view, **kwargs)
@@ -32,5 +34,10 @@ class OverrideAuditFreshenPackageCommand(ContextHelper,sublime_plugin.TextComman
 
         return self._pkg_contains_expired(package, **kwargs)
 
+    def is_enabled(self, **kwargs):
+        target = self.view_target(self.view, **kwargs)
+        package, _o, _d = self.view_context(target, False, **kwargs)
+
+        return package is not None
 
 ###----------------------------------------------------------------------------

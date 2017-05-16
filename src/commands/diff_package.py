@@ -9,7 +9,9 @@ from ..core import ContextHelper
 
 class OverrideAuditDiffPackageCommand(ContextHelper,sublime_plugin.TextCommand):
     """
-    Freshen the given package on disk so it is no longer considered expired.
+    Bulk diff either a single package or all packages. This can be invoked via
+    a context menu to set a package, invoked with a "package" argument to set
+    the package, or with no arguments to diff all packages.
     """
     def run(self, edit, **kwargs):
         target = self.view_target(self.view, **kwargs)
