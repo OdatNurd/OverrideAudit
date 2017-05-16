@@ -451,7 +451,7 @@ class OverrideFreshenThread(BackgroundWorkerThread):
             # TODO: This command could take a list of overrides in the package
             # and handle them all at once.
             view.run_command("override_audit_modify_mark", {
-                "pkg_name": pkg_name,
+                "package": pkg_name,
                 "override": override
             })
 
