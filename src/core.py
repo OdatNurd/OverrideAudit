@@ -172,15 +172,15 @@ def delete_override(window, pkg_name, override):
             log("Deleted %s", relative_name, status=True)
 
 
-def freshen_override(view, pkg_name, override=None):
+def freshen_override(view, package, override=None):
     """
     Touch either the explicitly specified override in the provided package or
     all expired overrides in the package.
     """
     if oa_setting("confirm_freshen"):
-        target = "Expired overrides in '%s'" % pkg_name
+        target = "Expired overrides in '%s'" % package
         if override is not None:
-            relative_name = os.path.join(pkg_name, override)
+            relative_name = os.path.join(package, override)
             target = override_display(relative_name)
 
         msg = "Confirm freshen:\n\n{}".format(target)
@@ -189,7 +189,7 @@ def freshen_override(view, pkg_name, override=None):
 
     callback = lambda thread: log(thread.result, status=True)
     OverrideFreshenThread(view.window(), "Freshening Files", callback,
-                       pkg_name=pkg_name, override=override, view=view).start()
+                       package=package, override=override, view=view).start()
 
 
 def diff_override(window, pkg_info, override,
@@ -496,20 +496,20 @@ class OverrideFreshenThread(BackgroundWorkerThread):
 
     def _process(self):
         view = self.args.get("view", None)
-        pkg_name = self.args.get("pkg_name", None)
+        package = self.args.get("package", None)
         override = self.args.get("override", None)
 
-        if not view or not pkg_name:
+        if not view or not package:
             self.result = "Nothing done; missing parameters"
             return log("freshen thread not given a view or package")
 
-        pkg_info = PackageInfo(pkg_name)
+        pkg_info = PackageInfo(package)
         if not pkg_info.exists():
-            self.result = "Unable to freshen '%s'; no such package" % pkg_name
+            self.result = "Unable to freshen '%s'; no such package" % package
             return
 
         if not pkg_info.package_file():
-            self.result = "Unable to freshen '%s'; no overrides" % pkg_name
+            self.result = "Unable to freshen '%s'; no overrides" % package
             return
 
         try:
