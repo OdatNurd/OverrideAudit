@@ -1,6 +1,8 @@
 import sublime
 import sublime_plugin
 
+from collections import OrderedDict
+from operator import itemgetter
 from datetime import datetime
 from time import time
 from bisect import bisect
@@ -568,6 +570,36 @@ class ReportGenerationThread(BackgroundWorkerThread):
 ###----------------------------------------------------------------------------
 
 
+class CommandContext(tuple):
+    """
+    This is a custom named tuple that is used by the ContextHelper class to
+    describe the context that a command is being executed in.
+    """
+    __slots__ = ()
+    package = property(itemgetter(0))
+    override = property(itemgetter(1))
+    is_diff = property(itemgetter(2))
+    source = property(itemgetter(3))
+
+    def __new__(_cls, package, override, is_diff, source):
+        return tuple.__new__(_cls, (package, override, is_diff, source))
+
+    def __repr__(self):
+        return self.__class__.__name__ + '(package=%r, override=%r, is_diff=%r, source=%r)' % self
+
+    def has_target(self):
+        return None not in (self.package, self.override)
+
+    def is_complete(self):
+        return None not in (self.package, self.override, self.is_diff)
+
+    def has_diff(self):
+        return self.is_diff is not None
+
+
+###----------------------------------------------------------------------------
+
+
 class ContextHelper():
     """
     Helper class to allow context specific commands to seamlessly work in view
@@ -628,9 +660,9 @@ class ContextHelper():
 
     def view_context(self, view, expired, event=None, **kwargs):
         """
-        Return a tuple of (pkg_name, override_name, is_diff) for the provided
-        view and possible event. Some members of the tuple will be None if they
-        do not apply or cannot be determined by the current command state.
+        Return a CommandContext tuple for the provided view and possible event.
+        Some members of the tuple will be None if they do not apply or cannot
+        be determined by the current command state.
 
         If view is none, view_target is invoked to determine it. Additionally,
         expired indicates if the override found needs to be expired or not.
@@ -638,29 +670,33 @@ class ContextHelper():
         if view is None:
             view = self.view_target(self.view, **kwargs)
 
-        pkg_name = None
+        package = None
         override = None
         is_diff = None
+        source = None
 
         # Prioritize explicit arguments when present
         if any(key in kwargs for key in ("pkg_name", "package", "override")):
-            pkg_name = kwargs.get("pkg_name", kwargs.get("package", None))
+            package = kwargs.get("pkg_name", kwargs.get("package", None))
             override = kwargs.get("override", None)
             is_diff = kwargs.get("is_diff", None)
+            source = "args"
 
         # Favor settings if they exist (only for non-expired)
         elif override_group.has(view) and expired == False:
-            pkg_name, override, is_diff = override_group.get(view)
+            package, override, is_diff = override_group.get(view)
+            source = "settings"
 
         # Check for context clicks on a package or override name as a fallback
         elif event is not None:
-            pkg_name = self._package_at_point(event)
-            if pkg_name is None:
+            source = "context"
+            package = self._package_at_point(event)
+            if package is None:
                 override = self._override_at_point(event, expired)
                 if override is not None:
-                    pkg_name = self._package_for_override_at(event)
+                    package = self._package_for_override_at(event)
 
-        return (pkg_name, override, is_diff)
+        return CommandContext(package, override, is_diff, source)
 
     def want_event(self):
         return True

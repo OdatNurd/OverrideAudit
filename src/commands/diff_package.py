@@ -14,26 +14,23 @@ class OverrideAuditDiffPackageCommand(ContextHelper,sublime_plugin.TextCommand):
     the package, or with no arguments to diff all packages.
     """
     def run(self, edit, **kwargs):
-        target = self.view_target(self.view, **kwargs)
-        package, _o, _d = self.view_context(target, False, **kwargs)
+        ctx = self.view_context(None, False, **kwargs)
 
         self.view.window().run_command("override_audit_diff_report",
-                                       {"package": package})
+                                       {"package": ctx.package})
 
     def description(self, **kwargs):
-        target = self.view_target(self.view, **kwargs)
-        package, _o, _d = self.view_context(target, False, **kwargs)
+        ctx = self.view_context(None, False, **kwargs)
 
-        return "OverrideAudit: Bulk Diff Package '%s'" % package
+        return "OverrideAudit: Bulk Diff Package '%s'" % ctx.package
 
     def is_visible(self, **kwargs):
-        target = self.view_target(self.view, **kwargs)
-        package, override, _ = self.view_context(target, False, **kwargs)
+        ctx = self.view_context(None, False, **kwargs)
 
-        if package is None or override is not None:
+        if ctx.package is None or ctx.override is not None:
             return False
 
-        return not self._report_type(**kwargs) == package
+        return not self._report_type(**kwargs) == ctx.package
 
 
 ###----------------------------------------------------------------------------

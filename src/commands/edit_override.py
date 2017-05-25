@@ -13,30 +13,25 @@ class OverrideAuditEditOverrideCommand(ContextHelper,sublime_plugin.TextCommand)
     """
     def run(self, edit, **kwargs):
         target = self.view_target(self.view, **kwargs)
-        package, override, _ = self.view_context(target, False, **kwargs)
+        ctx = self.view_context(target, False, **kwargs)
 
-        open_override(target.window(), package, override)
+        open_override(target.window(), ctx.package, ctx.override)
 
     def description(self, **kwargs):
-        target = self.view_target(self.view, **kwargs)
-        package, override, _ = self.view_context(target, False, **kwargs)
+        ctx = self.view_context(None, False, **kwargs)
 
-        return "OverrideAudit: Edit Override '%s'" % override
+        return "OverrideAudit: Edit Override '%s'" % ctx.override
 
     def is_visible(self, **kwargs):
-        target = self.view_target(self.view, **kwargs)
-        package, override, is_diff = self.view_context(target, False, **kwargs)
+        ctx = self.view_context(None, False, **kwargs)
 
-        if package is not None and override is not None:
-            return is_diff is None or is_diff
+        if ctx.has_target():
+            return ctx.is_diff is None or ctx.is_diff
 
         return False
 
     def is_enabled(self, **kwargs):
-        target = self.view_target(self.view, **kwargs)
-        package, override, _ = self.view_context(target, False, **kwargs)
-
-        return package is not None and override is not None
+        return self.view_context(None, False, **kwargs).has_target()
 
 
 ###----------------------------------------------------------------------------

@@ -13,30 +13,22 @@ class OverrideAuditDeleteOverrideCommand(ContextHelper,sublime_plugin.TextComman
     """
     def run(self, edit, **kwargs):
         target = self.view_target(self.view, **kwargs)
-        package, override, _ = self.view_context(target, False, **kwargs)
-
-        delete_override(target.window(), package, override)
+        ctx = self.view_context(target, False, **kwargs)
+        delete_override(target.window(), ctx.package, ctx.override)
 
     def description(self, **kwargs):
-        target = self.view_target(self.view, **kwargs)
-        package, override, _ = self.view_context(target, False, **kwargs)
+        ctx = self.view_context(None, False, **kwargs)
 
-        return "OverrideAudit: Delete Override '%s'" % override
+        return "OverrideAudit: Delete Override '%s'" % ctx.override
 
     # TODO this should only trigger if the file that's going to be potentially
     # deleted actually exists on disk right now. Currently delete_override()
     # will do nothing, so this should not offer it.
     def is_visible(self, **kwargs):
-        target = self.view_target(self.view, **kwargs)
-        package, override, _ = self.view_context(target, False, **kwargs)
-
-        return package is not None and override is not None
+        return self.view_context(None, False, **kwargs).has_target()
 
     def is_enabled(self, **kwargs):
-        target = self.view_target(self.view, **kwargs)
-        package, override, _ = self.view_context(target, False, **kwargs)
-
-        return package is not None and override is not None
+        return self.view_context(None, False, **kwargs).has_target()
 
 
 ###----------------------------------------------------------------------------

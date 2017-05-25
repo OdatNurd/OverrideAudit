@@ -14,30 +14,27 @@ class OverrideAuditFreshenPackageCommand(ContextHelper,sublime_plugin.TextComman
     remark (if invoked from within an override report).
     """
     def run(self, edit, **kwargs):
-        target = self.view_target(self.view, **kwargs)
-        package, _o, _d = self.view_context(target, False, **kwargs)
+        ctx = self.view_context(None, False, **kwargs)
 
-        freshen_override(self.view, package)
+        freshen_override(self.view, ctx.package)
 
     def description(self, **kwargs):
-        target = self.view_target(self.view, **kwargs)
-        package, _o, _d = self.view_context(target, False, **kwargs)
+        ctx = self.view_context(None, False, **kwargs)
 
-        return "OverrideAudit: Freshen Expired Overrides in '%s'" % package
+        return "OverrideAudit: Freshen Expired Overrides in '%s'" % ctx.package
 
     def is_visible(self, **kwargs):
-        target = self.view_target(self.view, **kwargs)
-        package, override, _ = self.view_context(target, False, **kwargs)
+        ctx = self.view_context(None, False, **kwargs)
 
-        if package is None or override is not None:
+        if ctx.package is None or ctx.override is not None:
             return False
 
-        return self._pkg_contains_expired(package, **kwargs)
+        return self._pkg_contains_expired(ctx.package, **kwargs)
 
     def is_enabled(self, **kwargs):
-        target = self.view_target(self.view, **kwargs)
-        package, _o, _d = self.view_context(target, False, **kwargs)
+        ctx = self.view_context(None, False, **kwargs)
 
-        return package is not None
+        return ctx.package is not None
+
 
 ###----------------------------------------------------------------------------
