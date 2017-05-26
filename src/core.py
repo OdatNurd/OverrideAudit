@@ -698,6 +698,17 @@ class ContextHelper():
 
         return CommandContext(package, override, is_diff, source)
 
+    def always_visible(self, **kwargs):
+        return kwargs.get("always_visible", True)
+
+    def override_exists(self, ctx):
+        if ctx.has_target():
+            relative_name = os.path.join(ctx.package, ctx.override)
+            full_name = os.path.join(sublime.packages_path(), relative_name)
+            return os.path.isfile(full_name)
+
+        return False
+
     def want_event(self):
         return True
 
