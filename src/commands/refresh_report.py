@@ -33,6 +33,9 @@ class OverrideAuditRefreshReportCommand(ContextHelper,sublime_plugin.TextCommand
         window.run_command(command, args)
 
     def description(self, **kwargs):
+        if self._report_type(**kwargs) is None:
+            return "OverrideAudit: Refresh Report"
+
         report = self._report_type(**kwargs)
         report = {
             ":packages":          "Package Report",
@@ -44,6 +47,9 @@ class OverrideAuditRefreshReportCommand(ContextHelper,sublime_plugin.TextCommand
         return "OverrideAudit: Refresh %s" % report
 
     def is_visible(self, **kwargs):
+        if self.always_visible(**kwargs):
+            return True
+
         return self._report_type(**kwargs) is not None
 
     def is_enabled(self, **kwargs):

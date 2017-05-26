@@ -1,6 +1,9 @@
 import sublime
 import sublime_plugin
 
+import os
+
+
 from ..core import ContextHelper, delete_override
 
 
@@ -18,17 +21,23 @@ class OverrideAuditDeleteOverrideCommand(ContextHelper,sublime_plugin.TextComman
 
     def description(self, **kwargs):
         ctx = self.view_context(None, False, **kwargs)
+        if ctx.source == "settings":
+            return "OverrideAudit: Delete this Override"
 
-        return "OverrideAudit: Delete Override '%s'" % ctx.override
+        stub = "OverrideAudit: Delete Override"
+        if ctx.has_target():
+            return "%s '%s'" % (stub, ctx.override)
+        else:
+            return stub
 
-    # TODO this should only trigger if the file that's going to be potentially
-    # deleted actually exists on disk right now. Currently delete_override()
-    # will do nothing, so this should not offer it.
     def is_visible(self, **kwargs):
+        if self.always_visible(**kwargs):
+            return True
+
         return self.view_context(None, False, **kwargs).has_target()
 
     def is_enabled(self, **kwargs):
-        return self.view_context(None, False, **kwargs).has_target()
+        return self.override_exists(self.view_context(None, False, **kwargs))
 
 
 ###----------------------------------------------------------------------------

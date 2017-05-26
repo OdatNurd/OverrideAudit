@@ -7,8 +7,6 @@ from ..core import ContextHelper
 ###----------------------------------------------------------------------------
 
 
-# TODO: The is_visible and is_enabled in this command need some work because
-# they're probably triggering when they should not, going forward.
 class OverrideAuditToggleOverrideCommand(ContextHelper,sublime_plugin.TextCommand):
     """
     Swap between editing an override or diffing it based on the current state.
@@ -29,20 +27,18 @@ class OverrideAuditToggleOverrideCommand(ContextHelper,sublime_plugin.TextComman
             target.run_command("override_audit_diff_override", args)
 
     def description(self, **kwargs):
-        ctx = self.view_context(None, False, **kwargs)
-
-        return "OverrideAudit: Toggle Override '%s'" % ctx.override
+        return "OverrideAudit: Swap Diff/Edit of Current Override"
 
     def is_visible(self, **kwargs):
+        if self.always_visible(**kwargs):
+            return True
+
         ctx = self.view_context(None, False, **kwargs)
-
-        if ctx.has_target():
-            return ctx.has_diff()
-
-        return False
+        return true if ctx.has_target() and ctx.has_diff() else False
 
     def is_enabled(self, **kwargs):
-        return self.view_context(None, False, **kwargs).has_target()
+        ctx = self.view_context(None, False, **kwargs)
+        return ctx.has_diff() and self.override_exists(ctx)
 
 
 ###----------------------------------------------------------------------------

@@ -19,19 +19,31 @@ class OverrideAuditEditOverrideCommand(ContextHelper,sublime_plugin.TextCommand)
 
     def description(self, **kwargs):
         ctx = self.view_context(None, False, **kwargs)
+        if ctx.source == "settings":
+            return "OverrideAudit: Edit this Override"
 
-        return "OverrideAudit: Edit Override '%s'" % ctx.override
+        stub = "OverrideAudit: Edit Override"
+        if ctx.has_target():
+            return "%s '%s'" % (stub, ctx.override)
+        else:
+            return stub
 
     def is_visible(self, **kwargs):
-        ctx = self.view_context(None, False, **kwargs)
+        if self.always_visible(**kwargs):
+            return True
 
+        ctx = self.view_context(None, False, **kwargs)
         if ctx.has_target():
-            return ctx.is_diff is None or ctx.is_diff
+            return ctx.is_diff if ctx.has_diff() else True
 
         return False
 
     def is_enabled(self, **kwargs):
-        return self.view_context(None, False, **kwargs).has_target()
+        ctx = self.view_context(None, False, **kwargs)
+        if self.override_exists(ctx):
+            return ctx.is_diff if ctx.has_diff() else True
+
+        return False
 
 
 ###----------------------------------------------------------------------------

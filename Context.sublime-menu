@@ -2,21 +2,21 @@
     { "caption": "-" },
 
     // Core override operations
-    { "command": "override_audit_edit_override" },
-    { "command": "override_audit_diff_override" },
-    { "command": "override_audit_delete_override" },
+    { "command": "override_audit_edit_override" , "args": { "always_visible": false }},
+    { "command": "override_audit_diff_override" , "args": { "always_visible": false }},
+    { "command": "override_audit_delete_override" , "args": { "always_visible": false }},
 
     // Bulk diffing of a single package in a report
-    { "command": "override_audit_diff_package" },
+    { "command": "override_audit_diff_package" , "args": { "always_visible": true }},
 
     // Refresh an existing report window
-    { "command": "override_audit_refresh_report" },
+    { "command": "override_audit_refresh_report" , "args": { "always_visible": false } },
 
     { "caption": "-" },
 
     // Freshen actions for expired items
-    { "command": "override_audit_freshen_override" },
-    { "command": "override_audit_freshen_package" },
+    { "command": "override_audit_freshen_override" , "args": { "always_visible": true }},
+    { "command": "override_audit_freshen_package" , "args": { "always_visible": true }},
 
     { "caption": "-" },
 ]
