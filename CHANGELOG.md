@@ -19,25 +19,41 @@ Next Version (????-??-??)
 
     The full list of changes is:
 
-        override_audit_diff_override
-          -> override_audit_diff_single
+      override_audit_diff_override
+        -> override_audit_diff_single
 
-        override_audit_diff_package
-          -> override_audit_diff_report
+      override_audit_diff_package
+        -> override_audit_diff_report
 
-        override_audit_context_override
-          -> override_audit_toggle_override
-          -> override_audit_diff_override
-          -> override_audit_edit_override
-          -> override_audit_delete_override
-          -> override_audit_freshen_override
+      override_audit_context_override
+        -> override_audit_toggle_override
+        -> override_audit_diff_override
+        -> override_audit_edit_override
+        -> override_audit_delete_override
+        -> override_audit_freshen_override
 
-        override_audit_context_package
-          -> override_audit_diff_package
-          -> override_audit_freshen_package
+      override_audit_context_package
+        -> override_audit_diff_package
+        -> override_audit_freshen_package
 
-        override_audit_context_report
-          -> override_audit_refresh_report
+      override_audit_context_report
+        -> override_audit_refresh_report
+
+  * Enhanced all of the commands available via the context menu:
+
+      - Commands are now always visible unless you provide an argument telling
+        them to hide themselves when they do not apply; this allows you to add
+        these commands to other menus and control visibily.
+
+      - Commands will be visible but disabled when the underlying package or
+        override they are supposed to work with does not exist. For an override
+        this means a file does not exist, while for a package it means that the
+        unpacked folder is missing.
+
+      - The default captions for disabled commands is slightly different when
+        the appropriate context information is not available to tell you what
+        exactly they will do (e.g. "Diff Override" instead of telling you what
+        override will be diffed)
 
 
 Version 1.1.1 (2017-05-01)
