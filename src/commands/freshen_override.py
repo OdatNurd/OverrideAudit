@@ -18,15 +18,22 @@ class OverrideAuditFreshenOverrideCommand(ContextHelper,sublime_plugin.TextComma
         freshen_override(target, ctx.package, ctx.override)
 
     def description(self, **kwargs):
+        stub = "OverrideAudit: Freshen Override"
         ctx = self.view_context(None, True, **kwargs)
-
-        return "OverrideAudit: Freshen Override '%s'" % ctx.override
+        if ctx.has_target():
+            return "%s '%s'" % (stub, ctx.override)
+        else:
+            return stub
 
     def is_visible(self, **kwargs):
+        if self.always_visible(**kwargs):
+            return True
+
         return self.view_context(None, True, **kwargs).has_target()
 
     def is_enabled(self, **kwargs):
-        return self.view_context(None, True, **kwargs).has_target()
+        ctx = self.view_context(None, True, **kwargs)
+        return self.override_exists(ctx)
 
 
 ###----------------------------------------------------------------------------

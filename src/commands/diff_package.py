@@ -20,17 +20,24 @@ class OverrideAuditDiffPackageCommand(ContextHelper,sublime_plugin.TextCommand):
                                        {"package": ctx.package})
 
     def description(self, **kwargs):
+        stub = "OverrideAudit: Bulk Diff Package"
         ctx = self.view_context(None, False, **kwargs)
-
-        return "OverrideAudit: Bulk Diff Package '%s'" % ctx.package
+        if ctx.package_only():
+            return "%s '%s'" % (stub, ctx.package)
+        else:
+            return stub
 
     def is_visible(self, **kwargs):
+        if self.always_visible(**kwargs):
+            return True
+
+        return self.view_context(None, False, **kwargs).package_only()
+
+    def is_enabled(self, **kwargs):
         ctx = self.view_context(None, False, **kwargs)
+        report_type = self._report_type(**kwargs)
 
-        if ctx.package is None or ctx.override is not None:
-            return False
-
-        return not self._report_type(**kwargs) == ctx.package
+        return report_type != ctx.package and self.package_exists(ctx)
 
 
 ###----------------------------------------------------------------------------

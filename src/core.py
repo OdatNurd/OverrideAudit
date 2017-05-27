@@ -593,6 +593,9 @@ class CommandContext(tuple):
     def is_complete(self):
         return None not in (self.package, self.override, self.is_diff)
 
+    def package_only(self):
+        return self.package is not None and self.override is None
+
     def has_diff(self):
         return self.is_diff is not None
 
@@ -706,6 +709,13 @@ class ContextHelper():
             relative_name = os.path.join(ctx.package, ctx.override)
             full_name = os.path.join(sublime.packages_path(), relative_name)
             return os.path.isfile(full_name)
+
+        return False
+
+    def package_exists(self, ctx):
+        if ctx.package_only():
+            pkg_dir = os.path.join(sublime.packages_path(), ctx.package)
+            return os.path.isdir(pkg_dir)
 
         return False
 
