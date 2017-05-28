@@ -7,6 +7,10 @@ Next Version (????-??-??)
     visually appear unsaved in some circumstances even though
     the file was actually saved.
 
+  * Fix a bug introduced in 1.1.0 while fixing #24 which caused
+    text in reports telling you that there are no overrides to
+    be treated as an override.
+
   * Massive internal refactoring has been done to make it easier
     to add in new commands and functionality. The primary target
     of the refactor was in taking a few commands which were

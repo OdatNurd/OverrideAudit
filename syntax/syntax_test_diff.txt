@@ -29,8 +29,8 @@
 #     ^ storage.modifier
 #      ^^^^^^^^^^^^^^^^^^ entity.name.package.dependency
 #                        ^ storage.modifier
-    [No simple overrides found]
-#   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ text.override-audit
+    <No simple overrides found>
+#   ^^^^^^^^^^^^^^^^^^^^^^^^^^^ text.override-audit - entity.name.filename.override
 
 [S U] [Vintage]
 #     ^^^^^^^^^ comment

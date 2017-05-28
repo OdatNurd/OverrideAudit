@@ -80,11 +80,11 @@ class OverrideReportThread(ReportGenerationThread):
 
     def _output_overrides(self, result, overrides, expired, only_expired):
         if not overrides:
-            return result.append("    [No simple overrides found]")
+            return result.append("    <No simple overrides found>")
 
         # Must be overrides, if none are expired use a different message.
         if only_expired and not expired:
-            return result.append("    [No expired simple overrides found]")
+            return result.append("    <No expired simple overrides found>")
 
         for item in (expired if only_expired else overrides):
             fmt = "  `- {}" if item not in expired else "  `- [X] {}"

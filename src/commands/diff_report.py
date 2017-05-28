@@ -99,11 +99,11 @@ class BulkDiffReportThread(ReportGenerationThread):
 
         if len(override_list) == 0:
             if pkg_info.has_possible_overrides(simple=True):
-                result.append("    [No simple overrides found]")
+                result.append("    <No simple overrides found>")
             else:
                 reason = ("no sublime-package" if pkg_info.is_unpacked() else
                           "no unpacked files")
-                result.append("    [No overrides possible; %s]" % reason)
+                result.append("    <No overrides possible; %s>" % reason)
         result.append("")
 
 
