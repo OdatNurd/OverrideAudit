@@ -8,7 +8,7 @@ contexts:
     - match: '^(\[[SIU ]{3}]) '
       captures:
         1: storage.modifier
-      push: [package_row, scope:text.override-audit.diff#package_name]
+      push: [package_row, 'scope:text.override-audit.diff#package_name']
 
     - match: '^WARNING:'
       scope: keyword.control.expired
