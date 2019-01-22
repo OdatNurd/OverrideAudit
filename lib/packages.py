@@ -325,8 +325,11 @@ class PackageInfo():
         if os.path.isdir(pkg_path):
             self.unpacked_path = pkg_path
 
+            # The second form is only for locally installed dependencies,
+            # e.g. for a dependency that is under development.
             metadata = os.path.join(pkg_path, "dependency-metadata.json")
-            if os.path.isfile(metadata):
+            dev_metadata = os.path.join(pkg_path, ".sublime-dependency")
+            if os.path.isfile(metadata) or os.path.isfile(dev_metadata):
                 self.is_dependency = True
 
             if hasattr(self, "verify_name"):

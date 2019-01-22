@@ -11,6 +11,10 @@ Next Version (????-??-??)
     text in reports telling you that there are no overrides to
     be treated as an override.
 
+  * Improve detection of packages that are dependency packages
+    that are still under development so that they appear as
+    appropriate in package reports (#25).
+
 
 Version 1.1.1 (2017-05-01)
 --------------------------
