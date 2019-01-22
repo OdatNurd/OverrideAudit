@@ -1,9 +1,9 @@
 [
     {
-        "caption": "OverrideAudit: View README",
-        "command": "open_file",
+        "caption": "OverrideAudit: View Documentation",
+        "command": "open_url",
         "args": {
-            "file": "${packages}/OverrideAudit/README.md"
+            "url": "https://odatnurd.net/overrideaudit/docs/"
         }
     },
     {

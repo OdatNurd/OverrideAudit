@@ -15,6 +15,11 @@ Next Version (????-??-??)
     that are still under development so that they appear as
     appropriate in package reports (#25).
 
+  * Include links to the online documentation in the settings
+    menu and the command palette instead of opening the README
+    file, since they contain the same information but one is
+    hyperlinked and laid out better than the other one.
+
 
 Version 1.1.1 (2017-05-01)
 --------------------------

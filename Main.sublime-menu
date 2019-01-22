@@ -37,10 +37,10 @@
                         "children":
                         [
                             {
-                                "caption": "README",
-                                "command": "open_file",
+                                "caption": "Documentation",
+                                "command": "open_url",
                                 "args": {
-                                    "file": "${packages}/OverrideAudit/README.md"
+                                    "url": "https://odatnurd.net/overrideaudit/docs/"
                                 }
                             },
 
