@@ -1,7 +1,7 @@
 OverrideAudit ChangeLog
 =======================
 
-Next Version (????-??-??)
+Version 1.1.2 (2019-01-21)
 -------------------------
   * Fix a bug in save_on_diff handling whereby the buffer might
     visually appear unsaved in some circumstances even though
