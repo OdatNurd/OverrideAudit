@@ -7,6 +7,11 @@ Next Version (????-??-??)
     visually appear unsaved in some circumstances even though
     the file was actually saved.
 
+  * Fix a bug introduced in 1.1.0 while fixing #24 which caused
+    text in reports telling you that there are no overrides to
+    be treated as an override.
+
+
 Version 1.1.1 (2017-05-01)
 --------------------------
   * Remove a debug print statement that slipped through during some

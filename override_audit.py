@@ -685,11 +685,11 @@ class OverrideReportThread(ReportGenerationThread):
 
     def _output_overrides(self, result, overrides, expired, only_expired):
         if not overrides:
-            return result.append("    [No simple overrides found]")
+            return result.append("    <No simple overrides found>")
 
         # Must be overrides, if none are expired use a different message.
         if only_expired and not expired:
-            return result.append("    [No expired simple overrides found]")
+            return result.append("    <No expired simple overrides found>")
 
         for item in (expired if only_expired else overrides):
             fmt = "  `- {}" if item not in expired else "  `- [X] {}"
@@ -796,11 +796,11 @@ class BulkDiffReportThread(ReportGenerationThread):
 
         if len(override_list) == 0:
             if pkg_info.has_possible_overrides(simple=True):
-                result.append("    [No simple overrides found]")
+                result.append("    <No simple overrides found>")
             else:
                 reason = ("no sublime-package" if pkg_info.is_unpacked() else
                           "no unpacked files")
-                result.append("    [No overrides possible; %s]" % reason)
+                result.append("    <No overrides possible; %s>" % reason)
         result.append("")
 
 
