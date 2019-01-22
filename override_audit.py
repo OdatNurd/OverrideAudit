@@ -1071,10 +1071,7 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
             action = "diff" if not is_diff else "edit"
 
         if action == "diff":
-            if (_oa_setting("save_on_diff") and target.is_dirty() and
-                    os.path.isfile(target.file_name())):
-                target.run_command("save")
-            self._context_diff(target.window(), pkg_name, override)
+            self._context_diff(target.window(), target, pkg_name, override)
 
         elif action == "edit":
             _open_override(target.window(), pkg_name, override)
@@ -1088,12 +1085,16 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
         else:
             _log("Error: unknown action for override context: %s", action)
 
-    def _context_diff(self, window, package, override):
-        callback = lambda thr: self._pkg_loaded(thr, window, package, override)
+    def _context_diff(self, window, target, package, override):
+        callback = lambda thr: self._pkg_loaded(thr, window, target, package, override)
         PackageListCollectionThread(window, "Collecting Package List",
                                     callback, name_list=package).start()
 
-    def _pkg_loaded(self, thread, window, pkg_name, override):
+    def _pkg_loaded(self, thread, window, save_view, pkg_name, override):
+        if (_oa_setting("save_on_diff") and save_view.is_dirty() and
+                os.path.isfile(save_view.file_name())):
+            save_view.run_command("save")
+
         pkg_list = thread.pkg_list
         _thr_diff_override(window, pkg_list[pkg_name], override,
                            diff_only=True, force_reuse=True)
