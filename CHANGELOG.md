@@ -3,18 +3,6 @@ OverrideAudit ChangeLog
 
 Next Version (????-??-??)
 -------------------------
-  * Fix a bug in save_on_diff handling whereby the buffer might
-    visually appear unsaved in some circumstances even though
-    the file was actually saved.
-
-  * Fix a bug introduced in 1.1.0 while fixing #24 which caused
-    text in reports telling you that there are no overrides to
-    be treated as an override.
-
-  * Improve detection of packages that are dependency packages
-    that are still under development so that they appear as
-    appropriate in package reports (#25).
-
   * Massive internal refactoring has been done to make it easier
     to add in new commands and functionality. The primary target
     of the refactor was in taking a few commands which were
