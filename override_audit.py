@@ -59,6 +59,7 @@ def plugin_loaded():
         "confirm_deletion": True,
         "confirm_freshen": True,
         "report_on_unignore": True,
+        "external_diff": False,
 
         # Inherits from user preferences
         "binary_file_patterns": None

@@ -73,5 +73,22 @@
     // detect if recent package changes might have caused an override to expire.
     //
     // The report will only be displayed if any expired overrides are found.
-    "report_on_unignore": true
+    "report_on_unignore": true,
+
+    // A dictionary that specifies the command to be used to perform a diff in
+    // an external program. If this value is false, external diffing is not
+    // enabled.
+    //
+    // When this is a dictionary, the "shell_cmd", "working_dir", "path" and
+    // "env" keys are used to determine what program to execute and how. These
+    // function in the same way as their counterparts in the exec command (build
+    // systems) do.
+    //
+    // The keys "linux", "windows" and "osx" can be optionally specified as
+    // dictionaries to alter settings per platform.
+    //
+    // In addition to all of the standard build variables, this also supports
+    // the variables "$override" and "$base" to indicate the file names of the
+    // two files respectively.
+    "external_diff": false
 }
