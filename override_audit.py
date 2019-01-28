@@ -5,6 +5,8 @@ from datetime import datetime
 from time import time
 from bisect import bisect
 from zipfile import ZipFile
+from tempfile import mkstemp
+import stat
 import os
 
 import sys
@@ -282,6 +284,35 @@ def _find_override(view, pkg_name, override):
             return file_pos
 
     return None
+
+
+def _extract_packed_override(pkg_info, override):
+    override_type, contents = pkg_info.packed_override_contents(override)
+    if override_type is None:
+        return None
+
+    name,ext = os.path.splitext(override)
+    prefix = "{pre}_{pkg}_{name}_".format(
+        pre=override_type,
+        pkg=pkg_info.name,
+        name=name.replace("/", "_")
+        )
+
+    try:
+        fd, base_name = mkstemp(prefix=prefix, suffix=ext)
+        os.chmod(base_name, stat.S_IREAD)
+        for line in contents:
+            os.write(fd, line.encode("utf-8"))
+
+        os.close(fd)
+
+        return base_name
+
+    except Exception as err:
+        print("Error creating temporary file for %s/%s: %s" % (
+            pkg_info.name, override, str(err)))
+        return None
+
 
 ###----------------------------------------------------------------------------
 
