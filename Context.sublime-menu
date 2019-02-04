@@ -4,6 +4,10 @@
     // Toggle between an open override and a diff of it
     { "command": "override_audit_context_override", "args": { "action": "toggle" } },
 
+    // Open an override diff in the external tool
+    { "command": "override_audit_context_override", "args": { "action": "open_external" } },
+
+
     // Core operations for an override being referenced by name in a report.
     { "command": "override_audit_context_override", "args": { "action": "edit" } },
     { "command": "override_audit_context_override", "args": { "action": "diff" } },

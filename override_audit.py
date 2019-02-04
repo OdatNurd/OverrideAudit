@@ -289,6 +289,11 @@ def _find_override(view, pkg_name, override):
 
 
 def _extract_packed_override(pkg_info, override):
+    """
+    Given a package information structure for a package and an override inside
+    of that packages, this determines the package file that the base file is
+    contained in and extracts it to a temporary file, whose name is returned.
+    """
     override_type, contents = pkg_info.packed_override_contents(override)
     if override_type is None:
         return None
@@ -467,6 +472,55 @@ class OverrideDiffThread(BackgroundWorkerThread):
 ###----------------------------------------------------------------------------
 
 
+class OpenDiffInExternalProgramThread(BackgroundWorkerThread):
+    """
+    For a specific override in a specific package, execute the configured
+    external diff program to diff that override against the currently used
+    base file. The base file is temporarily extracted out of the package file
+    to a temporary file.
+    """
+    def _process(self):
+        pkg_name = self.args.get("pkg_name", None)
+        override = self.args.get("override", None)
+
+        if not pkg_name:
+            self.result = "Nothing done; missing parameters"
+            return _log("external diff thread not given a view or package")
+
+        pkg_info = PackageInfo(pkg_name)
+        if not pkg_info.exists():
+            self.result = "Unable to externally diff '%s'; no such package" % pkg_name
+            return
+
+        if not pkg_info.package_file():
+            self.result = "Unable to externally diff '%s'; no overrides" % pkg_name
+            return
+
+        try:
+            base_name = _extract_packed_override(pkg_info, override)
+            override_name = os.path.join(pkg_info.unpacked_path, override)
+            external_diff_spec = _oa_setting("external_diff")
+
+            if base_name is None:
+                self.result = "Unable to extract packed file to diff it"
+                return
+
+            if not external_diff_spec:
+                self.result = "Nothing done; no external diff tool configured"
+                return
+
+            self.result = "Launching external diff tool"
+            ExternalDiffThread(self.window,
+                               base_name, override_name,
+                               external_diff_spec).start()
+
+        except Exception as e:
+            self.result = "Error while externally diffing: %s" % str(e)
+
+
+###----------------------------------------------------------------------------
+
+
 class OverrideFreshenThread(BackgroundWorkerThread):
     """
     Touch either the explicitly specified override in the provided package or
@@ -561,6 +615,7 @@ class OverrideFreshenThread(BackgroundWorkerThread):
                     self.result = self._pkg(view, zFile, pkg_info)
         except Exception as e:
             self.result = "Error while freshening: %s" % str(e)
+
 
 ###----------------------------------------------------------------------------
 
@@ -1236,6 +1291,14 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
         if action == "diff":
             self._context_diff(target.window(), target, pkg_name, override)
 
+        elif action == "open_external":
+            callback = lambda thread: _log(thread.result, status=True)
+            OpenDiffInExternalProgramThread(target.window(),
+                                            "Extracting Override",
+                                            callback,
+                                            pkg_name=pkg_name,
+                                            override=override).start()
+
         elif action == "edit":
             _open_override(target.window(), pkg_name, override)
 
@@ -1267,6 +1330,8 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
 
         if action == "toggle":
             action = "diff" if is_diff is False else "edit"
+        elif action == "open_external":
+            return "OverrideAudit: Open Diff of '%s' Externally" % override
 
         return "OverrideAudit: %s Override '%s'" % (action.title(), override)
 
@@ -1281,6 +1346,9 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
 
         if action == "toggle":
             return True if is_diff is not None else False
+
+        if action == "open_external":
+            return True if is_diff and _oa_setting("external_diff") else False
 
         # Everything else requires package and override to be visible
         if pkg_name is not None and override is not None:
