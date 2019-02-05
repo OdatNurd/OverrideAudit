@@ -8,6 +8,8 @@ from zipfile import ZipFile
 from tempfile import mkstemp
 import stat
 import os
+import threading
+import subprocess
 
 import sys
 from imp import reload
@@ -834,6 +836,135 @@ class BulkDiffReportThread(ReportGenerationThread):
                           "no unpacked files")
                 result.append("    <No overrides possible; %s>" % reason)
         result.append("")
+
+
+###----------------------------------------------------------------------------
+
+
+class ExternalDiffThread(threading.Thread):
+    """
+    Spawn a diff in an external process, waiting for it to complete and then
+    cleaning up any temporary files.
+    """
+    def __init__(self, window, base, override, args):
+        super().__init__()
+        self.window = window
+        self.base = base
+        self.override = override
+        self.args = args
+
+    def launch(self):
+        shell_cmd = self.args.get("shell_cmd")
+        path = self.args.get("path")
+        env = self.args.get("env", {})
+        working_dir = self.args.get("working_dir", "")
+
+        if working_dir == "" and self.window.active_view() and self.window.active_view().file_name():
+            working_dir = os.path.dirname(self.window.active_view().file_name())
+
+        if not shell_cmd:
+            raise ValueError("shell_cmd is required")
+
+        if not isinstance(shell_cmd, str):
+            raise ValueError("shell_cmd must be a string")
+
+        _log("Running %s", shell_cmd)
+
+        # Hide the console window on Windows
+        startupinfo = None
+        if os.name == "nt":
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+
+        # If a path was provided, save it and set the new one in.
+        if path:
+            org_path = os.environ["PATH"]
+            os.environ["PATH"] = os.path.expandvars(path)
+
+        process_env = os.environ.copy()
+        process_env.update(env)
+        for var, value in process_env.items():
+            process_env[var] = os.path.expandvars(value)
+
+        if working_dir != "":
+            os.chdir(working_dir)
+
+        if sys.platform == "win32":
+            # Use shell=True on Windows, so shell_cmd is passed through with the correct escaping
+            self.proc = subprocess.Popen(
+                shell_cmd,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                stdin=subprocess.DEVNULL,
+                startupinfo=startupinfo,
+                env=process_env,
+                shell=True)
+        elif sys.platform == "darwin":
+            # Use a login shell on OSX, otherwise the users expected env vars won't be setup
+            self.proc = subprocess.Popen(
+                ["/usr/bin/env", "bash", "-l", "-c", shell_cmd],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                stdin=subprocess.DEVNULL,
+                startupinfo=startupinfo,
+                env=process_env,
+                shell=False)
+        elif sys.platform == "linux":
+            # Explicitly use /bin/bash on Linux, to keep Linux and OSX as
+            # similar as possible. A login shell is explicitly not used for
+            # linux, as it's not required
+            self.proc = subprocess.Popen(
+                ["/usr/bin/env", "bash", "-c", shell_cmd],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                stdin=subprocess.DEVNULL,
+                startupinfo=startupinfo,
+                env=process_env,
+                shell=False)
+
+        if path:
+            os.environ["PATH"] = org_path
+
+    def _prepare_args_dict(self):
+        osx = self.args.pop("osx", {})
+        linux = self.args.pop("linux", {})
+        windows = self.args.pop("windows", {})
+
+        self.args.update({
+            "osx": osx,
+            "linux": linux,
+            "windows": windows
+            }[sublime.platform()]
+        )
+
+        variables = self.window.extract_variables()
+        variables["base"] = self.base
+        variables["override"] = self.override
+
+        self.args = sublime.expand_variables(self.args, variables)
+
+    def run(self):
+        """
+        Spawns thread; waits for the external process to terminate and then
+        deletes the base file, since it's a temporary file.
+        """
+        try:
+            self._prepare_args_dict()
+            self.launch()
+            result = self.proc.wait()
+        except Exception as err:
+            result = None
+            _log("Error while diffing: %s", str(err), dialog=True)
+
+        if result:
+            _log("External diff finished with return code {}".format(result))
+
+        try:
+            if os.path.exists(self.base):
+                os.chmod(self.base, stat.S_IREAD | stat.S_IWRITE)
+                os.remove(self.base)
+        except:
+            pass
 
 
 ###----------------------------------------------------------------------------

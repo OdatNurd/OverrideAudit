@@ -18,6 +18,7 @@ _spinner_key.lock = threading.Lock()
 
 ###----------------------------------------------------------------------------
 
+
 class Spinner():
     """
     A simple spinner that follows the active view in the provided window which
