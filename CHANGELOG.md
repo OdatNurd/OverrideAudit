@@ -1,6 +1,13 @@
 OverrideAudit ChangeLog
 =======================
 
+Version 1.2.0 (????-??-??)
+--------------------------
+  * Implement the ability to open an override diff in an external diff tool
+    via the `external_diff` setting. This command is available from the command
+    palette and the context menu of override diff views.
+
+
 Version 1.1.2 (2019-01-21)
 -------------------------
   * Fix a bug in save_on_diff handling whereby the buffer might
