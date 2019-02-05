@@ -914,14 +914,23 @@ class ExternalDiffThread(threading.Thread):
         env = self.args.get("env", {})
         working_dir = self.args.get("working_dir", "")
 
-        if working_dir == "" and self.window.active_view() and self.window.active_view().file_name():
-            working_dir = os.path.dirname(self.window.active_view().file_name())
-
         if not shell_cmd:
             raise ValueError("shell_cmd is required")
 
         if not isinstance(shell_cmd, str):
             raise ValueError("shell_cmd must be a string")
+
+        variables = self.window.extract_variables()
+        variables["base"] = self.base
+        variables["override"] = self.override
+
+        # Only expand in these; the env and path may contain environment vars
+        # that we don't want to accidentally clobber.
+        shell_cmd = sublime.expand_variables(shell_cmd, variables)
+        working_dir = sublime.expand_variables(working_dir, variables)
+
+        if working_dir == "" and self.window.active_view() and self.window.active_view().file_name():
+            working_dir = os.path.dirname(self.window.active_view().file_name())
 
         _log("Running %s", shell_cmd)
 
@@ -991,12 +1000,6 @@ class ExternalDiffThread(threading.Thread):
             "windows": windows
             }[sublime.platform()]
         )
-
-        variables = self.window.extract_variables()
-        variables["base"] = self.base
-        variables["override"] = self.override
-
-        self.args = sublime.expand_variables(self.args, variables)
 
     def run(self):
         """
