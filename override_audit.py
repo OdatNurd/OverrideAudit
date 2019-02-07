@@ -927,8 +927,10 @@ class ExternalDiffThread(threading.Thread):
         shell_cmd = sublime.expand_variables(shell_cmd, variables)
         working_dir = sublime.expand_variables(working_dir, variables)
 
-        if working_dir == "" and self.window.active_view() and self.window.active_view().file_name():
-            working_dir = os.path.dirname(self.window.active_view().file_name())
+        if working_dir == "" and self.window.active_view():
+            path = os.path.dirname(self.window.active_view().file_name() or "")
+            if os.path.isdir(path):
+                working_dir = os.path.dirname(view.file_name())
 
         _log("Running %s", shell_cmd)
 
@@ -943,6 +945,8 @@ class ExternalDiffThread(threading.Thread):
         for var, value in process_env.items():
             process_env[var] = os.path.expandvars(value)
 
+        # Might not exist, but that is a user error. We checked before auto
+        # changing it.
         if working_dir != "":
             os.chdir(working_dir)
 
