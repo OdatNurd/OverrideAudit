@@ -480,7 +480,7 @@ describes an external diff tool to execute. When set to `false`, the external
 diff functionality is disabled.
 
 When set to a JSON object, the object may contain the keys `shell_cmd`,
-`working_dir`, `path` and `env`, which work as they do in Sublime build system.
+`working_dir` and `env`, which work as they do in Sublime build system.
 Additionally, the keys `linux`, `windows` and `osx` may be set to JSON objects
 that override keys on a per-platform basis.
 

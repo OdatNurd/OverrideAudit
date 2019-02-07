@@ -910,7 +910,6 @@ class ExternalDiffThread(threading.Thread):
 
     def launch(self):
         shell_cmd = self.args.get("shell_cmd")
-        path = self.args.get("path")
         env = self.args.get("env", {})
         working_dir = self.args.get("working_dir", "")
 
@@ -924,8 +923,7 @@ class ExternalDiffThread(threading.Thread):
         variables["base"] = self.base
         variables["override"] = self.override
 
-        # Only expand in these; the env and path may contain environment vars
-        # that we don't want to accidentally clobber.
+        # Don't expand vars in env; we let python do that for us.
         shell_cmd = sublime.expand_variables(shell_cmd, variables)
         working_dir = sublime.expand_variables(working_dir, variables)
 
@@ -939,11 +937,6 @@ class ExternalDiffThread(threading.Thread):
         if os.name == "nt":
             startupinfo = subprocess.STARTUPINFO()
             startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-
-        # If a path was provided, save it and set the new one in.
-        if path:
-            org_path = os.environ["PATH"]
-            os.environ["PATH"] = os.path.expandvars(path)
 
         process_env = os.environ.copy()
         process_env.update(env)
@@ -985,9 +978,6 @@ class ExternalDiffThread(threading.Thread):
                 startupinfo=startupinfo,
                 env=process_env,
                 shell=False)
-
-        if path:
-            os.environ["PATH"] = org_path
 
     def _prepare_args_dict(self):
         osx = self.args.pop("osx", {})

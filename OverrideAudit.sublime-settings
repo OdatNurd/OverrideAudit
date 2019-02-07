@@ -79,10 +79,10 @@
     // an external program. If this value is false, external diffing is not
     // enabled.
     //
-    // When this is a dictionary, the "shell_cmd", "working_dir", "path" and
-    // "env" keys are used to determine what program to execute and how. These
-    // function in the same way as their counterparts in the exec command (build
-    // systems) do.
+    // When this is a dictionary, the "shell_cmd", "working_dir" and "env" keys
+    // are used to determine what program to execute and how. These function in
+    // the same way as their counterparts in the exec command (build systems)
+    // do.
     //
     // The keys "linux", "windows" and "osx" can be optionally specified as
     // dictionaries to alter settings per platform.
