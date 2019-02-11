@@ -930,7 +930,7 @@ class ExternalDiffThread(threading.Thread):
         if working_dir == "" and self.window.active_view():
             path = os.path.dirname(self.window.active_view().file_name() or "")
             if os.path.isdir(path):
-                working_dir = os.path.dirname(view.file_name())
+                working_dir = path
 
         _log("Running %s", shell_cmd)
 
