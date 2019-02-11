@@ -1,7 +1,7 @@
 OverrideAudit ChangeLog
 =======================
 
-Version 1.2.0 (????-??-??)
+Version 1.2.0 (2019-02-10)
 --------------------------
   * Implement the ability to open an override diff in an external diff tool
     via the `external_diff` setting. This command is available from the command
