@@ -475,18 +475,24 @@ When enabled, the report will only be shown if any expired overrides are found.
 
 ### `external_diff`: Object or false (Default: false) ###
 
-This setting can be either `false` (the default value) or a JSON object that
-describes an external diff tool to execute. When set to `false`, the external
-diff functionality is disabled.
+This setting can be `false` (the default value), the string `"sublimerge"` or a
+JSON object.
+
+A value of `false` disables the external diff functionality while the string
+`"sublimerge"` tells OverrideAudit to use
+[Sublimerge Pro](https://packagecontrol.io/packages/Sublimerge%20Pro) or
+[Sublimerge 3](https://packagecontrol.io/packages/Sublimerge%203) to perform the
+diff. This requires that one of those packages be installed and enabled, or the
+value is presumed to be `false`.
 
 When set to a JSON object, the object may contain the keys `shell_cmd`,
 `working_dir` and `env`, which work as they do in Sublime build system.
 Additionally, the keys `linux`, `windows` and `osx` may be set to JSON objects
 that override keys on a per-platform basis.
 
-In addition to all of the standard build variables, variables `$override` and
-`$base` may be used to indicate the file names of the override and base files
-respectively.
+In addition to all of the standard build variables, the variables `$override`
+and `$base` expand to the file names of the override and base files respectively
+for use in the command line.
 
 
 -------------------------------------------------------------------------------

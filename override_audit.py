@@ -108,6 +108,29 @@ def _oa_setting(key):
     return _oa_setting.obj.get(key, default)
 
 
+def _oa_can_diff_externally():
+    """
+    Determine if the external diff functionality should be enabled. This is
+    based on an introspection of the external_diff setting.
+    """
+    spec = _oa_setting("external_diff")
+    if not spec:
+        return False
+
+    if isinstance(spec, str):
+        if spec == "sublimerge":
+            # Both Sublimerge Pro and Sublimerge 3 include a top level resource
+            # by this name that contains their version.
+            for res in sublime.find_resources("version"):
+                if res.split("/")[1] in ("Sublimerge 3", "Sublimerge Pro"):
+                    return True
+
+        return False
+
+    # Should verify that the setting is a valid object maybe?
+    return True
+
+
 def _packages_with_overrides(pkg_list, name_list=None):
     """
     Collect a list of package names from the given package list for which there
@@ -258,6 +281,24 @@ def _thr_diff_override(window, pkg_info, override,
                        pkg_info=pkg_info, override=override).start()
 
 
+def _diff_with_sublimerge(base_file, override_file):
+    """
+    Use Sublimerge 3 or Sublimerge Pro to diff the override against its base
+    file. This assumes that one of those packages is installed and enabled
+    (the command is not visible otherwise).
+    """
+    sublime.run_command("new_window")
+    window = sublime.active_window()
+
+    window.open_file(base_file).settings().set("_oa_ext_diff_base", base_file)
+    window.open_file(override_file)
+
+    window.run_command("sublimerge_diff_views", {
+        "left_read_only": True,
+        "right_read_only": False,
+        })
+
+
 def _find_override(view, pkg_name, override):
     """
     Given a report view, return the bounds of the override belonging to the
@@ -319,6 +360,20 @@ def _extract_packed_override(pkg_info, override):
         print("Error creating temporary file for %s/%s: %s" % (
             pkg_info.name, override, str(err)))
         return None
+
+
+def _delete_packed_override(filename):
+    """
+    Attempt to delete the given named file, which should be a file returned
+    from _extract_packed_override.
+    """
+    try:
+        if os.path.exists(filename):
+            os.chmod(filename, stat.S_IREAD | stat.S_IWRITE)
+            os.remove(filename)
+        _log("Deleted temporary file '%s'" % filename)
+    except:
+        _log("Error deleting '%s'" % filename)
 
 
 ###----------------------------------------------------------------------------
@@ -509,10 +564,14 @@ class OpenDiffInExternalProgramThread(BackgroundWorkerThread):
                 self.result = "Nothing done; no external diff tool configured"
                 return
 
-            self.result = "Launching external diff tool"
-            ExternalDiffThread(self.window,
-                               base_name, override_name,
-                               external_diff_spec).start()
+            if external_diff_spec == "sublimerge":
+                self.result = "Diffing with Sublimerge"
+                _diff_with_sublimerge(base_name, override_name)
+            else:
+                self.result = "Launching external diff tool"
+                ExternalDiffThread(self.window,
+                                   base_name, override_name,
+                                   external_diff_spec).start()
 
         except Exception as e:
             self.result = "Error while externally diffing: %s" % str(e)
@@ -1011,12 +1070,7 @@ class ExternalDiffThread(threading.Thread):
         if result:
             _log("External diff finished with return code {}".format(result))
 
-        try:
-            if os.path.exists(self.base):
-                os.chmod(self.base, stat.S_IREAD | stat.S_IWRITE)
-                os.remove(self.base)
-        except:
-            pass
+        _delete_packed_override(self.base)
 
 
 ###----------------------------------------------------------------------------
@@ -1345,7 +1399,7 @@ class OverrideAuditContextOverrideCommand(ContextHelper,sublime_plugin.TextComma
             return True if is_diff is not None else False
 
         if action == "open_external":
-            return True if is_diff and _oa_setting("external_diff") else False
+            return True if is_diff and _oa_can_diff_externally() else False
 
         # Everything else requires package and override to be visible
         if pkg_name is not None and override is not None:
@@ -1464,6 +1518,11 @@ class OverrideAuditEventListener(sublime_plugin.EventListener):
         # actually exists; context items are only allowed once the file is
         # actually saved.
         self._check_for_override(view)
+
+    def on_close(self, view):
+        tmp_base = view.settings().get("_oa_ext_diff_base", None)
+        if tmp_base is not None:
+            _delete_packed_override(tmp_base)
 
     def on_query_context(self, view, key, operator, operand, match_all):
         if key == "override_audit_override_view":
