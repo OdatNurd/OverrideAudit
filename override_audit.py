@@ -117,6 +117,12 @@ def _oa_can_diff_externally():
     if not spec:
         return False
 
+    if isinstance(spec, bool):
+        return False
+
+    if isinstance(spec, dict):
+        return True
+
     if isinstance(spec, str):
         if spec == "sublimerge":
             # Both Sublimerge Pro and Sublimerge 3 include a top level resource
@@ -127,8 +133,7 @@ def _oa_can_diff_externally():
 
         return False
 
-    # Should verify that the setting is a valid object maybe?
-    return True
+    return False
 
 
 def _packages_with_overrides(pkg_list, name_list=None):

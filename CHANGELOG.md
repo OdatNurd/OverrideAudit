@@ -6,6 +6,8 @@ Version 1.2.1 (????-??-??)
   * Support using Sublimerge Pro or Sublimerge 3 as the external diff
     tool by setting `external_diff` to `"sublimerge"`.
 
+  * Improve detection of an invalid `external_diff` setting.
+
   * Log to the console when the tempoary files created during an
     external diff are removed
 
