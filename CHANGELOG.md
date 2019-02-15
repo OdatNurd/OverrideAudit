@@ -52,6 +52,26 @@ Next Version (????-??-??)
         override will be diffed)
 
 
+Version 1.1.2 (2019-01-21)
+-------------------------
+  * Fix a bug in save_on_diff handling whereby the buffer might
+    visually appear unsaved in some circumstances even though
+    the file was actually saved.
+
+  * Fix a bug introduced in 1.1.0 while fixing #24 which caused
+    text in reports telling you that there are no overrides to
+    be treated as an override.
+
+  * Improve detection of packages that are dependency packages
+    that are still under development so that they appear as
+    appropriate in package reports (#25).
+
+  * Include links to the online documentation in the settings
+    menu and the command palette instead of opening the README
+    file, since they contain the same information but one is
+    hyperlinked and laid out better than the other one.
+
+
 Version 1.1.1 (2017-05-01)
 --------------------------
   * Remove a debug print statement that slipped through during some
