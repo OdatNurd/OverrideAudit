@@ -1,12 +1,16 @@
 OverrideAudit ChangeLog
 =======================
 
-Version 1.2.1 (????-??-??)
+Version 1.2.1 (2019-02-15)
 --------------------------
-  * Support using Sublimerge Pro or Sublimerge 3 as the external diff
-    tool by setting `external_diff` to `"sublimerge"`.
+  * Support using
+    [Sublimerge Pro](https://packagecontrol.io/packages/Sublimerge%20Pro) or
+    [Sublimerge 3](https://packagecontrol.io/packages/Sublimerge%203)
+    as the external diff tool by setting `external_diff` to the
+    string `"sublimerge"`.
 
-  * Improve detection of an invalid `external_diff` setting.
+  * Improve detection of an invalid `external_diff` setting that could
+    lead to the command being enabled when it should not be.
 
   * Log to the console when the tempoary files created during an
     external diff are removed

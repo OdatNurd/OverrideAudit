@@ -227,10 +227,9 @@ program to access it. This file is created read-only as an indication that
 changes to it will be lost, as OverrideAudit will remove it once the external
 tool terminates.
 
-This command requires the `external_diff` setting to be set to the appropriate
-command line for the external tool in order to be available. The default
-settings do not provide an external tool, which causes the command to be
-hidden.
+This command requires the `external_diff` setting be set to tell OverrideAudit
+how to open the external diff. By default this setting is set to `false`,
+which causes the command to be hidden.
 
 
 ### `OverrideAudit: Delete Override` ###
@@ -473,7 +472,7 @@ been ignoring, this is also an indication that
 When enabled, the report will only be shown if any expired overrides are found.
 
 
-### `external_diff`: Object or false (Default: false) ###
+### `external_diff`: Object, string or false (Default: false) ###
 
 This setting can be `false` (the default value), the string `"sublimerge"` or a
 JSON object.
