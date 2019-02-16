@@ -3,10 +3,14 @@ Version 1.0.1 (2017-04-10)
 
   * Fix display of mixed path separators between packages and their
     overrides in some situations (#14)
+
   * Disable word wrap by default in reports
+
   * Enhanced integration with manually opened override files (e.g.
     via PackageResourceViewer)
+
   * New config option "save_on_diff" to automatically save changes
     before performing a diff
+
   * Swap "Override View" with "Edit View" in some commands and tab
     titles for clarity

@@ -73,5 +73,27 @@
     // detect if recent package changes might have caused an override to expire.
     //
     // The report will only be displayed if any expired overrides are found.
-    "report_on_unignore": true
+    "report_on_unignore": true,
+
+    // The tool to use for opening an override diff externally.
+    //
+    // A value of false disables the external diff functionality (the default).
+    //
+    // The string "sublimerge" will use Sublimerge Pro or Sublimerge 3 as the
+    // external diff tool. This requires that you have Sublimerge installed and
+    // enabled; otherwise the value is assumed to be false.
+    //
+    // The value can also be a dictionary that specifies the command to be used
+    // to perform the diff. In this case the "shell_cmd", "working_dir" and
+    // "env" keys are used to determine what program to execute and how. These
+    // function in the same way as their counterparts in the exec command (build
+    // systems) do.
+    //
+    // The keys "linux", "windows" and "osx" can be optionally specified as
+    // dictionaries to alter settings per platform.
+    //
+    // In addition to all of the standard build variables, this also supports
+    // the variables "$override" and "$base" to indicate the file names of the
+    // two files respectively.
+    "external_diff": false
 }

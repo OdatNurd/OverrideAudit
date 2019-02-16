@@ -37,19 +37,51 @@ Next Version (????-??-??)
 
   * Enhanced all of the commands available via the context menu:
 
-      - Commands are now always visible unless you provide an argument telling
-        them to hide themselves when they do not apply; this allows you to add
-        these commands to other menus and control visibily.
+      - Commands are now always visible unless you provide an
+        argument telling them to hide themselves when they do
+        not apply; this allows you to add these commands to other
+        menus and control visibily.
 
-      - Commands will be visible but disabled when the underlying package or
-        override they are supposed to work with does not exist. For an override
-        this means a file does not exist, while for a package it means that the
-        unpacked folder is missing.
+      - Commands will be visible but disabled when the underlying
+        package or override they are supposed to work with does
+        not exist. For an override this means a file does not
+        exist, while for a package it means that the unpacked
+        folder is missing.
 
-      - The default captions for disabled commands is slightly different when
-        the appropriate context information is not available to tell you what
-        exactly they will do (e.g. "Diff Override" instead of telling you what
-        override will be diffed)
+      - The default captions for disabled commands is slightly
+        different when the appropriate context information is not
+        available to tell you what exactly they will do (e.g.
+        "Diff Override" instead of telling you what override will
+        be diffed)
+
+
+Version 1.2.0 (2019-02-10)
+--------------------------
+  * Implement the ability to open an override diff in an external diff
+    tool via the `external_diff` setting. This command is available
+    from the command palette and the context menu of override diff
+    views.
+    palette and the context menu of override diff views.
+
+
+Version 1.1.2 (2019-01-21)
+-------------------------
+  * Fix a bug in save_on_diff handling whereby the buffer might
+    visually appear unsaved in some circumstances even though
+    the file was actually saved.
+
+  * Fix a bug introduced in 1.1.0 while fixing #24 which caused
+    text in reports telling you that there are no overrides to
+    be treated as an override.
+
+  * Improve detection of packages that are dependency packages
+    that are still under development so that they appear as
+    appropriate in package reports (#25).
+
+  * Include links to the online documentation in the settings
+    menu and the command palette instead of opening the README
+    file, since they contain the same information but one is
+    hyperlinked and laid out better than the other one.
 
 
 Version 1.1.1 (2017-05-01)

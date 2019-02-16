@@ -87,6 +87,11 @@
         "command": "override_audit_toggle_override",
     },
     {
+        "caption": "OverrideAudit: Open Diff Externally",
+        "command": "override_audit_diff_externally",
+        "args": { "action": "open_external" }
+    },
+    {
         "caption": "OverrideAudit: Delete Current Override",
         "command": "override_audit_delete_override",
         "args": { "action": "delete" }

@@ -2,7 +2,7 @@ import sublime
 import sublime_plugin
 import os
 
-from .core import override_group
+from .core import override_group, delete_packed_override
 from ..lib.packages import check_potential_override
 
 
@@ -35,6 +35,11 @@ class OverrideAuditEventListener(sublime_plugin.EventListener):
         # actually exists; context items are only allowed once the file is
         # actually saved.
         self._check_for_override(view)
+
+    def on_close(self, view):
+        tmp_base = view.settings().get("_oa_ext_diff_base", None)
+        if tmp_base is not None:
+            delete_packed_override(tmp_base)
 
 
 ###----------------------------------------------------------------------------

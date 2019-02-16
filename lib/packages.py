@@ -232,13 +232,13 @@ class PackageInfo():
 
     A package can exist in one or more of these three states:
        * Shipped if it is a sublime-package that ships with Sublime Text
-       * Installed if it is a sublime-package installed in Installed Packages\
-       * Unpacked if there is a directory inside "Packages\" with that name
+       * Installed if it is a sublime-package installed in Installed Packages/
+       * Unpacked if there is a directory inside "Packages/" with that name
 
     Stored paths are fully qualified names of either the sublime-package file
     or the directory where the unpacked package resides.
 
-    If there is a sublime-package file in Installed Packages\ that is the same
+    If there is a sublime-package file in Installed Packages/ that is the same
     name as a shipped package, Sublime will ignore the shipped package in favor
     of the installed version. This is a complete override and methods in this
     class know to look in the package file being used by Sublime in this case
@@ -584,6 +584,30 @@ class PackageInfo():
         self.expired_overrides[simple] = result
         return self.expired_overrides[simple]
 
+    def packed_override_contents(self, override_file):
+        """
+        Given the name of an override file, return back a tuple that indicates
+        if the source package is shipped or installed and the contents of the
+        base file for that override as a list of lines.
+        """
+        content = self._get_packed_pkg_file_contents(override_file)
+        if not content:
+            return (None, None)
+
+        return ("Installed" if self.installed_path else "Shipped",
+                content[0])
+
+    def unpacked_override_contents(self, override_file):
+        """
+        Given the name of an override file, return back the contents of the
+        override as a list of lines.
+        """
+        content = self._get_unpacked_override_contents(override_file)
+        if not content:
+            return None
+
+        return content[0]
+
     def set_binary_pattern(self, pattern_list):
         """
         Set the list of file patterns that should be considered to be binary
@@ -668,7 +692,7 @@ class PackageList():
         critera: (shipped, installed, unpacked, disabled, dependencies).
 
         Note that installed packages indicates the number of packages installed
-        by the user into the Installed Packages\ folder.
+        by the user into the Installed Packages/ folder.
         """
         return (self._shipped, self._installed, self._unpacked,
                 self._disabled, self._dependencies)
@@ -737,7 +761,7 @@ class PackageList():
     def __find_pkgs(self, location, name_list, packed=True, shipped=False):
         count = 0
         # Follow symlinks since we're stopping after one level anyway except in
-        # the Installed Packages\ folder. Maybe an issue if someone goes crazy
+        # the Installed Packages/ folder. Maybe an issue if someone goes crazy
         # in there?
         for (path, dirs, files) in os.walk(location, followlinks=True):
             if packed:

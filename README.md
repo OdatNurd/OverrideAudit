@@ -213,6 +213,26 @@ and `diff` respectively in order to ensure that you don't end up with a large
 number of duplicate views.
 
 
+### `OverrideAudit: Open Diff Externally` ###
+
+This command is only available in the Command Palette while the current file is
+a diff of an override.
+
+Although this command does not appear in the top level `Tools > OverrideAudit`
+menu, it does appear within the context menu of override diff views.
+
+Regardless of how you trigger the command, a temporary file is created which
+contains the base file from the `sublime-package` file to allow the external
+program to access it. This file is created read-only as an indication that
+changes to it will be lost, as OverrideAudit will remove it once the external
+tool terminates.
+
+This command requires the `external_diff` setting to be set to the appropriate
+command line for the external tool in order to be available. The default
+settings do not provide an external tool, which causes the command to be
+hidden.
+
+
 ### `OverrideAudit: Delete Override` ###
 
 This command is only available in the Command Palette while the current file is
@@ -453,6 +473,28 @@ been ignoring, this is also an indication that
 When enabled, the report will only be shown if any expired overrides are found.
 
 
+### `external_diff`: Object, string or false (Default: false) ###
+
+This setting can be `false` (the default value), the string `"sublimerge"` or a
+JSON object.
+
+A value of `false` disables the external diff functionality while the string
+`"sublimerge"` tells OverrideAudit to use
+[Sublimerge Pro](https://packagecontrol.io/packages/Sublimerge%20Pro) or
+[Sublimerge 3](https://packagecontrol.io/packages/Sublimerge%203) to perform the
+diff. This requires that one of those packages be installed and enabled, or the
+value is presumed to be `false`.
+
+When set to a JSON object, the object may contain the keys `shell_cmd`,
+`working_dir` and `env`, which work as they do in Sublime build system.
+Additionally, the keys `linux`, `windows` and `osx` may be set to JSON objects
+that override keys on a per-platform basis.
+
+In addition to all of the standard build variables, the variables `$override`
+and `$base` expand to the file names of the override and base files respectively
+for use in the command line.
+
+
 -------------------------------------------------------------------------------
 
 
@@ -572,7 +614,7 @@ address the situation.
 
 ## License ##
 
-Copyright 2017 Terence Martin
+Copyright 2017-2019 Terence Martin
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in

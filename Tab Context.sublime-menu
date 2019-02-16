@@ -3,6 +3,7 @@
 
     { "command": "override_audit_edit_override",   "args": { "group": -1, "index": -1, "always_visible": false } },
     { "command": "override_audit_diff_override",   "args": { "group": -1, "index": -1, "always_visible": false } },
+    { "command": "override_audit_diff_externally", "args": { "group": -1, "index": -1, "always_visible": false } },
     { "command": "override_audit_delete_override", "args": { "group": -1, "index": -1, "always_visible": false } },
 
     { "command": "override_audit_refresh_report", "args": { "group": -1, "index": -1, "always_visible": false } },
