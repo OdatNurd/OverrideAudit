@@ -213,6 +213,26 @@ and `diff` respectively in order to ensure that you don't end up with a large
 number of duplicate views.
 
 
+### `OverrideAudit: Open Diff Externally` ###
+
+This command is only available in the Command Palette while the current file is
+a diff of an override.
+
+Although this command does not appear in the top level `Tools > OverrideAudit`
+menu, it does appear within the context menu of override diff views.
+
+Regardless of how you trigger the command, a temporary file is created which
+contains the base file from the `sublime-package` file to allow the external
+program to access it. This file is created read-only as an indication that
+changes to it will be lost, as OverrideAudit will remove it once the external
+tool terminates.
+
+This command requires the `external_diff` setting to be set to the appropriate
+command line for the external tool in order to be available. The default
+settings do not provide an external tool, which causes the command to be
+hidden.
+
+
 ### `OverrideAudit: Delete Override` ###
 
 This command is only available in the Command Palette while the current file is
@@ -451,6 +471,22 @@ been ignoring, this is also an indication that
 [Package Control](https://packagecontrol.io/) has finished upgrading a package.
 
 When enabled, the report will only be shown if any expired overrides are found.
+
+
+### `external_diff`: Object or false (Default: false) ###
+
+This setting can be either `false` (the default value) or a JSON object that
+describes an external diff tool to execute. When set to `false`, the external
+diff functionality is disabled.
+
+When set to a JSON object, the object may contain the keys `shell_cmd`,
+`working_dir` and `env`, which work as they do in Sublime build system.
+Additionally, the keys `linux`, `windows` and `osx` may be set to JSON objects
+that override keys on a per-platform basis.
+
+In addition to all of the standard build variables, variables `$override` and
+`$base` may be used to indicate the file names of the override and base files
+respectively.
 
 
 -------------------------------------------------------------------------------

@@ -4,6 +4,7 @@
     // Core override operations
     { "command": "override_audit_edit_override" , "args": { "always_visible": false }},
     { "command": "override_audit_diff_override" , "args": { "always_visible": false }},
+    { "command": "override_audit_diff_externally", "args": { "always_visible": false }},
     { "command": "override_audit_delete_override" , "args": { "always_visible": false }},
 
     // Bulk diffing of a single package in a report

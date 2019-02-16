@@ -7,7 +7,12 @@ from datetime import datetime
 from time import time
 from bisect import bisect
 from zipfile import ZipFile
+from tempfile import mkstemp
+import stat
 import os
+import threading
+import subprocess
+import sys
 
 
 from ..lib.packages import PackageInfo, PackageList, PackageFileSet
@@ -49,6 +54,7 @@ def loaded():
         "confirm_deletion": True,
         "confirm_freshen": True,
         "report_on_unignore": True,
+        "external_diff": False,
 
         # Inherits from user preferences
         "binary_file_patterns": None
@@ -244,6 +250,31 @@ def diff_override(window, pkg_info, override,
                        pkg_info=pkg_info, override=override).start()
 
 
+def diff_externally(window, pkg_info, override):
+    """
+    Launch the configured external diff tool to diff the override from the
+    given package info. The task is launched in a background thread.
+    """
+    base_file = None
+    override_file = None
+
+    if pkg_info.exists():
+        base_file = extract_packed_override(pkg_info, override)
+        override_file = os.path.join(pkg_info.unpacked_path, override)
+        diff_args = oa_setting("external_diff")
+
+    if None in (base_file, override_file):
+        return log("Unable to externally diff %s/%s\n\n"
+                    "Error loading file contents of one or both files.\n"
+                    "Check the console for more information",
+                    pkg_info.name, override, dialog=True)
+
+    callback = lambda thread: log(thread.result, status=True)
+    DiffExternallyThread(window, "Launching external diff", callback,
+                         diff_args=diff_args,
+                         base=base_file, override=override_file).start()
+
+
 def find_override(view, pkg_name, override):
     """
     Given a report view, return the bounds of the override belonging to the
@@ -272,6 +303,39 @@ def find_override(view, pkg_name, override):
             return file_pos
 
     return None
+
+
+def extract_packed_override(pkg_info, override):
+    """
+    Given a package information structure for a package and an override inside
+    of that packages, this determines the package file that the base file is
+    contained in and extracts it to a temporary file, whose name is returned.
+    """
+    override_type, contents = pkg_info.packed_override_contents(override)
+    if override_type is None:
+        return log("Unable to extract %s/%s; unable to locate base file",
+                    pkg_info.name, override)
+
+    name,ext = os.path.splitext(override)
+    prefix = "{pre}_{pkg}_{name}_".format(
+        pre=override_type,
+        pkg=pkg_info.name,
+        name=name.replace("/", "_")
+        )
+
+    try:
+        fd, base_name = mkstemp(prefix=prefix, suffix=ext)
+        os.chmod(base_name, stat.S_IREAD)
+        for line in contents:
+            os.write(fd, line.encode("utf-8"))
+
+        os.close(fd)
+
+        return base_name
+
+    except Exception as err:
+        return log("Error creating temporary file for %s/%s: %s",
+                   pkg_info.name, override, str(err))
 
 
 ###----------------------------------------------------------------------------
@@ -523,6 +587,7 @@ class OverrideFreshenThread(BackgroundWorkerThread):
         except Exception as e:
             self.result = "Error while freshening: %s" % str(e)
 
+
 ###----------------------------------------------------------------------------
 
 
@@ -565,6 +630,135 @@ class ReportGenerationThread(BackgroundWorkerThread):
         self.report_type = report_type
         self.syntax = syntax
         self.settings = settings
+
+
+###----------------------------------------------------------------------------
+
+
+class DiffExternallyThread(BackgroundWorkerThread):
+    """
+    Spawn a diff in an external process, waiting for it to complete and then
+    cleaning up any temporary files.
+    """
+    def _launch(self, base, override, diff_args):
+        shell_cmd = diff_args.get("shell_cmd")
+        env = diff_args.get("env", {})
+        working_dir = diff_args.get("working_dir", "")
+
+        if not shell_cmd:
+            raise ValueError("shell_cmd is required")
+
+        if not isinstance(shell_cmd, str):
+            raise ValueError("shell_cmd must be a string")
+
+        variables = self.window.extract_variables()
+        variables["base"] = base
+        variables["override"] = override
+
+        # Don't expand vars in env; we let python do that for us.
+        shell_cmd = sublime.expand_variables(shell_cmd, variables)
+        working_dir = sublime.expand_variables(working_dir, variables)
+
+        if working_dir == "" and self.window.active_view():
+            path = os.path.dirname(self.window.active_view().file_name() or "")
+            if os.path.isdir(path):
+                working_dir = path
+
+        log("Running %s", shell_cmd)
+
+        # Hide the console window on Windows
+        startupinfo = None
+        if os.name == "nt":
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+
+        process_env = os.environ.copy()
+        process_env.update(env)
+        for var, value in process_env.items():
+            process_env[var] = os.path.expandvars(value)
+
+        # Might not exist, but that is a user error. We checked before auto
+        # changing it.
+        if working_dir != "":
+            os.chdir(working_dir)
+
+        if sys.platform == "win32":
+            # Use shell=True on Windows, so shell_cmd is passed through with the correct escaping
+            self.proc = subprocess.Popen(
+                shell_cmd,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                stdin=subprocess.DEVNULL,
+                startupinfo=startupinfo,
+                env=process_env,
+                shell=True)
+        elif sys.platform == "darwin":
+            # Use a login shell on OSX, otherwise the users expected env vars won't be setup
+            self.proc = subprocess.Popen(
+                ["/usr/bin/env", "bash", "-l", "-c", shell_cmd],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                stdin=subprocess.DEVNULL,
+                startupinfo=startupinfo,
+                env=process_env,
+                shell=False)
+        elif sys.platform == "linux":
+            # Explicitly use /bin/bash on Linux, to keep Linux and OSX as
+            # similar as possible. A login shell is explicitly not used for
+            # linux, as it's not required
+            self.proc = subprocess.Popen(
+                ["/usr/bin/env", "bash", "-c", shell_cmd],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                stdin=subprocess.DEVNULL,
+                startupinfo=startupinfo,
+                env=process_env,
+                shell=False)
+
+    def _prepare_args_dict(self, args):
+        prepared = args.copy()
+        osx = prepared.pop("osx", {})
+        linux = prepared.pop("linux", {})
+        windows = prepared.pop("windows", {})
+
+        prepared.update({
+            "osx": osx,
+            "linux": linux,
+            "windows": windows
+            }[sublime.platform()]
+        )
+
+        return prepared
+
+    def _process(self):
+        base = self.args.get("base", None)
+        override = self.args.get("override", None)
+        diff_args = self.args.get("diff_args", None)
+
+        if None in (base, override, diff_args):
+            self.result = "Nothing done; missing parameters"
+            return log("external diff thread not given files and diff args")
+
+        try:
+            diff_args = self._prepare_args_dict(diff_args)
+
+            self._launch(base, override, diff_args)
+            result_code = self.proc.wait()
+            self.result = "External diff tool has exited"
+        except Exception as err:
+            result_code = None
+            self.result = "External diff failure"
+            log("Error while diffing externally: %s", str(err), dialog=True)
+
+        if result_code:
+            log("External diff finished with return code %d", result_code)
+
+        try:
+            if os.path.exists(self.base):
+                os.chmod(self.base, stat.S_IREAD | stat.S_IWRITE)
+                os.remove(self.base)
+        except:
+            pass
 
 
 ###----------------------------------------------------------------------------
