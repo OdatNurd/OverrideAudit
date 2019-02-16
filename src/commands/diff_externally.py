@@ -1,7 +1,7 @@
 import sublime
 import sublime_plugin
 
-from ..core import oa_setting, diff_externally
+from ..core import oa_can_diff_externally, diff_externally
 from ..core import PackageListCollectionThread, ContextHelper
 
 
@@ -39,7 +39,7 @@ class OverrideAuditDiffExternallyCommand(ContextHelper,sublime_plugin.TextComman
         ctx = self.view_context(None, False, **kwargs)
         return True if (ctx.has_target() and
                         ctx.is_diff and
-                        oa_setting("external_diff")) else False
+                        oa_can_diff_externally()) else False
 
 
 ###----------------------------------------------------------------------------

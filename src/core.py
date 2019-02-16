@@ -100,6 +100,34 @@ def oa_setting(key):
     return oa_setting.obj.get(key, default)
 
 
+def oa_can_diff_externally():
+    """
+    Determine if the external diff functionality should be enabled. This is
+    based on an introspection of the external_diff setting.
+    """
+    spec = oa_setting("external_diff")
+    if not spec:
+        return False
+
+    if isinstance(spec, bool):
+        return False
+
+    if isinstance(spec, dict):
+        return True
+
+    if isinstance(spec, str):
+        if spec == "sublimerge":
+            # Both Sublimerge Pro and Sublimerge 3 include a top level resource
+            # by this name that contains their version.
+            for res in sublime.find_resources("version"):
+                if res.split("/")[1] in ("Sublimerge 3", "Sublimerge Pro"):
+                    return True
+
+        return False
+
+    return False
+
+
 def packages_with_overrides(pkg_list, name_list=None):
     """
     Collect a list of package names from the given package list for which there
@@ -269,10 +297,31 @@ def diff_externally(window, pkg_info, override):
                     "Check the console for more information",
                     pkg_info.name, override, dialog=True)
 
-    callback = lambda thread: log(thread.result, status=True)
-    DiffExternallyThread(window, "Launching external diff", callback,
-                         diff_args=diff_args,
-                         base=base_file, override=override_file).start()
+    if diff_args == "sublimerge":
+        diff_with_sublimerge(base_file, override_file)
+    else:
+        callback = lambda thread: log(thread.result, status=True)
+        DiffExternallyThread(window, "Launching external diff", callback,
+                             diff_args=diff_args,
+                             base=base_file, override=override_file).start()
+
+
+def diff_with_sublimerge(base_file, override_file):
+    """
+    Use Sublimerge 3 or Sublimerge Pro to diff the override against its base
+    file. This assumes that one of those packages is installed and enabled
+    (the command is not visible otherwise).
+    """
+    sublime.run_command("new_window")
+    window = sublime.active_window()
+
+    window.open_file(base_file).settings().set("_oa_ext_diff_base", base_file)
+    window.open_file(override_file)
+
+    window.run_command("sublimerge_diff_views", {
+        "left_read_only": True,
+        "right_read_only": False,
+        })
 
 
 def find_override(view, pkg_name, override):
@@ -336,6 +385,20 @@ def extract_packed_override(pkg_info, override):
     except Exception as err:
         return log("Error creating temporary file for %s/%s: %s",
                    pkg_info.name, override, str(err))
+
+
+def delete_packed_override(filename):
+    """
+    Attempt to delete the given named file, which should be a file returned
+    from extract_packed_override().
+    """
+    try:
+        if os.path.exists(filename):
+            os.chmod(filename, stat.S_IREAD | stat.S_IWRITE)
+            os.remove(filename)
+        log("Deleted temporary file '%s'", filename)
+    except:
+        log("Error deleting '%s'", filename)
 
 
 ###----------------------------------------------------------------------------
@@ -753,12 +816,7 @@ class DiffExternallyThread(BackgroundWorkerThread):
         if result_code:
             log("External diff finished with return code %d", result_code)
 
-        try:
-            if os.path.exists(self.base):
-                os.chmod(self.base, stat.S_IREAD | stat.S_IWRITE)
-                os.remove(self.base)
-        except:
-            pass
+        delete_packed_override(base)
 
 
 ###----------------------------------------------------------------------------
