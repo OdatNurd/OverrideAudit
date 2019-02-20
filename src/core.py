@@ -89,7 +89,7 @@ def oa_syntax(file):
     """
     Return the full name of an Override Audit syntax based on the short name.
     """
-    return "Packages/OverrideAudit/syntax/%s.sublime-syntax" % file
+    return "Packages/OverrideAudit/resources/syntax/%s.sublime-syntax" % file
 
 
 def oa_setting(key):

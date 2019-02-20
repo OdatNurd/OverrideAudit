@@ -1,4 +1,4 @@
-# SYNTAX TEST "Packages/OverrideAudit/syntax/OA-Diff.sublime-syntax"
+# SYNTAX TEST "Packages/OverrideAudit/resources/syntax/OA-Diff.sublime-syntax"
 
 [S U] Objective-C
     Objective-C++.sublime-syntax

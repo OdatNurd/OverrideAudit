@@ -1,4 +1,4 @@
-# SYNTAX TEST "Packages/OverrideAudit/syntax/OA-PkgReport.sublime-syntax"
+# SYNTAX TEST "Packages/OverrideAudit/resources/syntax/OA-PkgReport.sublime-syntax"
 
 | Default                                  | [S] | [I] | [U] |
 # ^^^^^^^ entity.name.package.enabled

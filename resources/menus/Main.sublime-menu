@@ -51,7 +51,7 @@
                                 "caption": "Settings",
                                 "command": "override_audit_edit_settings",
                                 "args": {
-                                    "base_file": "${packages}/OverrideAudit/OverrideAudit.sublime-settings",
+                                    "base_file": "${packages}/OverrideAudit/resources/settings/OverrideAudit.sublime-settings",
                                     "default": "{\n\t$0\n}\n"
                                 }
                             },
@@ -59,7 +59,7 @@
                                 "caption": "Settings – Default",
                                 "command": "override_audit_open_file",
                                 "args": {
-                                    "file": "${packages}/OverrideAudit/OverrideAudit.sublime-settings"
+                                    "file": "${packages}/OverrideAudit/resources/settings/OverrideAudit.sublime-settings"
                                 }
                             },
                             {
@@ -77,7 +77,7 @@
                                 "caption": "Key Bindings",
                                 "command": "override_audit_edit_settings",
                                 "args": {
-                                    "base_file": "${packages}/OverrideAudit/Default ($platform).sublime-keymap",
+                                    "base_file": "${packages}/OverrideAudit/resources/keymaps/Default ($platform).sublime-keymap",
                                     "default": "[\n\t$0\n]\n"
                                 }
                             },
@@ -85,7 +85,7 @@
                                 "caption": "Key Bindings – Default",
                                 "command": "override_audit_open_file",
                                 "args": {
-                                    "file": "${packages}/OverrideAudit/Default ($platform).sublime-keymap"
+                                    "file": "${packages}/OverrideAudit/resources/keymaps/Default ($platform).sublime-keymap"
                                 }
                             },
                             {
