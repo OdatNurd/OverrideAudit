@@ -7,7 +7,7 @@ Version 1.2.2 (2019-03-13)
   This is the final reminder that version 2.0.0 is going to be
   dropping imminently, which will:
 
-    * Require Sublime Text build 3297+ (Sublime Text 3.2+)
+    * Require Sublime Text build 3197+ (Sublime Text 3.2+)
 
     * May require tweaks to any customized key bindings you may
       have made using OverrideAudit commands.
