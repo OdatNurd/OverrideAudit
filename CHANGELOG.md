@@ -1,7 +1,7 @@
 OverrideAudit ChangeLog
 =======================
 
-Next Version (2019-03-13)
+Version 2.0.0 (2019-03-13)
 -------------------------
   * Massive internal refactoring has been done to make it easier
     to add in new commands and functionality. The primary target
@@ -58,6 +58,27 @@ Next Version (2019-03-13)
     of `+` characters is really hard to unsee once it's pointed
     out.
 
+Version 1.2.2 (2019-03-13)
+--------------------------
+  * Last public version of OverrideAudit version 1.x. This version is
+    functionally identical to the previous version, but is here to point
+    out that no further releases in this series are planned.
+
+
+Version 1.2.1 (2019-02-15)
+--------------------------
+  * Support using
+    [Sublimerge Pro](https://packagecontrol.io/packages/Sublimerge%20Pro) or
+    [Sublimerge 3](https://packagecontrol.io/packages/Sublimerge%203)
+    as the external diff tool by setting `external_diff` to the
+    string `"sublimerge"`.
+
+  * Improve detection of an invalid `external_diff` setting that could
+    lead to the command being enabled when it should not be.
+
+  * Log to the console when the tempoary files created during an
+    external diff are removed
+
 
 Version 1.2.0 (2019-02-10)
 --------------------------
@@ -65,27 +86,26 @@ Version 1.2.0 (2019-02-10)
     tool via the `external_diff` setting. This command is available
     from the command palette and the context menu of override diff
     views.
-    palette and the context menu of override diff views.
 
 
 Version 1.1.2 (2019-01-21)
 -------------------------
   * Fix a bug in save_on_diff handling whereby the buffer might
-    visually appear unsaved in some circumstances even though
-    the file was actually saved.
+    visually appear unsaved in some circumstances even though the file
+    was actually saved.
 
-  * Fix a bug introduced in 1.1.0 while fixing #24 which caused
-    text in reports telling you that there are no overrides to
-    be treated as an override.
+  * Fix a bug introduced in 1.1.0 while fixing #24 which caused text
+    in reports telling you that there are no overrides to be treated
+    as an override.
 
-  * Improve detection of packages that are dependency packages
-    that are still under development so that they appear as
-    appropriate in package reports (#25).
+  * Improve detection of packages that are dependency packages that
+    are still under development so that they appear as appropriate in
+    package reports (#25).
 
-  * Include links to the online documentation in the settings
-    menu and the command palette instead of opening the README
-    file, since they contain the same information but one is
-    hyperlinked and laid out better than the other one.
+  * Include links to the online documentation in the settings menu
+    and the command palette instead of opening the README file, since
+    they contain the same information but one is hyperlinked and laid
+    out better than the other one.
 
 
 Version 1.1.1 (2017-05-01)
