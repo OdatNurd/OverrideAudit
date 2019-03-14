@@ -1,0 +1,19 @@
+Version 2.0.0 (2019-03-13)
+--------------------------
+
+  * Lots of internal refactoring to make it easier to add in new
+    commands and functionality. Outwardly, things are largely
+    unchanged, but any customized key bindings, context menus,
+    or command palette entries may need to be updated.
+
+  * Context menu commands have been enhanced to allow for more
+    customization options. Where they would previously hide
+    themselves when they did not apply, they can now be made to
+    remain visible and disable themselves instead.
+
+  * The package report table frame was updated, because the lack
+    of `+` characters is really hard to unsee once it's pointed
+    out.
+
+  For the full details of this change, check out the CHANGELOG.md
+  file.

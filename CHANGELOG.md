@@ -1,7 +1,7 @@
 OverrideAudit ChangeLog
 =======================
 
-Next Version (????-??-??)
+Next Version (2019-03-13)
 -------------------------
   * Massive internal refactoring has been done to make it easier
     to add in new commands and functionality. The primary target
@@ -53,6 +53,10 @@ Next Version (????-??-??)
         available to tell you what exactly they will do (e.g.
         "Diff Override" instead of telling you what override will
         be diffed)
+
+  * The package report table frame was updated, because the lack
+    of `+` characters is really hard to unsee once it's pointed
+    out.
 
 
 Version 1.2.0 (2019-02-10)
