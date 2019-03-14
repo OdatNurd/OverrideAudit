@@ -3,6 +3,16 @@ package overrides in Sublime Text 3. From simply helping you remember
 what files you've overridden to warning you of potential problems,
 OverrideAudit has you covered.
 
+   +------------------------------------------------------------+
+   | NOTE                                                       |
+   +------------------------------------------------------------+
+   | This is the last of the 1.x versions of OverrideAudit. If  |
+   | you're seeing this text, you're using an older build of    |
+   | Sublime Text 3. Newer versions of Sublime Text have access |
+   | to newer builds of OverrideAudit. If possible, you should  |
+   | upgrade your version of Sublime Text 3.                    |
+   +------------------------------------------------------------+
+
 Quick Start
 -----------
 

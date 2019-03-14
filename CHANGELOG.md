@@ -1,6 +1,13 @@
 OverrideAudit ChangeLog
 =======================
 
+Version 1.2.2 (2019-03-13)
+--------------------------
+  * Last public version of OverrideAudit version 1.x. This version is
+    functionally identical to the previous version, but is here to point
+    out that no further releases in this series are planned.
+
+
 Version 1.2.1 (2019-02-15)
 --------------------------
   * Support using
