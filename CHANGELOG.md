@@ -1,7 +1,7 @@
 OverrideAudit ChangeLog
 =======================
 
-Version 2.0.0 (2019-03-13)
+Version 2.0.0 (2019-03-14)
 -------------------------
   * Massive internal refactoring has been done to make it easier
     to add in new commands and functionality. The primary target
