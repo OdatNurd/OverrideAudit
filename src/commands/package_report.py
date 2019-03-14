@@ -27,7 +27,7 @@ class PackageReportThread(ReportGenerationThread):
                  "{0} Installed Dependencies\n").format(fmt).format(*pkg_counts)
 
         row = "| {:<40} | {:3} | {:3} | {:<3} |".format("", "", "", "")
-        r_sep = "-" * len(row)
+        r_sep = "+------------------------------------------+-----+-----+-----+"
 
         result = [title, t_sep, "", self._generation_time(), stats, r_sep]
         for pkg_name, pkg_info in pkg_list:
