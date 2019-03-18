@@ -82,11 +82,23 @@ WARNING: Text
 #    ^^^ meta.override.expired
 #        ^^^^^^^^^^^^^^^^^ entity.name.filename.override.expired
 #                         ^ text.override-audit
+  `- [?] Lua.sublime-build
+# ^^ punctuation.override.begin
+#   ^ text.override-audit
+#    ^^^ meta.override.unknown
+#        ^^^^^^^^^^^^^^^^^ entity.name.filename.override.unknown
+#                         ^ text.override-audit
   `- [X] Lua Build.sublime-build
 # ^^ punctuation.override.begin
 #   ^ text.override-audit
 #    ^^^ meta.override.expired
 #        ^^^^^^^^^^^^^^^^^^^^^^^ entity.name.filename.override.expired
+#                               ^ text.override-audit
+  `- [?] Lua Build.sublime-build
+# ^^ punctuation.override.begin
+#   ^ text.override-audit
+#    ^^^ meta.override.unknown
+#        ^^^^^^^^^^^^^^^^^^^^^^^ entity.name.filename.override.unknown
 #                               ^ text.override-audit
   `- .gitignore
 # ^^ punctuation.override.begin
@@ -98,4 +110,10 @@ WARNING: Text
 #   ^ text.override-audit
 #    ^^^ meta.override.expired
 #        ^^^^^^^^^^ entity.name.filename.override.expired
+#                  ^ text.override-audit
+  `- [?] .gitignore
+# ^^ punctuation.override.begin
+#   ^ text.override-audit
+#    ^^^ meta.override.unknown
+#        ^^^^^^^^^^ entity.name.filename.override.unknown
 #                  ^ text.override-audit

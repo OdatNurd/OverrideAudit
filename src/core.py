@@ -683,8 +683,8 @@ class ReportGenerationThread(BackgroundWorkerThread):
         view.settings().set("override_audit_report_type", self.report_type)
 
         if self.settings is not None:
-            for setting in self.settings:
-                view.settings().set(setting, self.settings[setting])
+            for setting,value in self.settings.items():
+                view.settings().set(setting, value)
 
     def _set_content(self, caption, content, report_type, syntax,
                      settings=None):
@@ -961,6 +961,15 @@ class ContextHelper():
             relative_name = os.path.join(ctx.package, ctx.override)
             full_name = os.path.join(sublime.packages_path(), relative_name)
             return os.path.isfile(full_name)
+
+        return False
+
+    def override_unknown(self, view, ctx):
+        if ctx.has_target():
+            unknowns = view.settings().get("override_audit_unknown_overrides", {})
+            if ctx.package in unknowns:
+                if ctx.override in unknowns[ctx.package]:
+                    return True
 
         return False
 

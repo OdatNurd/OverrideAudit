@@ -30,6 +30,7 @@ class OverrideReportThread(ReportGenerationThread):
             report_type = ":overrides"
 
         expired_pkgs = []
+        unknown_files = {}
         result = []
         if only_expired:
             result.append("WARNING: Showing only expired overrides!\n"
@@ -40,7 +41,7 @@ class OverrideReportThread(ReportGenerationThread):
         for pkg_name, pkg_info in pkg_list:
             if pkg_name not in ignored:
                 if self._output_package(result, pkg_info, only_expired,
-                                        expired_pkgs):
+                                        expired_pkgs, unknown_files):
                     displayed += 1
 
         if displayed == 0:
@@ -51,17 +52,23 @@ class OverrideReportThread(ReportGenerationThread):
 
         self._set_content(title, result, report_type,
                           oa_syntax("OA-OverrideReport"),
-                          {"override_audit_expired_pkgs": expired_pkgs})
+                          {
+                            "override_audit_expired_pkgs": expired_pkgs,
+                            "override_audit_unknown_overrides": unknown_files
+                          })
 
-    def _output_package(self, result, pkg_info, only_expired, expired_pkgs):
+    def _output_package(self, result, pkg_info, only_expired, expired_pkgs, unknown_files):
         shipped_override = pkg_info.has_possible_overrides(simple=False)
         normal_overrides = pkg_info.override_files(simple=True)
 
         expired_overrides = pkg_info.expired_override_files(simple=True)
         expired_pkg = bool(pkg_info.expired_override_files(simple=False))
 
+        pkg_files         = pkg_info.unpacked_contents()
+        unknown_overrides = pkg_info.unknown_override_files()
+
         # No need to do anything if there are no overrides at all
-        if not normal_overrides and not shipped_override:
+        if not normal_overrides and not shipped_override and not unknown_overrides:
             return False
 
         if only_expired and not expired_overrides and not expired_pkg:
@@ -72,13 +79,17 @@ class OverrideReportThread(ReportGenerationThread):
 
         result.append(decorate_pkg_name(pkg_info))
 
-        self._output_overrides(result, normal_overrides,
-                               expired_overrides, only_expired)
+        if unknown_overrides:
+            unknown_files[pkg_info.name] = list(unknown_overrides)
+
+        self._output_overrides(result, pkg_files, normal_overrides,
+                               expired_overrides, unknown_overrides,
+                               only_expired)
         result.append("")
 
         return True
 
-    def _output_overrides(self, result, overrides, expired, only_expired):
+    def _output_overrides(self, result, pkg_files, overrides, expired, unknown, only_expired):
         if not overrides:
             return result.append("    <No simple overrides found>")
 
@@ -86,8 +97,12 @@ class OverrideReportThread(ReportGenerationThread):
         if only_expired and not expired:
             return result.append("    <No expired simple overrides found>")
 
-        for item in (expired if only_expired else overrides):
-            fmt = "  `- {}" if item not in expired else "  `- [X] {}"
+        for item in (expired if only_expired else pkg_files):
+            fmt = "  `- {}"
+            if item in expired:
+                fmt = "  `- [X] {}"
+            elif item in unknown:
+                fmt = "  `- [?] {}"
             result.append(fmt.format(item))
 
     def _empty_msg(self):
