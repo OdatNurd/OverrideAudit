@@ -1,8 +1,16 @@
 OverrideAudit ChangeLog
 =======================
 
+Version ?.?.? (????-??-??)
+--------------------------
+  * Loose files in an unpacked package that don't correspond to
+    any files in an associated `sublime-package` file are now
+    shown in override reports annotated with `[?]` to indicate
+    that their status is unknown.
+
+
 Version 2.0.0 (2019-03-14)
--------------------------
+--------------------------
   * Massive internal refactoring has been done to make it easier
     to add in new commands and functionality. The primary target
     of the refactor was in taking a few commands which were
