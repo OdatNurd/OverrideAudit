@@ -277,6 +277,7 @@ class PackageInfo():
 
         self.overrides = dict()
         self.expired_overrides = dict()
+        self.unknown_overrides = None
 
         self.binary_patterns = settings.get("binary_file_patterns", [])
 
@@ -544,10 +545,28 @@ class PackageInfo():
         self.overrides[simple] = over_list & base_list
         return self.overrides[simple]
 
+    def unknown_override_files(self):
+        """
+        Get the list of files that exist in the unpacked package but not in the
+        packed package (if any). This implies that the override type is simple,
+        and will return an empty set if there are no such files.
+        """
+        if not self.has_possible_overrides(True):
+            return PackageFileSet()
+
+        if self.unknown_overrides is not None:
+            return self.unknown_overrides
+
+        base_list = self.package_contents()
+        over_list = self.unpacked_contents()
+
+        self.unknown_overrides = over_list - base_list
+        return self.unknown_overrides
+
     def expired_override_files(self, simple=True):
         """
-        Get a list of all overriden files for this package which are older than
-        the source sublime-package file that is currently being used by
+        Get a list of all overridden files for this package which are older
+        than the source sublime-package file that is currently being used by
         sublime; the list of files may be empty.
 
         Note that this currently compares timestamps of the two package files
