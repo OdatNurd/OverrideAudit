@@ -20,6 +20,12 @@ contexts:
         2: meta.override.expired keyword.control.expired
         3: entity.name.filename.override.expired
 
+    - match: '^\s*(`-) (\[\?]) (.*)$'
+      captures:
+        1: punctuation.override.begin
+        2: meta.override.unknown comment
+        3: entity.name.filename.override.unknown
+
     - match: '^\s*(`-) (.*)$'
       captures:
         1: punctuation.override.begin
