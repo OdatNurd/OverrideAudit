@@ -53,6 +53,7 @@ def loaded():
         "save_on_diff": False,
         "confirm_deletion": True,
         "confirm_freshen": True,
+        "confirm_revert": True,
         "report_on_unignore": True,
         "external_diff": False,
 
@@ -322,6 +323,19 @@ def diff_with_sublimerge(base_file, override_file):
         "left_read_only": True,
         "right_read_only": False,
         })
+
+
+def revert_override(window, pkg_info, override):
+    if oa_setting("confirm_revert"):
+        target = override_display(os.path.join(pkg_info.name, override))
+        msg = "Confirm revert:\n\n".format(target)
+
+        if sublime.yes_no_cancel_dialog(msg) != sublime.DIALOG_YES:
+            return
+
+    callback = lambda thread: log(thread.result, status=True)
+    OverrideRevertThread(window, "Reverting File", callback,
+                       pkg_info=pkg_info, override=override).start()
 
 
 def find_override(view, pkg_name, override):
@@ -648,6 +662,43 @@ class OverrideFreshenThread(BackgroundWorkerThread):
                     self.result = self._pkg(view, zFile, pkg_info)
         except Exception as e:
             self.result = "Error while freshening: %s" % str(e)
+
+
+###----------------------------------------------------------------------------
+
+
+class OverrideRevertThread(BackgroundWorkerThread):
+    """
+    Revert the explicitly specified override in the provided package back to
+    it's initial unpacked state.
+    """
+    def _process(self):
+        pkg_info = self.args.get("pkg_info", None)
+        override = self.args.get("override", None)
+
+        if not pkg_info or not override:
+            self.result = "Nothing done; missing parameters"
+            return log("revert thread not given a package or override")
+
+        if not pkg_info.exists():
+            self.result = "Unable to revert '%s'; no such package" % package
+            return
+
+        if not pkg_info.package_file():
+            self.result = "Unable to revert '%s'; no overrides" % package
+            return
+
+        try:
+            fname = os.path.join(sublime.packages_path(), pkg_info.name, override)
+            o_type, contents = pkg_info.packed_override_contents(override, as_list=False)
+
+            with open(fname, 'wb') as file:
+                file.write(contents.encode("utf-8"))
+
+            self.result = "Reverted '%s/%s'" % (pkg_info.name, override)
+
+        except Exception as e:
+            self.result = "Error while reverting: %s" % str(e)
 
 
 ###----------------------------------------------------------------------------

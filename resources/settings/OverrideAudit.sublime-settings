@@ -53,6 +53,10 @@
     // more overrides?
     "confirm_freshen": true,
 
+    // Should the user be asked to confirm before OverrideAudit reverts changes
+    // to an override?
+    "confirm_revert": true,
+
     // Control what is considered to be a binary file for the purposes of
     // skipping attempts to calculate diff information. Any override file which
     // matches an item in this list will be considered binary and reported as
