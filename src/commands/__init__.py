@@ -3,7 +3,7 @@ from ...override_audit import reload
 reload("src.commands", ["package_report", "override_report", "diff_report",
        "refresh_report", "diff_single", "toggle_override", "diff_override",
        "edit_override", "delete_override", "freshen_override", "diff_package",
-       "diff_externally", "freshen_package", "modify_mark"])
+       "diff_externally", "revert_override", "freshen_package", "modify_mark"])
 
 from .package_report import OverrideAuditPackageReportCommand
 from .override_report import OverrideAuditOverrideReportCommand
@@ -11,6 +11,7 @@ from .diff_report import OverrideAuditDiffReportCommand
 from .diff_single import OverrideAuditDiffSingleCommand
 from .toggle_override import OverrideAuditToggleOverrideCommand
 from .diff_override import OverrideAuditDiffOverrideCommand
+from .revert_override import OverrideAuditRevertOverrideCommand
 from .diff_externally import OverrideAuditDiffExternallyCommand
 from .edit_override import OverrideAuditEditOverrideCommand
 from .delete_override import OverrideAuditDeleteOverrideCommand
@@ -31,6 +32,7 @@ __all__ = [
     "OverrideAuditToggleOverrideCommand",
     "OverrideAuditDiffOverrideCommand",
     "OverrideAuditDiffExternallyCommand",
+    "OverrideAuditRevertOverrideCommand",
     "OverrideAuditEditOverrideCommand",
     "OverrideAuditDeleteOverrideCommand",
     "OverrideAuditFreshenOverrideCommand",
