@@ -104,7 +104,7 @@ additional note to this effect is added to let you know.
 
 All *simple* overrides for a package are displayed below the package name in
 the report, and may be prefixed with a `[X]` mark if they are currently
-*expired*.
+*expired* or `[?]` if they are currently *unknown*.
 
 As with the `Package Report`, a context menu item is presented on package names
 to allow a quick bulk diff of overrides in that package. Additionally, override
@@ -211,6 +211,26 @@ This command ignores the current values of the `reuse_view`, `clear_existing`
 and `diff_unchanged` settings and operates as if they are set to `true`, `true`
 and `diff` respectively in order to ensure that you don't end up with a large
 number of duplicate views.
+
+
+## `OverrideAudit: Revert Current Override` ###
+
+This command is only available in the Command Palette while the current file is
+an edit session for an override that is not `unknown`; that is, that the file
+represents a file stored in the underlying `sublime-package` file.
+
+Although this command does not appear in the top level `Tools > OverrideAudit`
+menu, it does appear within the context menu of an appropriate file view, as
+well as on the context menu of an override file from within an `Override Report`
+or `Bulk Diff`.
+
+When invoked, the command will confirm that you wish to perform the revert, and
+then replace the override on disk with a freshly unpacked copy from the source
+`sublime-package` file. This puts that file back in line with the original
+version while leaving the file along.
+
+The `confirm_revert` setting can be used to disable the confirmation check
+prior to running the command.
 
 
 ### `OverrideAudit: Open Diff Externally` ###
@@ -414,7 +434,6 @@ for a single file diff this option will only have an effect if `diff_unchanged`
 is set to `"diff"`, as otherwise no diff is displayed.
 
 
-
 ### `save_on_diff`: true/false (Default: false) ###
 
 This setting controls whether or not OverrideAudit will make sure any unsaved
@@ -439,11 +458,17 @@ perform file deletions.
 ### `confirm_freshen` : true/false (Default: true) ###
 
 When freshening expired override files, this setting controls whether
-OverrideAUdit will prompt you to confirm the operation before it happens or
+OverrideAudit will prompt you to confirm the operation before it happens or
 not.
 
 Although this operation is not destructive, freshening an expired override will
 stop OverrideAudit from warning you that it's expired.
+
+
+### `confirm_revert` : true/false (Default: true) ###
+
+When reverting override files, this setting controls whether OverrideAudit will
+prompt you to confirm the operation before it happens or not.
 
 
 ### `binary_file_patterns`: Array (Default: from user settings) ###
@@ -606,6 +631,17 @@ or new features.
 The tools in OverrideAudit are designed to help warn you when this is happening
 and allow you to easily see what has changed so you can decide how best to
 address the situation.
+
+
+### Unknown Override ###
+
+This terminology is unique to OverrideAudit, and is used to indicate that an
+unpacked package folder contains files that don't exist in the source
+`sublime-package` file.
+
+Such files are not technically overrides (since they do not override anything)
+but OverrideAudit will display them in bulk diff and override reports in order
+to remind you that extraneous unknown files exist in the unpacked package.
 
 
 -------------------------------------------------------------------------------

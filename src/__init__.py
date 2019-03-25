@@ -29,6 +29,7 @@ __all__ = [
     "OverrideAuditRefreshReportCommand",
     "OverrideAuditToggleOverrideCommand",
     "OverrideAuditDiffOverrideCommand",
+    "OverrideAuditRevertOverrideCommand",
     "OverrideAuditDiffExternallyCommand",
     "OverrideAuditEditOverrideCommand",
     "OverrideAuditDeleteOverrideCommand",
