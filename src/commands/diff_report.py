@@ -3,7 +3,7 @@ import sublime_plugin
 
 from ..core import oa_syntax, oa_setting, decorate_pkg_name, log
 from ..core import packages_with_overrides, ReportGenerationThread
-from ...lib.packages import PackageList
+from ...lib.packages import PackageList, OverrideDiffResult
 
 
 ###----------------------------------------------------------------------------
@@ -43,6 +43,7 @@ class BulkDiffReportThread(ReportGenerationThread):
         description = "Bulk Diff Report for overrides in"
         report_type = ":bulk_all"
         expired_pkgs = []
+        unknown_files = {}
 
         if len(names) == 1 and single_package:
             title += names[0]
@@ -64,29 +65,44 @@ class BulkDiffReportThread(ReportGenerationThread):
 
             result.append(decorate_pkg_name(pkg_info))
             self._perform_diff(pkg_info, context_lines, result,
-                               expired_pkgs)
+                               expired_pkgs, unknown_files)
 
         self._set_content(title, result, report_type, oa_syntax("OA-Diff"),
-                          {"override_audit_expired_pkgs": expired_pkgs})
+                          {
+                            "override_audit_expired_pkgs": expired_pkgs,
+                            "override_audit_unknown_overrides": unknown_files
+                          })
 
-    def _perform_diff(self, pkg_info, context_lines, result, expired_pkgs):
+    def _perform_diff(self, pkg_info, context_lines, result, expired_pkgs, unknown_files):
+        pkg_files = pkg_info.unpacked_contents()
         override_list = pkg_info.override_files(simple=True)
         expired_list = pkg_info.expired_override_files(simple=True)
+        unknown_overrides = pkg_info.unknown_override_files()
+
         empty_diff_hdr = oa_setting("diff_empty_hdr")
 
         if expired_list:
             expired_pkgs.append(pkg_info.name)
 
-        for file in override_list:
+        if unknown_overrides:
+            unknown_files[pkg_info.name] = list(unknown_overrides)
+
+        for file in pkg_files:
             if file in expired_list:
                 result.append("    [X] {}".format(file))
+            elif file in unknown_overrides:
+                result.append("    [?] {}".format(file))
             else:
                 result.append("    {}".format(file))
 
-            diff = pkg_info.override_diff(file, context_lines,
-                                          empty_result="No differences found",
-                                          binary_result="<File is binary>",
-                                          indent=8)
+            if file in unknown_overrides:
+                diff = OverrideDiffResult(None, None, (" " * 8) +
+                                          "<File does not exist in the underlying package file; cannot diff>")
+            else:
+                diff = pkg_info.override_diff(file, context_lines,
+                                              empty_result="No differences found",
+                                              binary_result="<File is binary>",
+                                              indent=8)
 
             if diff is None:
                 content = (" " * 8) + ("Error opening or decoding file;"
