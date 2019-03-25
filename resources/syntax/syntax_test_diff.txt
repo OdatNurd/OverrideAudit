@@ -50,4 +50,11 @@
 #   ^^^ meta.override.expired
 #       ^^^^^^^^^^^^^^^^^^^^^^^^^ entity.name.filename.override.expired
 
+    [?] lib/threads.py
+#   ^^^ meta.override.unknown
+#       ^^^^^^^^^^^^^^ entity.name.filename.override.unknown
+
+    [?] .github/ISSUE_TEMPLATE.md
+#   ^^^ meta.override.unknown
+#       ^^^^^^^^^^^^^^^^^^^^^^^^^ entity.name.filename.override.unknown
 

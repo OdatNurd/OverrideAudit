@@ -22,6 +22,11 @@ contexts:
       captures:
         1: meta.override.expired keyword.control.expired
         2: entity.name.filename.override.expired
+    - match: '^    (\[\?]) (.*)'
+      captures:
+        1: meta.override.unknown comment
+        2: entity.name.filename.override.unknown
+
     - match: '^    ([^<\s].*)'
       captures:
         1: entity.name.filename.override
