@@ -360,7 +360,7 @@ def extract_packed_override(pkg_info, override):
     of that packages, this determines the package file that the base file is
     contained in and extracts it to a temporary file, whose name is returned.
     """
-    override_type, contents = pkg_info.packed_override_contents(override)
+    override_type, contents = pkg_info.packed_override_contents(override, as_list=False)
     if override_type is None:
         return log("Unable to extract %s/%s; unable to locate base file",
                     pkg_info.name, override)
@@ -375,8 +375,7 @@ def extract_packed_override(pkg_info, override):
     try:
         fd, base_name = mkstemp(prefix=prefix, suffix=ext)
         os.chmod(base_name, stat.S_IREAD)
-        for line in contents:
-            os.write(fd, line.encode("utf-8"))
+        os.write(fd, contents.encode("utf-8"))
 
         os.close(fd)
 

@@ -399,12 +399,15 @@ class PackageInfo():
 
         return result
 
-    def _get_packed_pkg_file_contents(self, override_file):
+    def _get_packed_pkg_file_contents(self, override_file, as_list=True):
         try:
             with zipfile.ZipFile(self.package_file()) as zFile:
                 info = find_zip_entry(zFile, override_file)
                 file = codecs.EncodedFile(zFile.open(info, mode="rU"), "utf-8")
-                content = io.TextIOWrapper(file, encoding="utf-8").readlines()
+                if as_list:
+                    content = io.TextIOWrapper(file, encoding="utf-8").readlines()
+                else:
+                    content = io.TextIOWrapper(file, encoding="utf-8").read()
 
                 source = "Shipped Packages"
                 if self.installed_path is not None:
@@ -603,13 +606,13 @@ class PackageInfo():
         self.expired_overrides[simple] = result
         return self.expired_overrides[simple]
 
-    def packed_override_contents(self, override_file):
+    def packed_override_contents(self, override_file, as_list=True):
         """
         Given the name of an override file, return back a tuple that indicates
         if the source package is shipped or installed and the contents of the
         base file for that override as a list of lines.
         """
-        content = self._get_packed_pkg_file_contents(override_file)
+        content = self._get_packed_pkg_file_contents(override_file, as_list)
         if not content:
             return (None, None)
 
@@ -652,7 +655,7 @@ class PackageInfo():
             return OverrideDiffResult(None, None, binary_result,
                                       is_binary=True, indent=indent)
 
-        packed = self._get_packed_pkg_file_contents(override_file)
+        packed = self._get_packed_pkg_file_contents(override_file, as_list=True)
         unpacked = self._get_unpacked_override_contents(override_file)
 
         if not packed or not unpacked:
