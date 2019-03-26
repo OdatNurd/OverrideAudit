@@ -113,7 +113,7 @@ class BulkDiffReportThread(ReportGenerationThread):
 
             result.extend([content, ""])
 
-        if len(override_list) == 0:
+        if not override_list and not unknown_overrides:
             if pkg_info.has_possible_overrides(simple=True):
                 result.append("    <No simple overrides found>")
             else:

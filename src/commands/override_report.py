@@ -90,7 +90,9 @@ class OverrideReportThread(ReportGenerationThread):
         return True
 
     def _output_overrides(self, result, pkg_files, overrides, expired, unknown, only_expired):
-        if not overrides:
+        # If there are unknown overrides, we don't say that there are no simple
+        # overrides found.
+        if not overrides and not unknown:
             return result.append("    <No simple overrides found>")
 
         # Must be overrides, if none are expired use a different message.
