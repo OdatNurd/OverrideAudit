@@ -1,6 +1,6 @@
 from ..override_audit import reload
 
-reload("src", ["core", "events", "contexts", "settings_proxy"])
+reload("src", ["core", "events", "contexts", "browse", "settings_proxy"])
 reload("src.commands")
 
 from . import core
@@ -13,6 +13,9 @@ from .commands import *
 __all__ = [
     # core
     "core",
+
+    # browse
+    "browse",
 
     # settings_proxy
     "OverrideAuditOpenFileCommand",
