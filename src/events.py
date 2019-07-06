@@ -43,3 +43,40 @@ class OverrideAuditEventListener(sublime_plugin.EventListener):
 
 
 ###----------------------------------------------------------------------------
+
+
+class CreateOverrideEventListener(sublime_plugin.ViewEventListener):
+    """
+    This listener applies only to newly created override views created by the
+    override_audit_create_override command. It ensures that the appropriate
+    path exists prior to saving a new override, and removes the scratch mark
+    from a new override once it has been modified for the first time.
+    """
+    @classmethod
+    def is_applicable(cls, settings):
+        return settings.get("_oa_is_new_override", False)
+
+    def on_pre_save(self):
+        """
+        Before the first save of a new override, try to create the appropriate
+        unpacked folder; doing so marked this as no longer a potential new
+        override.
+        """
+        path = os.path.dirname(self.view.file_name())
+        try:
+            os.makedirs(path, exist_ok=True)
+            self.view.settings().erase("_oa_is_new_override")
+        except:
+            log("Error creating package directory for new override",
+                dialog=True)
+
+    def on_modified(self):
+        """
+        On first modification to the buffer, turn off the scratch status so the
+        user knows they modified the original file.
+        """
+        if self.view.is_scratch():
+            self.view.set_scratch(False)
+
+
+###----------------------------------------------------------------------------

@@ -87,6 +87,10 @@
         "command": "override_audit_toggle_override",
     },
     {
+        "caption": "OverrideAudit: Create Override",
+        "command": "override_audit_create_override"
+    },
+    {
         "caption": "OverrideAudit: Revert Current Override",
         "command": "override_audit_revert_override"
     },

@@ -18,6 +18,11 @@ Version ?.?.? (????-??-??)
     whether the user gets asked to confirm this action before
     it is carried out.
 
+  * Include a new command to create an override; this works very
+    similarly to PackageResourceViewer, but is implemented
+    differently in that it works with mini_diff if you have that
+    turned on.
+
 
 Version 2.0.0 (2019-03-14)
 --------------------------

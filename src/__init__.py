@@ -31,6 +31,7 @@ __all__ = [
     "OverrideAuditDiffReportCommand",
     "OverrideAuditRefreshReportCommand",
     "OverrideAuditToggleOverrideCommand",
+    "OverrideAuditCreateOverrideCommand",
     "OverrideAuditDiffOverrideCommand",
     "OverrideAuditRevertOverrideCommand",
     "OverrideAuditDiffExternallyCommand",
