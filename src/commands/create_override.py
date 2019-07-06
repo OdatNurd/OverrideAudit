@@ -1,6 +1,8 @@
 import sublime
 import sublime_plugin
 
+import os
+
 from ..core import diff_override, packages_with_overrides, log
 from ..core import PackageListCollectionThread
 from ..browse import ResourceType, PackageResourceBrowser
@@ -44,16 +46,19 @@ class OverrideAuditCreateOverrideCommand(sublime_plugin.WindowCommand):
         # Mark the view as a potential new override and set it up.
         view = self.window.active_view()
         view.settings().set("_oa_is_new_override", True)
-        sublime.set_timeout(lambda: self.setup_view(view), 0)
+        self.setup_view(view)
 
     def pick(self, pkg_info, resource):
         if pkg_info is not None:
-            self.window.run_command("create_override", {
+            self.window.run_command("override_audit_create_override", {
                 "package": pkg_info.name,
                 "file": resource
             })
 
     def setup_view(self, view):
+        if view.is_loading():
+            return sublime.set_timeout(lambda: self.setup_view(view), 10)
+
         settings = sublime.load_settings("Preferences.sublime-settings")
         mini_diff = settings.get("mini_diff")
 
