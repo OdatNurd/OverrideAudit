@@ -25,15 +25,22 @@ class PackageBrowser():
     """
     Provide the ability to browse for a package among all known packages. The
     browse can be filtered to show all packages (ALL) or only those packages
-    that contain at least one override (OVERRIDE) as desired.
+    that contain at least one override (OVERRIDE) as desired. The NONOVERRIDE
+    option is treated as ALL for the purposes of this class.
 
-    The NONOVERRIDE option is treated as ALL for the purposes of this class.
+    If a filter is provided, it will be invoked once for each package in the
+    list to see if the package should be presented; this trumps the file_type
+    argument.
     """
-    def __init__(self, window=None, file_type=ResourceType.ALL):
+    def __init__(self, window=None, file_type=ResourceType.ALL, p_filter=None):
         self.window = window or sublime.active_window()
         self.file_type = file_type
+        self.p_filter = p_filter
 
     def _get_contents(self, pkg_list):
+        if self.p_filter:
+            return [name for name, pkg in pkg_list if self.p_filter(pkg)]
+
         if self.file_type == ResourceType.OVERRIDE:
             return packages_with_overrides(pkg_list)
         else:
@@ -224,7 +231,7 @@ class PackageResourceBrowser():
     """
     def __init__(self, pkg_name=None, resource=None, window=None,
                  file_type=ResourceType.ALL, pkg_list=None, unknown=True,
-                 on_done=None):
+                 p_filter=None, on_done=None):
         self.pkg_name = pkg_name
         self.resource = resource
         self.window = window or sublime.active_window()
@@ -232,7 +239,7 @@ class PackageResourceBrowser():
         self.pkg_list = pkg_list
         self.on_done = on_done
         self.cache = {}
-        self.pkg_browser = PackageBrowser(self.window, self.file_type)
+        self.pkg_browser = PackageBrowser(self.window, self.file_type, p_filter)
         self.res_browser = ResourceBrowser(self.window, self.file_type, unknown)
 
     def _on_done(self, pkg_info, resource_name):
