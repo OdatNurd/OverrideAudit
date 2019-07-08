@@ -28,21 +28,18 @@ class OverrideAuditCreateOverrideCommand(sublime_plugin.WindowCommand):
                 p_filter=lambda p: bool(p.package_file()),
                 on_done=lambda p,r: self.pick(p, r)).browse()
 
-        # If an unpacked version already exists, just open it normally.
+        # Open normally if an unpacked copy exists; fallback for manual calls
         unpacked = os.path.join(sublime.packages_path(), package, file)
         if os.path.exists(unpacked):
             return self.window.open_file(unpacked)
 
-        # Convert the filename to a resource; see if it exists in that package
-        # or not.
-        resource = '/'.join(["Packages", package, file])
-        if resource not in sublime.find_resources(resource.split('/')[-1]):
+        # No unpacked file; verify the package contains the resource
+        res = '/'.join([package, file])
+        if "Packages/" + res not in sublime.find_resources(res.split('/')[-1]):
             return log("'{0}' not found; cannot create override".format(
                        file), dialog=True)
 
-        # Convert the filename to a package resource and open it
-        resource = '/'.join(["${packages}", package, file])
-        self.window.run_command("open_file", {"file": resource})
+        self.window.run_command("open_file", {"file": "${packages}/" + res})
 
         # Mark the view as a potential new override and set it up.
         view = self.window.active_view()
