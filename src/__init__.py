@@ -23,6 +23,7 @@ __all__ = [
 
     # events/contexts
     "OverrideAuditEventListener",
+    "CreateOverrideEventListener",
     "OverrideAuditContextListener",
 
     # commands/*
