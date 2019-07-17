@@ -44,6 +44,7 @@ class BulkDiffReportThread(ReportGenerationThread):
         report_type = ":bulk_all"
         expired_pkgs = []
         unknown_files = {}
+        packages = {}
 
         if len(names) == 1 and single_package:
             title += names[0]
@@ -60,6 +61,8 @@ class BulkDiffReportThread(ReportGenerationThread):
 
         for name in names:
             pkg_info = pkg_list[name]
+            packages[name] = pkg_info.status(detailed=True)
+
             if binary_patterns is not None:
                 pkg_info.set_binary_pattern(binary_patterns)
 
@@ -69,6 +72,7 @@ class BulkDiffReportThread(ReportGenerationThread):
 
         self._set_content(title, result, report_type, oa_syntax("OA-Diff"),
                           {
+                            "override_audit_report_packages": packages,
                             "override_audit_expired_pkgs": expired_pkgs,
                             "override_audit_unknown_overrides": unknown_files
                           })

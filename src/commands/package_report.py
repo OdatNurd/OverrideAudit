@@ -29,8 +29,11 @@ class PackageReportThread(ReportGenerationThread):
         row = "| {:<40} | {:3} | {:3} | {:<3} |".format("", "", "", "")
         r_sep = "+------------------------------------------+-----+-----+-----+"
 
+        packages = {}
         result = [title, t_sep, "", self._generation_time(), stats, r_sep]
         for pkg_name, pkg_info in pkg_list:
+            packages[pkg_name] = pkg_info.status(detailed=False)
+
             result.append(
                 "| {:<40} | [{:1}] | [{:1}] | [{:1}] |".format(
                     decorate_pkg_name(pkg_info, name_only=True),
@@ -40,7 +43,9 @@ class PackageReportThread(ReportGenerationThread):
         result.extend([r_sep, ""])
 
         self._set_content("OverrideAudit: Package Report", result, ":packages",
-                          oa_syntax("OA-PkgReport"))
+                          oa_syntax("OA-PkgReport"), {
+                            "override_audit_report_packages": packages
+                         })
 
 
 ###----------------------------------------------------------------------------
