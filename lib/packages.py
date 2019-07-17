@@ -670,6 +670,48 @@ class PackageInfo():
         return OverrideDiffResult(packed, unpacked, result,
                                   empty_msg=empty_result, indent=indent)
 
+    def status(self, detailed=False):
+        """
+        Return a status dictionary for the status of this package. When
+        detailed is True, the resulting dictionary will contain complete
+        override details. False provides only information on whether overrides
+        are possible or not.
+
+        This detail requires gathering package contents and thus is a more
+        heavy-weight call.
+        """
+        if detailed:
+            overrides         = len(self.override_files(simple=True))
+            expired_overrides = len(self.expired_override_files(simple=True))
+            unknown_overrides = len(self.unknown_override_files())
+        else:
+            overrides = 1 if self.has_possible_overrides() else 0
+            expired_overrides = unknown_overrides = overrides
+
+
+        return {
+            # Core info
+            "name": self.name,
+
+            # Installation Status
+            "is_shipped":   bool(self.shipped_path),
+            "is_installed": bool(self.installed_path),
+            "is_unpacked":  bool(self.unpacked_path),
+
+            # Extended status
+            "is_disabled":   self.is_disabled,
+            "is_dependency": self.is_dependency,
+
+            # Is this a complete override?
+            "is_complete_override":         self.has_possible_overrides(simple=False),
+            "is_complete_override_expired": bool(self.expired_override_files(simple=False)),
+
+            # Override information; may contain false positives if detailed is
+            # False
+            "overrides":         overrides,
+            "expired_overrides": expired_overrides,
+            "unknown_overrides": unknown_overrides
+        }
 
 ###----------------------------------------------------------------------------
 
