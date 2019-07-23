@@ -260,6 +260,7 @@ class PackageInfo():
         ignored_list = settings.get("ignored_packages", [])
 
         self.name = name
+        self.metadata = {}
 
         self.is_dependency = False
         self.is_disabled = True if name in ignored_list else False
@@ -348,6 +349,7 @@ class PackageInfo():
         self._add_package(_pkg_scan(self.shipped_packages_path, pkg_filename), True)
         self._add_package(_pkg_scan(sublime.installed_packages_path(), pkg_filename, True))
         self._add_path(pkg_path)
+        self._load_metadata()
 
     def __get_sublime_pkg_zip_list(self, pkg_filename):
         if pkg_filename in self.zip_list:
@@ -398,6 +400,17 @@ class PackageInfo():
             self.pkg_content[filename] = result
 
         return result
+
+    def _load_metadata(self):
+        try:
+            prefix = "Packages/%s/" % self.name
+            resource = next((r for r in sublime.find_resources("*-metadata.json")
+                             if r.startswith(prefix)), None)
+
+            data = sublime.load_resource(resource)
+            self.metadata = sublime.decode_value(data)
+        except:
+            pass
 
     def _get_packed_pkg_file_contents(self, override_file, as_list=True):
         try:
@@ -688,10 +701,10 @@ class PackageInfo():
             overrides = 1 if self.has_possible_overrides() else 0
             expired_overrides = unknown_overrides = overrides
 
-
         return {
             # Core info
             "name": self.name,
+            "metadata": self.metadata,
 
             # Installation Status
             "is_shipped":   bool(self.shipped_path),
@@ -749,6 +762,9 @@ class PackageList():
         self._shipped = self.__find_pkgs(PackageInfo.shipped_packages_path, name_list, shipped=True)
         self._installed = self.__find_pkgs(sublime.installed_packages_path(), name_list)
         self._unpacked = self.__find_pkgs(sublime.packages_path(), name_list, packed=False)
+
+        for pkg in self._list.values():
+            pkg._load_metadata()
 
     def package_counts(self):
         """
