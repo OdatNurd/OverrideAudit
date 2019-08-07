@@ -466,6 +466,50 @@ class PackageInfo():
         except:
             print("Error loading %s; unknown error" % name)
 
+    def _get_file_internal(self, resource, as_binary=True):
+        """
+        Get file contents either from the packed package that Sublime would use
+        or the local folder and return it as either a string or bytes. This
+        is the analog of the sublime.load_resource() API call and it's binary
+        cousin, implemented here in a way that doesn't utilize the Sublime file
+        catalog so that it works with ignored packages.
+        """
+        if self.unpacked_path:
+            name = os.path.join(self.unpacked_path, resource)
+            mode, encoding = ("rb", None) if as_binary else ("r", "utf-8")
+            try:
+                with open(name, mode, encoding=encoding) as handle:
+                    return handle.read()
+
+            except PermissionError:
+                print("Error loading %s; permission denied" % name)
+                return None
+
+            except UnicodeDecodeError:
+                print("Error loading %s; unable to decode file contents" % name)
+                return None
+
+            except FileNotFoundError:
+                pass
+
+        try:
+            if self.package_file() is not None:
+                with zipfile.ZipFile(self.package_file()) as zFile:
+                    info = find_zip_entry(zFile, resource)
+                    file = codecs.EncodedFile(zFile.open(info, mode="rU"), "utf-8")
+                    if as_binary:
+                        return file.read()
+
+                    return io.TextIOWrapper(file, encoding="utf-8").read()
+
+        except (KeyError, FileNotFoundError):
+            return None
+
+        except UnicodeDecodeError:
+            print("Error loading %s:%s; unable to decode file contents" %
+                  (self.package_file(), resource))
+            return None
+
     def _override_is_binary(self, override_file):
         for pattern in self.binary_patterns:
             if fnmatch.fnmatch(override_file, pattern):
@@ -643,6 +687,44 @@ class PackageInfo():
 
         return content[0]
 
+    def contains_file(self, resource):
+        """
+        Checks to see if the resource provided exists in this package or not
+        and returns a value as appropriate. This will check both inside of
+        package files as well as on the local file system; the return value
+        only tells you that this resource exists in the package, not WHERE it
+        comes from.
+        """
+        try:
+            if self.package_file() is not None:
+                with zipfile.ZipFile(self.package_file()) as zFile:
+                    if find_zip_entry(zFile, resource) is not None:
+                        return True
+
+        except (KeyError, FileNotFoundError):
+            pass
+
+        if self.unpacked_path:
+            return os.path.exists(os.path.join(self.unpacked_path, resource))
+
+        return False
+
+    def get_file(self, resource):
+        """
+        Given a resource specification, get the contents of that resource and
+        return it; returns None if the resource is not found. The resource
+        loaded is the one that sublime.load_resource() would load.
+        """
+        return self._get_file_internal(resource, as_binary=False)
+
+    def get_binary_file(self, resource):
+        """
+        This works as get_file does, but the returned value is a bytes
+        instead of a string; thus it works like sublime.load_binary_resource.
+        As in get_file(), this returns the resource that API method would load.
+        """
+        return self._get_file_internal(resource, as_binary=True)
+
     def set_binary_pattern(self, pattern_list):
         """
         Set the list of file patterns that should be considered to be binary
@@ -725,6 +807,7 @@ class PackageInfo():
             "expired_overrides": expired_overrides,
             "unknown_overrides": unknown_overrides
         }
+
 
 ###----------------------------------------------------------------------------
 
