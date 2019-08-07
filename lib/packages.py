@@ -1,6 +1,7 @@
 import sublime
 import io
 import os
+import re
 import zipfile
 import codecs
 from datetime import datetime
@@ -65,6 +66,46 @@ def _pkg_scan(path, filename, recurse=False):
             break
 
     return None
+
+
+def _is_compatible_version(version_range):
+    """
+    This code is taken from Package Control and is used to match a version
+    selector like '>3200', '<3000' or '3100-3200' against the current build of
+    Sublime to see if it is compatible or not.
+    """
+    min_version = float("-inf")
+    max_version = float("inf")
+
+    if version_range == '*':
+        return True
+
+    gt_match = re.match(r'>(\d+)$', version_range)
+    ge_match = re.match(r'>=(\d+)$', version_range)
+    lt_match = re.match(r'<(\d+)$', version_range)
+    le_match = re.match(r'<=(\d+)$', version_range)
+    range_match = re.match(r'(\d+) - (\d+)$', version_range)
+
+    if gt_match:
+        min_version = int(gt_match.group(1)) + 1
+    elif ge_match:
+        min_version = int(ge_match.group(1))
+    elif lt_match:
+        max_version = int(lt_match.group(1)) - 1
+    elif le_match:
+        max_version = int(le_match.group(1))
+    elif range_match:
+        min_version = int(range_match.group(1))
+        max_version = int(range_match.group(2))
+    else:
+        return None
+
+    if min_version > int(sublime.version()):
+        return False
+    if max_version < int(sublime.version()):
+        return False
+
+    return True
 
 
 def find_zip_entry(zFile, override_file):
@@ -401,14 +442,59 @@ class PackageInfo():
 
         return result
 
-    def _load_metadata(self):
-        try:
-            prefix = "Packages/%s/" % self.name
-            resource = next((r for r in sublime.find_resources("*-metadata.json")
-                             if r.startswith(prefix)), None)
+    def __select_dependencies(self, dependency_info):
+        """
+        This is taken from Package Control (and slightly modified). It takes a
+        dependency JSON object from dependencies.json and determines which
+        entry  (if any) should be used based on sublime version, os and
+        architecture. It will return an empty list if there is no match.
+        """
+        platform_selectors = [
+            sublime.platform() + '-' + sublime.arch(),
+            sublime.platform(),
+            '*'
+        ]
 
-            data = sublime.load_resource(resource)
-            self.metadata = sublime.decode_value(data)
+        for platform_selector in platform_selectors:
+            if platform_selector not in dependency_info:
+                continue
+
+            platform_dependency = dependency_info[platform_selector]
+            versions = platform_dependency.keys()
+
+            # Sorting reverse will give us >, < then *
+            for version_selector in sorted(versions, reverse=True):
+                if not _is_compatible_version(version_selector):
+                    continue
+                return platform_dependency[version_selector]
+
+        # If there were no matches in the info, but there also weren't any
+        # errors, then it just means there are not dependencies for this machine
+        return []
+
+    def __get_dependencies(self):
+        if not self.contains_file("dependencies.json"):
+            return self.metadata.get("dependencies", [])
+
+        try:
+            data = self.get_file("dependencies.json")
+            return self.__select_dependencies(sublime.decode_value(data))
+
+        except:
+            return self.metadata.get("dependencies", [])
+
+    def _load_metadata(self):
+        res_name = "package-metadata.json"
+        if self.is_dependency:
+            res_name = "dependency-metadata.json"
+
+        try:
+            if self.contains_file(res_name):
+                data = self.get_file(res_name)
+                self.metadata = sublime.decode_value(data)
+
+            if not self.is_dependency:
+                self.metadata["dependencies"] = self.__get_dependencies()
         except:
             pass
 
