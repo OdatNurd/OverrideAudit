@@ -29,6 +29,10 @@ Version ?.?.? (????-??-??)
     differently in that it works with mini_diff if you have that
     turned on.
 
+  * Include hover popups for packages in reports. The popup gives
+    more detailed package information, displays some help
+    information on click, and can trigger reports as well.
+
 
 Version 2.0.0 (2019-03-14)
 --------------------------
