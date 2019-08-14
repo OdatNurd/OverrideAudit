@@ -9,6 +9,8 @@ import difflib
 from collections import MutableSet, OrderedDict
 import fnmatch
 
+from .metadata import default_metadata
+
 
 ###----------------------------------------------------------------------------
 
@@ -495,6 +497,8 @@ class PackageInfo():
         res_name = "package-metadata.json"
         if self.is_dependency:
             res_name = "dependency-metadata.json"
+
+        self.metadata = default_metadata(self)
 
         try:
             if self.contains_file(res_name):
