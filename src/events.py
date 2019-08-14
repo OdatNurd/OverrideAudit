@@ -2,6 +2,7 @@ import sublime
 import sublime_plugin
 import os
 
+from .pkg_popup import show_pkg_popup
 from .core import override_group, delete_packed_override
 from ..lib.packages import check_potential_override
 
@@ -40,6 +41,18 @@ class OverrideAuditEventListener(sublime_plugin.EventListener):
         tmp_base = view.settings().get("_oa_ext_diff_base", None)
         if tmp_base is not None:
             delete_packed_override(tmp_base)
+
+
+    def on_hover(self, view, point, hover_zone):
+        if hover_zone != sublime.HOVER_TEXT:
+            return
+
+        if not view.match_selector(point, "text.override-audit entity.name.package"):
+            return None
+
+        report_type = view.settings().get("override_audit_report_type", "??")
+        pkg_name = view.substr(view.extract_scope(point))
+        show_pkg_popup(view, point, "pkg:" + pkg_name, report_type != ":packages")
 
 
 ###----------------------------------------------------------------------------

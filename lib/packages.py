@@ -1,6 +1,7 @@
 import sublime
 import io
 import os
+import re
 import zipfile
 import codecs
 from datetime import datetime
@@ -65,6 +66,46 @@ def _pkg_scan(path, filename, recurse=False):
             break
 
     return None
+
+
+def _is_compatible_version(version_range):
+    """
+    This code is taken from Package Control and is used to match a version
+    selector like '>3200', '<3000' or '3100-3200' against the current build of
+    Sublime to see if it is compatible or not.
+    """
+    min_version = float("-inf")
+    max_version = float("inf")
+
+    if version_range == '*':
+        return True
+
+    gt_match = re.match(r'>(\d+)$', version_range)
+    ge_match = re.match(r'>=(\d+)$', version_range)
+    lt_match = re.match(r'<(\d+)$', version_range)
+    le_match = re.match(r'<=(\d+)$', version_range)
+    range_match = re.match(r'(\d+) - (\d+)$', version_range)
+
+    if gt_match:
+        min_version = int(gt_match.group(1)) + 1
+    elif ge_match:
+        min_version = int(ge_match.group(1))
+    elif lt_match:
+        max_version = int(lt_match.group(1)) - 1
+    elif le_match:
+        max_version = int(le_match.group(1))
+    elif range_match:
+        min_version = int(range_match.group(1))
+        max_version = int(range_match.group(2))
+    else:
+        return None
+
+    if min_version > int(sublime.version()):
+        return False
+    if max_version < int(sublime.version()):
+        return False
+
+    return True
 
 
 def find_zip_entry(zFile, override_file):
@@ -260,6 +301,7 @@ class PackageInfo():
         ignored_list = settings.get("ignored_packages", [])
 
         self.name = name
+        self.metadata = {}
 
         self.is_dependency = False
         self.is_disabled = True if name in ignored_list else False
@@ -348,6 +390,7 @@ class PackageInfo():
         self._add_package(_pkg_scan(self.shipped_packages_path, pkg_filename), True)
         self._add_package(_pkg_scan(sublime.installed_packages_path(), pkg_filename, True))
         self._add_path(pkg_path)
+        self._load_metadata()
 
     def __get_sublime_pkg_zip_list(self, pkg_filename):
         if pkg_filename in self.zip_list:
@@ -398,6 +441,62 @@ class PackageInfo():
             self.pkg_content[filename] = result
 
         return result
+
+    def __select_dependencies(self, dependency_info):
+        """
+        This is taken from Package Control (and slightly modified). It takes a
+        dependency JSON object from dependencies.json and determines which
+        entry  (if any) should be used based on sublime version, os and
+        architecture. It will return an empty list if there is no match.
+        """
+        platform_selectors = [
+            sublime.platform() + '-' + sublime.arch(),
+            sublime.platform(),
+            '*'
+        ]
+
+        for platform_selector in platform_selectors:
+            if platform_selector not in dependency_info:
+                continue
+
+            platform_dependency = dependency_info[platform_selector]
+            versions = platform_dependency.keys()
+
+            # Sorting reverse will give us >, < then *
+            for version_selector in sorted(versions, reverse=True):
+                if not _is_compatible_version(version_selector):
+                    continue
+                return platform_dependency[version_selector]
+
+        # If there were no matches in the info, but there also weren't any
+        # errors, then it just means there are not dependencies for this machine
+        return []
+
+    def __get_dependencies(self):
+        if not self.contains_file("dependencies.json"):
+            return self.metadata.get("dependencies", [])
+
+        try:
+            data = self.get_file("dependencies.json")
+            return self.__select_dependencies(sublime.decode_value(data))
+
+        except:
+            return self.metadata.get("dependencies", [])
+
+    def _load_metadata(self):
+        res_name = "package-metadata.json"
+        if self.is_dependency:
+            res_name = "dependency-metadata.json"
+
+        try:
+            if self.contains_file(res_name):
+                data = self.get_file(res_name)
+                self.metadata = sublime.decode_value(data)
+
+            if not self.is_dependency:
+                self.metadata["dependencies"] = self.__get_dependencies()
+        except:
+            pass
 
     def _get_packed_pkg_file_contents(self, override_file, as_list=True):
         try:
@@ -452,6 +551,50 @@ class PackageInfo():
 
         except:
             print("Error loading %s; unknown error" % name)
+
+    def _get_file_internal(self, resource, as_binary=True):
+        """
+        Get file contents either from the packed package that Sublime would use
+        or the local folder and return it as either a string or bytes. This
+        is the analog of the sublime.load_resource() API call and it's binary
+        cousin, implemented here in a way that doesn't utilize the Sublime file
+        catalog so that it works with ignored packages.
+        """
+        if self.unpacked_path:
+            name = os.path.join(self.unpacked_path, resource)
+            mode, encoding = ("rb", None) if as_binary else ("r", "utf-8")
+            try:
+                with open(name, mode, encoding=encoding) as handle:
+                    return handle.read()
+
+            except PermissionError:
+                print("Error loading %s; permission denied" % name)
+                return None
+
+            except UnicodeDecodeError:
+                print("Error loading %s; unable to decode file contents" % name)
+                return None
+
+            except FileNotFoundError:
+                pass
+
+        try:
+            if self.package_file() is not None:
+                with zipfile.ZipFile(self.package_file()) as zFile:
+                    info = find_zip_entry(zFile, resource)
+                    file = codecs.EncodedFile(zFile.open(info, mode="rU"), "utf-8")
+                    if as_binary:
+                        return file.read()
+
+                    return io.TextIOWrapper(file, encoding="utf-8").read()
+
+        except (KeyError, FileNotFoundError):
+            return None
+
+        except UnicodeDecodeError:
+            print("Error loading %s:%s; unable to decode file contents" %
+                  (self.package_file(), resource))
+            return None
 
     def _override_is_binary(self, override_file):
         for pattern in self.binary_patterns:
@@ -630,6 +773,44 @@ class PackageInfo():
 
         return content[0]
 
+    def contains_file(self, resource):
+        """
+        Checks to see if the resource provided exists in this package or not
+        and returns a value as appropriate. This will check both inside of
+        package files as well as on the local file system; the return value
+        only tells you that this resource exists in the package, not WHERE it
+        comes from.
+        """
+        try:
+            if self.package_file() is not None:
+                with zipfile.ZipFile(self.package_file()) as zFile:
+                    if find_zip_entry(zFile, resource) is not None:
+                        return True
+
+        except (KeyError, FileNotFoundError):
+            pass
+
+        if self.unpacked_path:
+            return os.path.exists(os.path.join(self.unpacked_path, resource))
+
+        return False
+
+    def get_file(self, resource):
+        """
+        Given a resource specification, get the contents of that resource and
+        return it; returns None if the resource is not found. The resource
+        loaded is the one that sublime.load_resource() would load.
+        """
+        return self._get_file_internal(resource, as_binary=False)
+
+    def get_binary_file(self, resource):
+        """
+        This works as get_file does, but the returned value is a bytes
+        instead of a string; thus it works like sublime.load_binary_resource.
+        As in get_file(), this returns the resource that API method would load.
+        """
+        return self._get_file_internal(resource, as_binary=True)
+
     def set_binary_pattern(self, pattern_list):
         """
         Set the list of file patterns that should be considered to be binary
@@ -670,6 +851,49 @@ class PackageInfo():
         return OverrideDiffResult(packed, unpacked, result,
                                   empty_msg=empty_result, indent=indent)
 
+    def status(self, detailed=False):
+        """
+        Return a status dictionary for the status of this package. When
+        detailed is True, the resulting dictionary will contain complete
+        override details. False provides only information on whether overrides
+        are possible or not.
+
+        This detail requires gathering package contents and thus is a more
+        heavy-weight call.
+        """
+        if detailed:
+            overrides         = len(self.override_files(simple=True))
+            expired_overrides = len(self.expired_override_files(simple=True))
+            unknown_overrides = len(self.unknown_override_files())
+        else:
+            overrides = 1 if self.has_possible_overrides() else 0
+            expired_overrides = unknown_overrides = overrides
+
+        return {
+            # Core info
+            "name": self.name,
+            "metadata": self.metadata,
+
+            # Installation Status
+            "is_shipped":   bool(self.shipped_path),
+            "is_installed": bool(self.installed_path),
+            "is_unpacked":  bool(self.unpacked_path),
+
+            # Extended status
+            "is_disabled":   self.is_disabled,
+            "is_dependency": self.is_dependency,
+
+            # Is this a complete override?
+            "is_complete_override":         self.has_possible_overrides(simple=False),
+            "is_complete_override_expired": bool(self.expired_override_files(simple=False)),
+
+            # Override information; may contain false positives if detailed is
+            # False
+            "overrides":         overrides,
+            "expired_overrides": expired_overrides,
+            "unknown_overrides": unknown_overrides
+        }
+
 
 ###----------------------------------------------------------------------------
 
@@ -707,6 +931,9 @@ class PackageList():
         self._shipped = self.__find_pkgs(PackageInfo.shipped_packages_path, name_list, shipped=True)
         self._installed = self.__find_pkgs(sublime.installed_packages_path(), name_list)
         self._unpacked = self.__find_pkgs(sublime.packages_path(), name_list, packed=False)
+
+        for pkg in self._list.values():
+            pkg._load_metadata()
 
     def package_counts(self):
         """
