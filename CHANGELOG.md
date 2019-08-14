@@ -3,6 +3,12 @@ OverrideAudit ChangeLog
 
 Version ?.?.? (????-??-??)
 --------------------------
+  * Fix a bug in which a package was only considered a dependency
+    if it was an unpacked package. The package control bootstrap
+    package 0_package_control_loader is an example of a dependency
+    that is packed, so detection has been altered to check if any
+    package is a dependency instead.
+
   * Loose files in an unpacked package that don't correspond to
     any files in an associated `sublime-package` file are now
     shown in override reports and bulk diffs annotated with `[?]`

@@ -364,16 +364,20 @@ class PackageInfo():
             if hasattr(self, "verify_name"):
                 self.__verify_pkg_name(filename)
 
+    def _check_if_depdendency(self):
+        """
+        See if this package represents a dependency or not; this requires that
+        all of the package files and the unpacked package path (if any) have
+        been set up first.
+        """
+        self.is_dependency = (
+            self.contains_file("dependency-metadata.json") or
+            self.contains_file(".sublime-dependency")
+            )
+
     def _add_path(self, pkg_path):
         if os.path.isdir(pkg_path):
             self.unpacked_path = pkg_path
-
-            # The second form is only for locally installed dependencies,
-            # e.g. for a dependency that is under development.
-            metadata = os.path.join(pkg_path, "dependency-metadata.json")
-            dev_metadata = os.path.join(pkg_path, ".sublime-dependency")
-            if os.path.isfile(metadata) or os.path.isfile(dev_metadata):
-                self.is_dependency = True
 
             if hasattr(self, "verify_name"):
                 self.__verify_pkg_name(pkg_path)
@@ -390,6 +394,10 @@ class PackageInfo():
         self._add_package(_pkg_scan(self.shipped_packages_path, pkg_filename), True)
         self._add_package(_pkg_scan(sublime.installed_packages_path(), pkg_filename, True))
         self._add_path(pkg_path)
+
+        # Now that package data is fully populated, check if we're a dep and
+        # then load our metadata.
+        self._check_if_depdendency()
         self._load_metadata()
 
     def __get_sublime_pkg_zip_list(self, pkg_filename):
@@ -933,7 +941,13 @@ class PackageList():
         self._unpacked = self.__find_pkgs(sublime.packages_path(), name_list, packed=False)
 
         for pkg in self._list.values():
+            # Check if the package is a dependency and then load it's metadata.
+            pkg._check_if_depdendency()
             pkg._load_metadata()
+
+            # Count it as a dependency
+            if pkg.is_dependency:
+                self._dependencies += 1
 
     def package_counts(self):
         """
@@ -1003,9 +1017,6 @@ class PackageList():
         pkg_path = os.path.join(path, name)
         pkg = self.__get_pkg(name)
         pkg._add_path(pkg_path)
-
-        if pkg.is_dependency:
-            self._dependencies += 1
 
     def __find_pkgs(self, location, name_list, packed=True, shipped=False):
         count = 0
