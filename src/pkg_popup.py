@@ -121,6 +121,13 @@ _css = """
         margin-top: -0.8rem;
     }
 
+    .url {
+        font-size: 0.8rem;
+        line-height: 0.8rem;
+        margin-top: -0.8rem;
+    }
+
+
     .metadata {
         font-size: 0.8rem;
         margin-bottom: 1rem;
@@ -205,6 +212,7 @@ def _popup_header(view, details):
     """
     metadata = details.get("metadata", {})
     version = metadata.get("version", "")
+    url = metadata.get("url", "")
 
     if version == "" and not details.get("is_shipped", False):
         version = "unknown version"
@@ -226,6 +234,7 @@ def _popup_header(view, details):
         <div class="{is_disabled}">This package is currently disabled</div>
         <div class="{is_dependency}">This package is a dependency library</div>
         <div class="{has_version}">Version: {version}</div>
+        <div class="{has_url}"><a href="{url}">{url}</a></div>
     """.format(
         name=name,
         is_complete="complete" if is_complete else "hidden",
@@ -233,7 +242,9 @@ def _popup_header(view, details):
         is_disabled="disabled" if is_disabled else "hidden",
         is_dependency="dependency" if is_dependency else "hidden",
         has_version="version" if version != '' else "hidden",
-        version=metadata.get("version", "Unknown")
+        version=version,
+        has_url="url" if url != '' else "hidden",
+        url=url
     )
 
 
@@ -397,6 +408,8 @@ def _popup_link(view, point, link_name, is_detailed):
     elif link_name.startswith("diff_report:"):
         package = link_name[len("diff_report:"):]
         view.window().run_command("override_audit_diff_report", {"package": package})
+    elif link_name.startswith("http"):
+        view.window().run_command("open_url", {"url": link_name})
 
     # We could use view.update_popup() instead, but when the content changes
     # size Sublime reads that as a mouse move and hides the popup instead.
