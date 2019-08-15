@@ -328,7 +328,7 @@ def diff_with_sublimerge(base_file, override_file):
 def revert_override(window, pkg_info, override):
     if oa_setting("confirm_revert"):
         target = override_display(os.path.join(pkg_info.name, override))
-        msg = "Confirm revert:\n\n".format(target)
+        msg = "Confirm revert:\n\n{}".format(target)
 
         if sublime.yes_no_cancel_dialog(msg) != sublime.DIALOG_YES:
             return
