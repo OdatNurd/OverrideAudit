@@ -2,6 +2,7 @@ import sublime
 import sublime_plugin
 
 from ..core import oa_syntax, oa_setting, decorate_pkg_name, log
+from ..core import get_ignore_unknown_patterns, filter_unknown_package_content
 from ..core import ReportGenerationThread
 from ...lib.packages import PackageList
 
@@ -29,6 +30,8 @@ class OverrideReportThread(ReportGenerationThread):
             title = "OverrideAudit: Override Report"
             report_type = ":overrides"
 
+        ignore_patterns = get_ignore_unknown_patterns()
+
         expired_pkgs = []
         unknown_files = {}
         packages = {}
@@ -42,7 +45,8 @@ class OverrideReportThread(ReportGenerationThread):
         for pkg_name, pkg_info in pkg_list:
             if pkg_name not in ignored:
                 if self._output_package(result, pkg_info, only_expired,
-                                        expired_pkgs, unknown_files):
+                                        expired_pkgs, unknown_files,
+                                        ignore_patterns):
                     packages[pkg_name] = pkg_info.status(detailed=True)
                     displayed += 1
 
@@ -60,15 +64,19 @@ class OverrideReportThread(ReportGenerationThread):
                             "override_audit_unknown_overrides": unknown_files
                           })
 
-    def _output_package(self, result, pkg_info, only_expired, expired_pkgs, unknown_files):
+    def _output_package(self, result, pkg_info, only_expired, expired_pkgs, unknown_files, ignore_patterns):
         shipped_override = pkg_info.has_possible_overrides(simple=False)
         normal_overrides = pkg_info.override_files(simple=True)
 
         expired_overrides = pkg_info.expired_override_files(simple=True)
         expired_pkg = bool(pkg_info.expired_override_files(simple=False))
 
-        pkg_files         = pkg_info.unpacked_contents()
         unknown_overrides = pkg_info.unknown_override_files()
+        pkg_files         = filter_unknown_package_content(
+                                pkg_info.unpacked_contents(),
+                                unknown_overrides,
+                                ignore_patterns
+                            )
 
         # No need to do anything if there are no overrides at all
         if not normal_overrides and not shipped_override and not unknown_overrides:
