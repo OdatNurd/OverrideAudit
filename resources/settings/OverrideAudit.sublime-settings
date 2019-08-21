@@ -99,5 +99,30 @@
     // In addition to all of the standard build variables, this also supports
     // the variables "$override" and "$base" to indicate the file names of the
     // two files respectively.
-    "external_diff": false
+    "external_diff": false,
+
+    // When generating an Override or Bulk Diff report, OverrideAudit can show
+    // you files that exist in the unpacked Packages folder that don't exist in
+    // the sublime-package file, which are known as "Unknown Overrides".
+    //
+    // This setting controls whether those files are displayed at all and, if
+    // they are, which should not be displayed due to not being interesting.
+    //
+    // Possible values:
+    //   true to never display any unknown overrides
+    //   false to always display every unknown override
+    //
+    // You may also set this to a list of regular expressions; in this case
+    // any unknown overrides that match one of the regular expressions will be
+    // hidden but others will remain. Expressions are always matched anchored
+    // at the start of the override name.
+    //
+    // The default value of this setting hides the contents of common VCS
+    // systems that may exist in an unpacked package directory that contains
+    // overrides.
+    "ignore_unknown_overrides": [
+        "\\.git/",
+        "\\.svn/",
+        "\\.hg/"
+    ]
 }
