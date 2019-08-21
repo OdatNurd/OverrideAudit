@@ -56,6 +56,11 @@ def loaded():
         "confirm_revert": True,
         "report_on_unignore": True,
         "external_diff": False,
+        "ignore_unknown_overrides": [
+            "^\\.git/",
+            "^\\.svn/",
+            "^\\.hg/"
+        ],
 
         # Inherits from user preferences
         "binary_file_patterns": None
