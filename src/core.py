@@ -13,6 +13,7 @@ import os
 import threading
 import subprocess
 import sys
+import re
 
 
 from ..lib.packages import PackageInfo, PackageList, PackageFileSet
@@ -132,6 +133,53 @@ def oa_can_diff_externally():
         return False
 
     return False
+
+
+def get_ignore_unknown_patterns():
+    """
+    Fetch the value of the setting that tells us what unknown overrides we
+    should ignore in reports. The regular expressions from the settings file
+    (if any) are compiled in the returned list.
+
+    When the setting is a boolean, the result is either an empty list or a list
+    with a regular expression that will match everything, depending on the
+    state of the boolean.
+    """
+    pattern_list = oa_setting("ignore_unknown_overrides")
+
+    # Only be case sensitive on Linux where the file system is case sensitive
+    re_opts = 0 if sublime.platform() == "linux" else re.IGNORECASE
+    patterns = []
+
+    if isinstance(pattern_list, bool):
+        return [re.compile(r'.')] if pattern_list else []
+
+    # Invalid regex patterns are ignored with a warning
+    for regex in pattern_list:
+        try:
+            patterns.append(re.compile(regex, re_opts))
+        except Exception as e:
+            log("Invalid ignore_unknown_overrides regex '%s': %s",
+                regex, str(e), status=True)
+
+    return patterns
+
+
+def filter_unknown_package_content(pkg_files, unknown_overrides, patterns):
+    """
+    Given a list of the entire unpacked contents of a package and a list of
+    overrides that are known to be unknown, return back a filtered copy of the
+    package contents in which the unknown overrides that match the patterns
+    provided are removed from the file list.
+    """
+    if pkg_files is None or unknown_overrides is None:
+        return pkg_files
+
+    # use re.match to do an implicit anchor at the start of the file name
+    filtered = {r for r in unknown_overrides
+                 if any(p.match(r) for p in patterns)}
+
+    return pkg_files - filtered
 
 
 def packages_with_overrides(pkg_list, name_list=None):
