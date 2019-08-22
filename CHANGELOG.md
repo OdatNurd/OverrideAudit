@@ -3,20 +3,10 @@ OverrideAudit ChangeLog
 
 Version ?.?.? (????-??-??)
 --------------------------
-  * Fix a bug in which a package was only considered a dependency
-    if it was an unpacked package. The package control bootstrap
-    package 0_package_control_loader is an example of a dependency
-    that is packed, so detection has been altered to check if any
-    package is a dependency instead.
-
-  * Loose files in an unpacked package that don't correspond to
-    any files in an associated `sublime-package` file are now
-    shown in override reports and bulk diffs annotated with `[?]`
-    to indicate that their status is unknown.
-
-  * Fix an issue where the temporary files created when an external
-    diff is performed might have different line endings than the
-    source file originally had.
+  * Include a new command to create an override; this works very
+    similarly to PackageResourceViewer, but is implemented
+    differently in that it works with mini_diff if you have that
+    turned on.
 
   * Include a new command to revert an existing override. This
     replaces the file with a freshly unpacked version of the
@@ -24,15 +14,27 @@ Version ?.?.? (????-??-??)
     whether the user gets asked to confirm this action before
     it is carried out.
 
-  * Include a new command to create an override; this works very
-    similarly to PackageResourceViewer, but is implemented
-    differently in that it works with mini_diff if you have that
-    turned on.
+  * Loose files in an unpacked package that don't correspond to
+    any files in an associated `sublime-package` file are now
+    shown in override reports and bulk diffs annotated with `[?]`
+    to indicate that their status is unknown. The new setting
+    `ignore_unknown_overrides` controls if this feature is enabled
+    or not and can be used to filter the list of unknown overrides
+    as needed.
 
   * Include hover popups for packages in reports. The popup gives
     more detailed package information, displays some help
     information on click, and can trigger reports as well.
 
+  * Fix a bug in which a package was only considered a dependency
+    if it was an unpacked package. The package control bootstrap
+    package 0_package_control_loader is an example of a dependency
+    that is packed, so detection has been altered to check if any
+    package is a dependency instead.
+
+  * Fix an issue where the temporary files created when an external
+    diff is performed might have different line endings than the
+    source file originally had.
 
 Version 2.0.0 (2019-03-14)
 --------------------------

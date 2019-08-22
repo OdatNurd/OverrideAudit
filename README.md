@@ -252,6 +252,20 @@ how to open the external diff. By default this setting is set to `false`,
 which causes the command to be hidden.
 
 
+### `OverrideAudit: Create Override` ###
+
+This command allows you to create a new override by prompting you for the
+package and resource to override. The prompt will display only packages that
+can contain an override (i.e. packages that are not represented by a
+`sublime-package` file are not eligible) and will only display package resources
+that are not already overridden.
+
+When a resource is selected, a new buffer is opened showing the contents of the
+underlying resource, allowing you to make any changes desired. The override is
+not created until you save the file, so you can close the tab at any point
+(even after making edits) without consequence.
+
+
 ### `OverrideAudit: Delete Override` ###
 
 This command is only available in the Command Palette while the current file is
@@ -519,6 +533,35 @@ and `$base` expand to the file names of the override and base files respectively
 for use in the command line.
 
 
+### `ignore_unknown_overrides`: Array or Boolean (Default: VCS directories) ###
+
+This setting controls whether unknown overrides are displayed in override or
+bulk diff reports, and can also control what unknown overrides are displayed
+and which are masked.
+
+A value of `true` indicates that no unknown override should ever be displayed
+in a report; this is how OverrideAudit behaved prior to this setting being
+introduced.
+
+A value of `false` indicates that every unknown override in every package
+should be displayed.
+
+The setting can also be set as an array of regular expressions; in this case
+the value is treated as a blend of both `true` and `false`; unknown overrides
+will be displayed, unless they match one of the regular expressions in the
+array.
+
+Regular expressions in the list match as if there is an implicit start of line
+anchor (`^`) present and are case sensitive or not based on the file system of
+the underlying operating system.
+
+The default value of the setting is a list of patterns that hides all files
+stored in a `git`, `subversion` or `mercurial` control directory.
+
+***NOTE:*** package resources are always represented using posix path separators
+(the `/` character).
+
+
 -------------------------------------------------------------------------------
 
 
@@ -641,7 +684,9 @@ unpacked package folder contains files that don't exist in the source
 
 Such files are not technically overrides (since they do not override anything)
 but OverrideAudit will display them in bulk diff and override reports in order
-to remind you that extraneous unknown files exist in the unpacked package.
+to remind you that extraneous unknown files exist in the unpacked package. The
+`ignore_unknown_overrides` setting can be used to adjust the display of unknown
+overrides.
 
 
 -------------------------------------------------------------------------------
