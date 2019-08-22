@@ -309,13 +309,16 @@ def _override_details(view, details):
     has_overrides = details["overrides"] > 0
     has_expired = details["expired_overrides"] > 0
     has_unknown = details["unknown_overrides"] > 0
+    has_filtered = details["unknowns_filtered"] > 0
 
     return """
         <div class="{override_class}">
             {overrides} overridden package resources
             <span class="{expired_class}">({expired} potentially expired)</span>
             <br>
-            <span class="{unknown_class}"> {unknown} unpacked resources not in the source package </span>
+            <span class="{unknown_class}"> {unknown} unpacked resources not in the source package
+                <span class={filtered_class}> ({filtered} being filtered)</span>
+            </span>
             <br>
             <span class="help">[<a href="diff_report:{pkg}">View Differences</a>]</span>
         </div>
@@ -328,7 +331,10 @@ def _override_details(view, details):
             expired=details["expired_overrides"],
 
             unknown_class="overrides" if has_unknown else "hidden",
-            unknown=details["unknown_overrides"])
+            unknown=details["unknown_overrides"],
+
+            filtered_class="filtered" if has_filtered else "hidden",
+            filtered=details["unknowns_filtered"])
 
 
 def _popup_footer(view, details):

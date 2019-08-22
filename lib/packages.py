@@ -322,6 +322,7 @@ class PackageInfo():
         self.overrides = dict()
         self.expired_overrides = dict()
         self.unknown_overrides = None
+        self.unknowns_filtered = 0
 
         self.binary_patterns = settings.get("binary_file_patterns", [])
 
@@ -721,6 +722,32 @@ class PackageInfo():
         self.unknown_overrides = over_list - base_list
         return self.unknown_overrides
 
+    def unpacked_contents_unknown_filtered(self, patterns):
+        """
+        This performs the same basic operation as unpacked_contents() does, but
+        the list of returned files is filtered such that any package contents
+        that appear in unknown_override_files() and also match one of the
+        patterns in the provided pattern list are removed prior to the return.
+
+        The value of this call is not cached; it also updates the internal
+        state on the number of unknown overrides that have been ignored, which
+        is reflected in the call to status().
+        """
+        self.unknowns_filtered = 0
+        pkg_files = self.unpacked_contents()
+        if pkg_files is None:
+            return None
+
+        unknown_overrides = self.unknown_override_files()
+
+        # use re.match to do an implicit anchor at the start of the file name
+        filtered = {r for r in unknown_overrides
+                     if any(p.match(r) for p in patterns)}
+
+        self.unknowns_filtered = len(filtered)
+
+        return pkg_files - filtered
+
     def expired_override_files(self, simple=True):
         """
         Get a list of all overridden files for this package which are older
@@ -903,7 +930,8 @@ class PackageInfo():
             # False
             "overrides":         overrides,
             "expired_overrides": expired_overrides,
-            "unknown_overrides": unknown_overrides
+            "unknown_overrides": unknown_overrides,
+            "unknowns_filtered": self.unknowns_filtered
         }
 
 

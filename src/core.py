@@ -165,23 +165,6 @@ def get_ignore_unknown_patterns():
     return patterns
 
 
-def filter_unknown_package_content(pkg_files, unknown_overrides, patterns):
-    """
-    Given a list of the entire unpacked contents of a package and a list of
-    overrides that are known to be unknown, return back a filtered copy of the
-    package contents in which the unknown overrides that match the patterns
-    provided are removed from the file list.
-    """
-    if pkg_files is None or unknown_overrides is None:
-        return pkg_files
-
-    # use re.match to do an implicit anchor at the start of the file name
-    filtered = {r for r in unknown_overrides
-                 if any(p.match(r) for p in patterns)}
-
-    return pkg_files - filtered
-
-
 def packages_with_overrides(pkg_list, name_list=None):
     """
     Collect a list of package names from the given package list for which there

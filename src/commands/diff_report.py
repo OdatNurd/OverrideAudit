@@ -2,7 +2,7 @@ import sublime
 import sublime_plugin
 
 from ..core import oa_syntax, oa_setting, decorate_pkg_name, log
-from ..core import get_ignore_unknown_patterns, filter_unknown_package_content
+from ..core import get_ignore_unknown_patterns
 from ..core import packages_with_overrides, ReportGenerationThread
 from ...lib.packages import PackageList, OverrideDiffResult
 
@@ -64,7 +64,6 @@ class BulkDiffReportThread(ReportGenerationThread):
 
         for name in names:
             pkg_info = pkg_list[name]
-            packages[name] = pkg_info.status(detailed=True)
 
             if binary_patterns is not None:
                 pkg_info.set_binary_pattern(binary_patterns)
@@ -72,6 +71,8 @@ class BulkDiffReportThread(ReportGenerationThread):
             result.append(decorate_pkg_name(pkg_info))
             self._perform_diff(pkg_info, context_lines, result,
                                expired_pkgs, unknown_files, ignore_patterns)
+
+            packages[name] = pkg_info.status(detailed=True)
 
         self._set_content(title, result, report_type, oa_syntax("OA-Diff"),
                           {
@@ -84,11 +85,7 @@ class BulkDiffReportThread(ReportGenerationThread):
         override_list = pkg_info.override_files(simple=True)
         expired_list = pkg_info.expired_override_files(simple=True)
         unknown_overrides = pkg_info.unknown_override_files()
-        pkg_files = filter_unknown_package_content(
-                        pkg_info.unpacked_contents(),
-                        unknown_overrides,
-                        ignore_patterns
-                    )
+        pkg_files = pkg_info.unpacked_contents_unknown_filtered(ignore_patterns)
 
         empty_diff_hdr = oa_setting("diff_empty_hdr")
 
