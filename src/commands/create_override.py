@@ -25,7 +25,7 @@ class OverrideAuditCreateOverrideCommand(sublime_plugin.WindowCommand):
         if package is None or file is None:
             return PackageResourceBrowser(package, file, self.window,
                 ResourceType.NONOVERRIDE, unknown=False,
-                p_filter=lambda p: bool(p.package_file()),
+                p_filter=lambda p: bool(p.package_file()) and not p.is_disabled,
                 on_done=lambda p,r: self.pick(p, r)).browse()
 
         # Open normally if an unpacked copy exists; fallback for manual calls
