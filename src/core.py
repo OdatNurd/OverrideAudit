@@ -62,6 +62,7 @@ def loaded():
             "^\\.svn/",
             "^\\.hg/"
         ],
+        "mini_diff_underlying": True,
 
         # Inherits from user preferences
         "binary_file_patterns": None
@@ -475,7 +476,7 @@ def setup_new_override_view(view, reposition=True):
     view.set_read_only(False)
 
     # Sublime turns off mini_diff for packed files that it opens.
-    if mini_diff:
+    if mini_diff is True:
         view.settings().set("mini_diff", mini_diff)
         reference_doc = view.substr(sublime.Region(0, len(view)))
         view.set_reference_document(reference_doc)
