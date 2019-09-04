@@ -12,6 +12,7 @@ from .diff_report import OverrideAuditDiffReportCommand
 from .diff_single import OverrideAuditDiffSingleCommand
 from .toggle_override import OverrideAuditToggleOverrideCommand
 from .create_override import OverrideAuditCreateOverrideCommand
+from .context_create_override import OverrideAuditContextCreateOverrideCommand
 from .diff_override import OverrideAuditDiffOverrideCommand
 from .revert_override import OverrideAuditRevertOverrideCommand
 from .diff_externally import OverrideAuditDiffExternallyCommand
@@ -33,6 +34,7 @@ __all__ = [
     # Override commands
     "OverrideAuditToggleOverrideCommand",
     "OverrideAuditCreateOverrideCommand",
+    "OverrideAuditContextCreateOverrideCommand",
     "OverrideAuditDiffOverrideCommand",
     "OverrideAuditDiffExternallyCommand",
     "OverrideAuditRevertOverrideCommand",
