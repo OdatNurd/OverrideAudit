@@ -450,6 +450,37 @@ def delete_packed_override(filename):
         log("Error deleting '%s'", filename)
 
 
+def setup_new_override_view(view, reposition=True):
+    """
+    Given a view that represents a potential new override, set it up so that
+    our event handler will create an override on save. This presumes that the
+    view passed in is read-only; it will be marked as non-read-only once it is
+    finished loading. If the mini_diff setting is turned on, the reference
+    document will be set to the content of the buffer when this is called.
+
+    When reposition is True, the cursor is jumped to the start of the file, as
+    if the user just opened it from disk. Otherwise the cursor is left wherever
+    it was in the view to begin with.
+    """
+    view.settings().set("_oa_is_new_override", True)
+    if view.is_loading():
+        return sublime.set_timeout(lambda: setup_new_override_view(view), 10)
+
+    settings = sublime.load_settings("Preferences.sublime-settings")
+    mini_diff = settings.get("mini_diff")
+
+    # File is left as a scratch buffer until the first modification
+    if reposition:
+        view.run_command("move_to", {"to": "bof"})
+    view.set_read_only(False)
+
+    # Sublime turns off mini_diff for packed files that it opens.
+    if mini_diff:
+        view.settings().set("mini_diff", mini_diff)
+        reference_doc = view.substr(sublime.Region(0, len(view)))
+        view.set_reference_document(reference_doc)
+
+
 ###----------------------------------------------------------------------------
 
 
