@@ -2,6 +2,7 @@
     { "caption": "-" },
 
     // Core override operations
+    { "command": "override_audit_context_create_override", "args": { "always_visible": false}},
     { "command": "override_audit_edit_override" , "args": { "always_visible": false }},
     { "command": "override_audit_diff_override" , "args": { "always_visible": false }},
     { "command": "override_audit_revert_override" , "args": { "always_visible": false }},
