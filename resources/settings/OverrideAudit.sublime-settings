@@ -124,5 +124,18 @@
         "\\.git/",
         "\\.svn/",
         "\\.hg/"
-    ]
+    ],
+
+    // When editing an override, OverrideAudit can use the Sublime mini_diff
+    // functionality to show in the gutter how the override is different from
+    // the underlying package file.
+    //
+    // When enabled, every time an override is loaded or saved the mini_diff is
+    // updated to show how the file content differs from the packed version of
+    // the file. When disabled, standard mini_diff functionality is used, which
+    // tracks the state of the buffer since it was originally loaded.
+    //
+    // This setting only has an effect when the mini_diff setting in your User
+    // preferences is set to True.
+    "mini_diff_underlying": true
 }

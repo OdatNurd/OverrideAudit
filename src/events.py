@@ -3,7 +3,7 @@ import sublime_plugin
 import os
 
 from .pkg_popup import show_pkg_popup
-from .core import override_group, delete_packed_override
+from .core import oa_setting, override_group, delete_packed_override
 from ..lib.packages import check_potential_override
 
 
@@ -21,9 +21,16 @@ class OverrideAuditEventListener(sublime_plugin.EventListener):
         if filename is None or not os.path.isfile(filename):
             return
 
-        result = check_potential_override(filename, deep=True)
+        settings = sublime.load_settings("Preferences.sublime-settings")
+        mini_diff = settings.get("mini_diff")
+
+        mini_diff_underlying = oa_setting("mini_diff_underlying") and mini_diff is True
+
+        result = check_potential_override(filename, deep=True, get_content=mini_diff_underlying)
         if result is not None:
             override_group.apply(view, result[0], result[1], False)
+            if result[2] is not None:
+                view.set_reference_document(result[2])
         else:
             override_group.remove(view)
 
@@ -41,7 +48,6 @@ class OverrideAuditEventListener(sublime_plugin.EventListener):
         tmp_base = view.settings().get("_oa_ext_diff_base", None)
         if tmp_base is not None:
             delete_packed_override(tmp_base)
-
 
     def on_hover(self, view, point, hover_zone):
         if hover_zone != sublime.HOVER_TEXT:
