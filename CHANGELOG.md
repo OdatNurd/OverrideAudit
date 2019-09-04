@@ -4,9 +4,15 @@ OverrideAudit ChangeLog
 Version ?.?.? (????-??-??)
 --------------------------
   * Include a new command to create an override; this works very
-    similarly to PackageResourceViewer, but is implemented
-    differently in that it works with mini_diff if you have that
-    turned on.
+    similarly to PackageResourceViewer. This is also available as
+    a context menu item on buffers opened via `View Package Files`
+    in the command palette.
+
+  * New setting `mini_diff_underlying` (default: `true`) that makes
+    OverrideAudit set up the gutter mini diff functionality to track
+    the underlying package file if you have `mini_diff` enabled in
+    your user preferences. This allows you to jump between changes,
+    see diff hunks, and make reverts using native functionality.
 
   * Include a new command to revert an existing override. This
     replaces the file with a freshly unpacked version of the

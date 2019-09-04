@@ -265,6 +265,11 @@ underlying resource, allowing you to make any changes desired. The override is
 not created until you save the file, so you can close the tab at any point
 (even after making edits) without consequence.
 
+This command is also available as a context menu item for any file tab opened
+by the `View Package File` command in the command palette. This allows you to
+promote a resource you're viewing into a resource easily. As above, the override
+is not created until you save the resulting file the first time.
+
 
 ### `OverrideAudit: Delete Override` ###
 
@@ -458,6 +463,25 @@ This option has no effect for a buffer with unsaved changes that represents a
 file that no longer exists on disk (i.e. you have opened the override and then
 deleted it) to ensure that you don't accidentally resurrect a deleted file by
 saving it again.
+
+
+### `mini_diff_underlying`: true/false (Default: true) ###
+
+This setting controls how the Sublime Text `mini_diff` functionality interacts
+with your overrides when you're editing them (including when they are initially
+created by the `Create Override` command).
+
+When enabled, while editing an override the file that Sublime uses to calculate
+the diff indicators in the gutter will be set to the unpacked version of the
+override you're working on.
+
+This allows you to use the internal Sublime functionality for jumping between
+changes to easily navigate your override, including showing you inline diff
+hunks of each change and allowing you to revert changes.
+
+This setting requires the `mini_diff` setting to be set to  `true` in your
+`Preferences.sublime-settings` file; when set to `false` or `"auto"` the
+`mini_diff_underlying` setting has no effect.
 
 
 ### `confirm_deletion` : true/false (Default: true) ###
