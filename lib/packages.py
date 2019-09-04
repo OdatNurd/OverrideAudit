@@ -143,7 +143,7 @@ def override_display(override_file, pkg_name=None):
     return _fixPath(override_file)
 
 
-def check_potential_override(filename, deep=False):
+def check_potential_override(filename, deep=False, get_content=False):
     """
     Given a filename path, check and see if this could conceivably be a
     reference to an override; i.e. that there is a shipped or installed
@@ -152,6 +152,10 @@ def check_potential_override(filename, deep=False):
     When deep is False, this only checks that the file could potentially be
     an override. Set deep to True to actually look inside of the package
     itself to see if this really represents an override or not.
+
+    When get_content is True and the filename represents an override, the
+    returned tuple will also contain as a third element the unpacked content
+    of the override; this requires deep to be set to True.
 
     The filename provided must be either absolute(and point to the Packages
     path) or relative (in which case it is assumed to point there).
@@ -180,12 +184,23 @@ def check_potential_override(filename, deep=False):
         # sublime-package would represent the override path internally.
         override = "/".join(parts[1:])
         if not deep:
-            return (pkg_name, override)
+            return (pkg_name, override, None)
 
         try:
             with zipfile.ZipFile(installed or shipped) as zFile:
                 info = find_zip_entry(zFile, override)
-                return (pkg_name, info.filename)
+
+                content = None
+                if get_content:
+                    # Make a stub PackageInfo with enough members filled out to
+                    # fetch the appropriate content.
+                    p_info = PackageInfo(pkg_name, scan=False)
+                    p_info.shipped_path = shipped
+                    p_info.installed_path = installed
+
+                    content = p_info.packed_override_contents(info.filename, as_list=False)[1]
+
+                return (pkg_name, info.filename, content)
         except:
             pass
 
