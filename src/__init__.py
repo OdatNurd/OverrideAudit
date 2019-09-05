@@ -7,7 +7,6 @@ from . import core
 from .core import *
 from .events import *
 from .contexts import *
-from .settings_proxy import *
 from .commands import *
 
 __all__ = [
@@ -16,10 +15,6 @@ __all__ = [
 
     # browse
     "browse",
-
-    # settings_proxy
-    "OverrideAuditOpenFileCommand",
-    "OverrideAuditEditSettingsCommand",
 
     # events/contexts
     "OverrideAuditEventListener",
