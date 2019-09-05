@@ -212,6 +212,10 @@ and `diff_unchanged` settings and operates as if they are set to `true`, `true`
 and `diff` respectively in order to ensure that you don't end up with a large
 number of duplicate views.
 
+In Override edit views, the `mini_diff_underlying` setting can be used to set
+the diff indicators in the buffer to diff against the underlying package file
+being overridden instead of the file as it appears on disk.
+
 
 ## `OverrideAudit: Revert Current Override` ###
 
@@ -254,21 +258,37 @@ which causes the command to be hidden.
 
 ### `OverrideAudit: Create Override` ###
 
-This command allows you to create a new override by prompting you for the
-package and resource to override. The prompt will display only packages that
-can contain an override (i.e. packages that are not represented by a
-`sublime-package` file are not eligible) and will only display package resources
-that are not already overridden.
+This command is available from the main menu and command palette and allows you
+to create a new override by by prompting you for the package and resource to
+override. The prompt will display only packages that can contain an override
+(i.e. packages that are not represented by a `sublime-package` file or which
+are currently in the `ignored_packages` list are not eligible) and will only
+display package resources that are not already overridden.
 
 When a resource is selected, a new buffer is opened showing the contents of the
 underlying resource, allowing you to make any changes desired. The override is
 not created until you save the file, so you can close the tab at any point
 (even after making edits) without consequence.
 
-This command is also available as a context menu item for any file tab opened
-by the `View Package File` command in the command palette. This allows you to
-promote a resource you're viewing into a resource easily. As above, the override
-is not created until you save the resulting file the first time.
+When the buffer is saved for the first time, OverrideAudit will ensure that the
+correct file structure under the `Packages` folder is created and place the new
+override at the correct location.
+
+The `mini_diff_underlying` setting can be used to set up the diff markers in the
+gutter to diff against the base package file, allowing you to more easily track
+your changes.
+
+
+### `OverrideAudit: Override Current Resource` ###
+
+This command is available from the main menu and the command palette whenever
+the current view represents a package resource that has been opened via the
+Sublime Text `View Package File` command in the command palette.
+
+This command immediately promotes the current buffer to a potential new
+override as if you used the `OverrideAudit: Create Override` command and
+selected the appropriate package and resource. As with that command, the
+override is not created until you save for the first time.
 
 
 ### `OverrideAudit: Delete Override` ###

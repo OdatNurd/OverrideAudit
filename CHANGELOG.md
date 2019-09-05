@@ -3,22 +3,22 @@ OverrideAudit ChangeLog
 
 Version ?.?.? (????-??-??)
 --------------------------
-  * Include a new command to create an override; this works very
-    similarly to PackageResourceViewer. This is also available as
-    a context menu item on buffers opened via `View Package Files`
-    in the command palette.
+  * New command to create an override or promote a view opened
+    by `View Package File` to a potential new override. Both are
+    available from the main menu and the command palette as
+    appropriate.
 
-  * New setting `mini_diff_underlying` (default: `true`) that makes
-    OverrideAudit set up the gutter mini diff functionality to track
-    the underlying package file if you have `mini_diff` enabled in
-    your user preferences. This allows you to jump between changes,
-    see diff hunks, and make reverts using native functionality.
+  * New setting `mini_diff_underlying` (default: `true`) that
+    sets the mini diff functionality in override edit views to
+    diff against the underlying package file instead of the file
+    on disk. Requires `mini_diff` to be enabled in your user
+    preferences.
 
-  * Include a new command to revert an existing override. This
-    replaces the file with a freshly unpacked version of the
-    underlying file. The new setting `confirm_revert` controls
-    whether the user gets asked to confirm this action before
-    it is carried out.
+  * New command to revert an existing override. This replaces
+    the file with a freshly unpacked version of the underlying
+    file. The new setting `confirm_revert` controls whether the
+    user gets asked to confirm this action before it is carried
+    out.
 
   * Loose files in an unpacked package that don't correspond to
     any files in an associated `sublime-package` file are now

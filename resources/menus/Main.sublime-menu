@@ -7,11 +7,14 @@
                 "caption": "OverrideAudit",
                 "children":
                 [
+                    { "caption": "Create Override…", "command": "override_audit_create_override"},
+                    { "caption": "Override Current Resource", "command": "override_audit_context_create_override"},
+                    { "caption": "-" },
                     { "caption": "Package Report", "command": "override_audit_package_report"},
                     { "caption": "Override Report", "command": "override_audit_override_report"},
                     { "caption": "Override Report (Only expired)", "command": "override_audit_override_report", "args": {"only_expired": true}},
-                    { "caption": "Diff Single Override...", "command": "override_audit_diff_single"},
-                    { "caption": "Bulk Diff: Single Package...", "command": "override_audit_diff_single", "args": {"bulk": true}},
+                    { "caption": "Diff Single Override…", "command": "override_audit_diff_single"},
+                    { "caption": "Bulk Diff: Single Package…", "command": "override_audit_diff_single", "args": {"bulk": true}},
                     { "caption": "Bulk Diff: All Packages", "command": "override_audit_diff_report"},
                     { "caption": "Refresh Current Report", "command": "override_audit_refresh_report"},
                     { "caption": "Swap Diff/Edit of Current Override", "command": "override_audit_toggle_override"},
