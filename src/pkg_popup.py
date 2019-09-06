@@ -2,16 +2,18 @@ import sublime
 import sublime_plugin
 import os
 
-from .core import override_group, delete_packed_override
-from ..lib.packages import check_potential_override
-
 
 ###----------------------------------------------------------------------------
 
 
+# Help information available in popups via [?] links; the help is stored based
+# on the link name associated with it.
+#
+# Each topic may contain {pkg} to reference the name of the package being
+# displayed in the popup.
 _help = {
-    # Help description of what a complete override is; this is linked from the
-    # caption of the popup for packages that are complete overrides.
+    # Description for complete overrides; linked from the popup caption for
+    # complete overrides.
     "complete_override":
     """
     <h1>{pkg}</h1>
@@ -27,24 +29,25 @@ _help = {
             package is <span class="complete">Completely</span> ignored.
         </p><p>
             When the header of the popup also mentions that the package is
-            <span class="expired">Expired</span>, the underlying <em>Shipped</em>
-            package has been updated; in this case the override may be masking
-            new features or bug fixes.
+            <span class="expired">Expired</span>, the underlying
+            <em>Shipped</em> package has been updated; in this case the
+            override may be masking new features or bug fixes from the
+            <em>Shipped</em> version of the package.
         </p>
     </div>
     <a href="pkg:{pkg}">Back</a>
     """,
 
-    # Help for why it's not possible for the current package to contain any
-    # overrides
+    # Description of why it's not possible for a package to contain any
+    # overrides.
     "no_override":
     """
     <h1>{pkg}</h1>
     <div class="help_text">
         <p>
-            In order for a package to support overridden package resources,
-            it must be represented by both a <b>sublime-package</b> file
-            (either <em>Shipped</em> or in the <em>Installed Packages</em>
+            In order for a package to support overridden resources, it must be
+            represented by both a <b>sublime-package</b> file (either
+            <em>Shipped</em> with Sublime or in the <em>Installed Packages</em>
             folder) as well as being represented in the unpacked
             <em>Packages</em> folder.
         </p><p>
@@ -61,6 +64,9 @@ _help = {
 ###----------------------------------------------------------------------------
 
 
+# The overall style sheet used for the package popups. The colors defined here
+# all come from the current color scheme by using the var() syntax to pull the
+# closest color available.
 _css = """
     body {
         font-family: system;
@@ -127,7 +133,6 @@ _css = """
         margin-top: -0.8rem;
     }
 
-
     .metadata {
         font-size: 0.8rem;
         margin-bottom: 1rem;
@@ -158,7 +163,8 @@ _css = """
     }
 """
 
-
+# The overal HTML layout of the minihtml that makes up the popup. This will be
+# filled out with generated data based on the current package.
 _pkg_popup = """
     <body id="overrideaudit-package-popup">
         <style>
@@ -167,6 +173,18 @@ _pkg_popup = """
         {body}
     </body>
 """
+
+
+###----------------------------------------------------------------------------
+
+
+# Pick a CSS class based on the value provided; the default value for a False
+# value is autoselected for clarity but can be specified as desired.
+_class = lambda v, avail, missing="hidden": avail if v else missing
+
+# Choose between a singular and a plural based on the value provided; for the
+# ultimate in pedantism. The most common values default.
+_p = lambda v, one="resource", many="resources": one if v == 1 else many
 
 
 ###----------------------------------------------------------------------------
@@ -237,13 +255,13 @@ def _popup_header(view, details):
         <div class="{has_url}"><a href="{url}">{url}</a></div>
     """.format(
         name=name,
-        is_complete="complete" if is_complete else "hidden",
-        is_complete_expired="expired" if is_expired else "hidden",
-        is_disabled="disabled" if is_disabled else "hidden",
-        is_dependency="dependency" if is_dependency else "hidden",
-        has_version="version" if version != '' else "hidden",
+        is_complete=_class(is_complete, "complete"),
+        is_complete_expired=_class(is_expired, "expired"),
+        is_disabled=_class(is_disabled, "disabled"),
+        is_dependency=_class(is_dependency, "dependency"),
+        has_version=_class(version != '', "version"),
         version=version,
-        has_url="url" if url != '' else "hidden",
+        has_url=_class(url != '', "url"),
         url=url
     )
 
@@ -274,7 +292,7 @@ def _metadata(view, details):
     </div>
     """.format(
         description=metadata.get("description", "No description provided"),
-        has_deps="depends" if is_dep or dep_list else "hidden",
+        has_deps=_class(is_dep or dep_list, "depends"),
         title=title,
         dependencies=dependencies
         )
@@ -288,7 +306,7 @@ def _can_have_overrides(view, details):
     if details["overrides"]:
         return """
         <div class="overrides">
-        This package may contain overridden package resources; to check, view
+        This package might contain overridden package resources; to check, view
         the <a href="override_report">override report</a>.
         </div>
         """
@@ -313,10 +331,10 @@ def _override_details(view, details):
 
     return """
         <div class="{override_class}">
-            {overrides} overridden package resources
-            <span class="{expired_class}">({expired} potentially expired)</span>
+            {overrides} overridden package {o_desc}
+            <span class="{expired_class}">({expired} expired)</span>
             <br>
-            <span class="{unknown_class}"> {unknown} unpacked resources not in the source package
+            <span class="{unknown_class}"> {unknown} unpacked {u_desc} not present in the source package
                 <span class={filtered_class}> ({filtered} being filtered)</span>
             </span>
             <br>
@@ -324,16 +342,18 @@ def _override_details(view, details):
         </div>
         """.format(
             pkg=details["name"],
-            override_class="overrides" if has_overrides else "hidden",
+            override_class=_class(has_overrides, "overrides"),
             overrides=details["overrides"],
+            o_desc=_p(details["overrides"]),
 
-            expired_class="has_expired" if has_expired else "hidden",
+            expired_class=_class(has_expired, "has_expired"),
             expired=details["expired_overrides"],
 
-            unknown_class="overrides" if has_unknown else "hidden",
+            unknown_class=_class(has_unknown, "overrides"),
             unknown=details["unknown_overrides"],
+            u_desc=_p(details["unknown_overrides"]),
 
-            filtered_class="filtered" if has_filtered else "hidden",
+            filtered_class=_class(has_filtered, "filtered"),
             filtered=details["unknowns_filtered"])
 
 
