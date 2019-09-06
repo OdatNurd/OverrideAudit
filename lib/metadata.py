@@ -33,168 +33,198 @@ _shipped_metadata = {
     # "Special" packages; these packages have a purpose other than to provide
     # support for a particular language.
     "Default": {
-        "description": "Provides core Sublime Text functionality"
+        "description": """
+        Default Sublime Text functionality that is not provided by the
+        underlying application core
+        """
     },
     "Theme - Default": {
-        "description": "Provides the Default and Adaptive application themes for Sublime Text 3"
+        "description": """
+        Default and Adaptive application themes for Sublime Text 3
+        """
     },
     "Color Scheme - Default": {
-        "description": "Default color schemes that ship with Sublime Text 3"
+        "description": """
+        Default color schemes that ship with Sublime Text 3
+        """
     },
     "Color Scheme - Legacy": {
-        "description": "Legacy color schemes; these used to ship with older versions of Sublime Text but have been officially deprecated"
+        "description": """
+        Legacy color schemes; these used to be in <em><b>Color Scheme -
+        Default</b></em> in older versions of Sublime Text but have now been
+        officially deprecated. Color schemes in this package may not take
+        advantage of new syntax highlighting improvements
+        """
     },
     "Language - English": {
-        "description": "Provides spell checking dictionaries for the English language"
+        "description": """
+        Provides tspell checking dictionaries for the English language
+        """
     },
 
     # This package is "special" but does not directly ship with Sublime and
     # instead is automatically created at first startup.
     "User": {
-        "description": "Your User-specific key bindings, preferences and plugins"
+        "description": """
+        Your User-specific key bindings, preferences and plugins are stored
+        in this package. Packages you have installed may also store other data
+        here as well.
+        """
     },
 
 
     # These packages ship with Sublime and provide language support (syntax,
     # completions, etc) for core languages and file types.
     "ActionScript": {
-        "description": "Default language support for ActionScript"
+        "description": "Support for working with ActionScript"
     },
     "AppleScript": {
-        "description": "Default language support for AppleScript"
+        "description": "Support for working with AppleScript"
     },
     "ASP": {
-        "description": "Default language support for ASP"
+        "description": "Support for working with ASP"
     },
     "Batch File": {
-        "description": "Default language support for Batch Files"
+        "description": "Support for working with Batch Files"
     },
     "C#": {
-        "description": "Default language support for C#"
+        "description": "Support for working with C#"
     },
     "C++": {
-        "description": "Default language support for C++"
+        "description": "Support for working with C and C++"
     },
     "Clojure": {
-        "description": "Default language support for Clojure"
+        "description": "Support for working with Clojure"
     },
     "CSS": {
-        "description": "Default language support for CSS"
+        "description": "Support for working with CSS"
     },
     "D": {
-        "description": "Default language support for D"
+        "description": "Support for working with D"
     },
     "Diff": {
-        "description": "Default language support for Diff"
+        "description": "Support for comparing files via the side bar"
     },
     "Erlang": {
-        "description": "Default language support for Erlang"
+        "description": "Support for working with Erlang"
     },
     "Git Formats": {
-        "description": "Default language support for <em><b>git</b></em> files and output (commit messages, logs, etc)"
+        "description": """
+        Support for working with <em><b>git</b></em> files and output (commit
+        messages, logs, etc)
+        """
     },
     "Go": {
-        "description": "Default language support for Go"
+        "description": "Support for working with Go"
     },
     "Graphviz": {
-        "description": "Default language support for Graphviz"
+        "description": "Support for working with Graphviz"
     },
     "Groovy": {
-        "description": "Default language support for Groovy"
+        "description": "Support for working with Groovy"
     },
     "Haskell": {
-        "description": "Default language support for Haskell"
+        "description": "Support for working with Haskell"
     },
     "HTML": {
-        "description": "Default language support for HTML"
+        "description": "Support for working with HTML"
     },
     "Java": {
-        "description": "Default language support for Java"
+        "description": "Support for working with Java"
     },
     "JavaScript": {
-        "description": "Default language support for JavaScript"
+        "description": "Support for working with JavaScript"
     },
     "LaTeX": {
-        "description": "Default language support for LaTeX"
+        "description": "Support for working with LaTeX"
     },
     "Lisp": {
-        "description": "Default language support for Lisp"
+        "description": "Support for working with Lisp"
     },
     "Lua": {
-        "description": "Default language support for Lua"
+        "description": "Support for working with Lua"
     },
     "Makefile": {
-        "description": "Default language support for Makefile"
+        "description": """
+        Support for working with <em><b>make</b></em> and Makefiles
+        """
     },
     "Markdown": {
-        "description": "Default language support for Markdown"
+        "description": "Support for working with Markdown"
     },
     "Matlab": {
-        "description": "Default language support for Matlab"
+        "description": "Support for working with Matlab"
     },
     "Objective-C": {
-        "description": "Default language support for Objective-C"
+        "description": "Support for working with Objective-C and Objective-C++"
     },
     "OCaml": {
-        "description": "Default language support for OCaml"
+        "description": "Support for working with OCaml"
     },
     "Pascal": {
-        "description": "Default language support for Pascal"
+        "description": "Support for working with Pascal"
     },
     "Perl": {
-        "description": "Default language support for Perl"
+        "description": "Support for working with Perl"
     },
     "PHP": {
-        "description": "Default language support for PHP"
+        "description": "Support for working with PHP"
     },
     "Python": {
-        "description": "Default language support for Python"
+        "description": "Support for working with Python"
     },
     "R": {
-        "description": "Default language support for R"
+        "description": "Support for working with R"
     },
     "Rails": {
-        "description": "Default language support for Rails"
+        "description": "Support for working with Rails"
     },
     "Regular Expressions": {
-        "description": "Syntax highlighting support for <em><b>PCRE</b></em> regular expressions for use in some languages and Sublime Text find panels"
+        "description": """
+        Syntax highlighting support for <em><b>PCRE</b></em> regular
+        expressions. This is used in Sublime Text find panels as well as in
+        some of the language packages that also ship with Sublime.
+        """
     },
     "RestructuredText": {
-        "description": "Default language support for RestructuredText"
+        "description": "Support for working with RestructuredText"
     },
     "Ruby": {
-        "description": "Default language support for Ruby"
+        "description": "Support for working with Ruby"
     },
     "Rust": {
-        "description": "Default language support for Rust"
+        "description": "Support for working with Rust"
     },
     "Scala": {
-        "description": "Default language support for Scala"
+        "description": "Support for working with Scala"
     },
     "ShellScript": {
-        "description": "Default language support for ShellScript"
+        "description": """
+        Support for working with shell scripts (<em><b>generic</b></em> as well
+        as <em><b>bash</b></em>)
+        """
     },
     "SQL": {
-        "description": "Default language support for SQL"
+        "description": "Support for working with SQL"
     },
     "TCL": {
-        "description": "Default language support for TCL"
+        "description": "Support for working with TCL"
     },
     "Text": {
-        "description": "Default language support for Plain Text files"
+        "description": "Support for working with Plain Text files"
     },
     "Textile": {
-        "description": "Default language support for Textile"
+        "description": "Support for working with Textile"
     },
     "Vintage": {
         "description": "<b><em>vi</em></b> mode editing package for Sublime Text 3",
         "url": "https://github.com/sublimehq/Vintage"
     },
     "XML": {
-        "description": "Default language support for XML"
+        "description": "Support for working with XML"
     },
     "YAML": {
-        "description": "Default language support for YAML"
+        "description": "Support for working with YAML"
     }
 }
 
