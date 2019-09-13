@@ -63,6 +63,8 @@ def loaded():
             "^\\.hg/"
         ],
         "mini_diff_underlying": True,
+        # This is currently undocumented and may go away in the future.
+        "enable_hover_popup": True,
 
         # Inherits from user preferences
         "binary_file_patterns": None

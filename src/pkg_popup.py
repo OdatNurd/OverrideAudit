@@ -2,6 +2,8 @@ import sublime
 import sublime_plugin
 import os
 
+from .core import oa_setting
+
 
 ###----------------------------------------------------------------------------
 
@@ -451,6 +453,9 @@ def show_pkg_popup(view, point, link_name, is_detailed):
     as the initial popup content. The popup may contain links, which will alter
     the content in the popup when they're clicked.
     """
+    if not oa_setting("enable_hover_popup"):
+        return
+
     body = _render_popup(view, link_name, is_detailed)
     if body is not None:
         view.show_popup(
