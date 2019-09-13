@@ -6,7 +6,7 @@ Version ?.?.? (????-??-??)
   * New command to create an override or promote a view opened
     by `View Package File` to a potential new override. Both are
     available from the main menu and the command palette as
-    appropriate.
+    appropriate, as well as package name context menus.
 
   * New setting `mini_diff_underlying` (default: `true`) that
     sets the mini diff functionality in override edit views to

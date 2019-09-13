@@ -1098,6 +1098,14 @@ class ContextHelper():
 
         return False
 
+    def package_overrides_possible(self, view, ctx):
+        if ctx.package_only():
+            pkgs = view.settings().get("override_audit_report_packages", {})
+            pkg_info = pkgs.get(ctx.package, {})
+            return pkg_info["is_shipped"] or pkg_info["is_installed"]
+
+        return False
+
     def want_event(self):
         return True
 
