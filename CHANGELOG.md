@@ -32,6 +32,10 @@ Version ?.?.? (????-??-??)
     more detailed package information, displays some help
     information on click, and can trigger reports as well.
 
+  * Fix a bug in bulk diff context menu items in reports; they
+    would appear disabled instead of hiding themselves. They're
+    now also smarter about when they enable themselves.
+
   * Fix a bug in which a package was only considered a dependency
     if it was an unpacked package. The package control bootstrap
     package 0_package_control_loader is an example of a dependency

@@ -31,13 +31,16 @@ class OverrideAuditDiffPackageCommand(ContextHelper,sublime_plugin.TextCommand):
         if self.always_visible(**kwargs):
             return True
 
-        return self.view_context(None, False, **kwargs).package_only()
+        return self.is_enabled(**kwargs)
 
     def is_enabled(self, **kwargs):
-        ctx = self.view_context(None, False, **kwargs)
+        target = self.view_target(self.view, **kwargs)
+        ctx = self.view_context(target, False, **kwargs)
         report_type = self._report_type(**kwargs)
 
-        return report_type != ctx.package and self.package_exists(ctx)
+        return (report_type != ctx.package and
+                self.package_overrides_possible(target, ctx) and
+                self.package_exists(ctx))
 
 
 ###----------------------------------------------------------------------------
