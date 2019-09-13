@@ -155,6 +155,11 @@ _css = """
         margin-bottom: 1rem;
     }
 
+    .links {
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
     .help_text {
         font-size: 0.9rem;
         margin: 1rem;
@@ -308,14 +313,14 @@ def _can_have_overrides(view, details):
     if details["overrides"]:
         return """
         <div class="overrides">
-        This package might contain overridden package resources; to check, view
+        This package may contain overridden package resources; to check, view
         the <a href="override_report">override report</a>.
         </div>
         """
     else:
         return """
         <div class="overrides">
-        This package cannot contain overridden package resources.
+        This package currently does not contain overridden package resources.
         <span class="help">[<a href="help:no_override:{pkg}">?</a>]</span>
         </div>
         """.format(pkg=details["name"])
@@ -339,8 +344,6 @@ def _override_details(view, details):
             <span class="{unknown_class}"> {unknown} unpacked {u_desc} not present in the source package
                 <span class={filtered_class}> ({filtered} being filtered)</span>
             </span>
-            <br>
-            <span class="help">[<a href="diff_report:{pkg}">View Differences</a>]</span>
         </div>
         """.format(
             pkg=details["name"],
@@ -373,6 +376,27 @@ def _popup_footer(view, details):
             installed="\u2611" if details["is_installed"] else "\u2610",
             unpacked="\u2611" if details["is_unpacked"] else "\u2610")
 
+def _package_links(view, details):
+    """
+    Generate a set of links for taking actions with this package. Each of the
+    links hides itself when it's not valid, and if none are valid the entire
+    section is hidden.
+    """
+    can_create = details.get("is_shipped", False) or details.get("is_installed", False)
+    has_overrides = details.get("overrides", 0) > 0
+
+    return """
+        <div class="{link_class}">
+            <span class="{has_overrides}">[<a href="diff_report:{pkg}">View Differences</a>]</span>
+            <span class="{can_create}">[<a href="override:{pkg}">Create new override</a>]</span>
+            <br>
+        </div>
+    """.format(
+        link_class=_class(can_create or has_overrides, "links"),
+        has_overrides=_class(has_overrides, "overrides"),
+        can_create=_class(can_create, "overrides"),
+        pkg=details["name"])
+
 
 def _expand_details(view, details, is_detailed):
     """
@@ -384,11 +408,13 @@ def _expand_details(view, details, is_detailed):
     {header}
     {metadata}
     {overrides}
+    {links}
     {footer}
     """.format(
         header=_popup_header(view, details),
         metadata=_metadata(view, details),
         overrides=_override_details(view, details) if is_detailed else _can_have_overrides(view, details),
+        links=_package_links(view, details),
         footer=_popup_footer(view, details)
         )
 
@@ -436,6 +462,9 @@ def _popup_link(view, point, link_name, is_detailed):
     elif link_name.startswith("diff_report:"):
         package = link_name[len("diff_report:"):]
         view.window().run_command("override_audit_diff_report", {"package": package})
+    elif link_name.startswith("override:"):
+        package = link_name[len("override:"):]
+        view.window().run_command("override_audit_create_override", {"package": package})
     elif link_name.startswith("http"):
         view.window().run_command("open_url", {"url": link_name})
 

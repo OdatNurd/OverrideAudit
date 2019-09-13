@@ -30,7 +30,8 @@ Version ?.?.? (????-??-??)
 
   * Include hover popups for packages in reports. The popup gives
     more detailed package information, displays some help
-    information on click, and can trigger reports as well.
+    information on click, and can trigger some commands as well.
+    This is currently a work in progress.
 
   * Fix a bug in bulk diff context menu items in reports; they
     would appear disabled instead of hiding themselves. They're
