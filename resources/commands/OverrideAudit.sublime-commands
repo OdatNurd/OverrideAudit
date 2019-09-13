@@ -8,48 +8,18 @@
     },
     {
         "caption": "Preferences: OverrideAudit Settings",
-        "command": "override_audit_edit_settings",
+        "command": "edit_settings",
         "args": {
             "base_file": "${packages}/OverrideAudit/resources/settings/OverrideAudit.sublime-settings",
             "default": "{\n\t$0\n}\n"
         }
     },
     {
-        "caption": "Preferences: OverrideAudit Settings – Default",
-        "command": "override_audit_open_file",
-        "args": {
-            "file": "${packages}/OverrideAudit/resources/settings/OverrideAudit.sublime-settings"
-        }
-    },
-    {
-        "caption": "Preferences: OverrideAudit Settings – User",
-        "command": "override_audit_open_file",
-        "args": {
-            "file": "${packages}/User/OverrideAudit.sublime-settings",
-            "contents": "{\n\t$0\n}\n"
-        }
-    },
-    {
         "caption": "Preferences: OverrideAudit Key Bindings",
-        "command": "override_audit_edit_settings",
+        "command": "edit_settings",
         "args": {
             "base_file": "${packages}/OverrideAudit/resources/keymaps/Default ($platform).sublime-keymap",
             "default": "[\n\t$0\n]\n"
-        }
-    },
-    {
-        "caption": "Preferences: OverrideAudit Key Bindings – Default",
-        "command": "override_audit_open_file",
-        "args": {
-            "file": "${packages}/OverrideAudit/resources/keymaps/Default ($platform).sublime-keymap"
-        }
-    },
-    {
-        "caption": "Preferences: OverrideAudit Key Bindings – User",
-        "command": "override_audit_open_file",
-        "args": {
-            "file": "${packages}/User/Default ($platform).sublime-keymap",
-            "contents": "[\n\t$0\n]\n"
         }
     },
     {
