@@ -8,7 +8,6 @@ from time import time
 from bisect import bisect
 from zipfile import ZipFile
 from tempfile import mkstemp
-from textwrap import dedent
 import stat
 import os
 import threading
@@ -368,13 +367,11 @@ def diff_with_sublimerge(base_file, override_file):
 def revert_override(window, pkg_info, override):
     if oa_setting("confirm_revert"):
         target = override_display(os.path.join(pkg_info.name, override))
-        msg = dedent("""
-              The current content of this override will be permanently lost;
-              you can't undo this operation. Are you sure you want to continue?
-
-              Confirm revert:\n
-              {}
-              """.format(target))
+        msg = (
+            "Are you sure you want to continue?\n\n" +
+            "The current content of this override will be permanently lost; " +
+            "you can't undo this operation.\n\n" +
+            "Confirm revert:\n\n{}".format(target))
 
         if sublime.yes_no_cancel_dialog(msg) != sublime.DIALOG_YES:
             return
