@@ -1,7 +1,7 @@
 OverrideAudit ChangeLog
 =======================
 
-Version ?.?.? (????-??-??)
+Version 2.1.0 (2019-09-15)
 --------------------------
   * New command to create an override or promote a view opened
     by `View Package File` to a potential new override. Both are

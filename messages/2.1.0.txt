@@ -1,0 +1,37 @@
+Version 2.1.0 (2019-09-15)
+--------------------------
+
+  * New commands have been added for creating new overrides,
+    both by prompting for the override to create as well as by
+    promoting a file opened by "View Package File"
+
+  * New command to revert the content of an override back to the
+    default without removing the file and a new "confirm_revert"
+    setting to enable verification (note: reverts are
+    destructive! Make backups if you might want to recover! )
+
+  * Support for Sublime's Incremental Diff to do inline diffs of
+    an override based on the underlying package file. This is
+    controlled by the new "mini_diff_underlying" setting and is
+    enabled by default.
+
+  * Display files in unpacked packages that don't exist in the
+    underlying sublime-package file as a warning about unknown
+    files. This is controlled by a new "ignore_unknown_overrides"
+    setting and is enabled by default.
+
+  * Include informational hover popups when hovering the mouse
+    over a package name in a report, including metadata info
+    such as name, description and dependencies.
+
+  * Fix bulk diff command, which did not properly hide itself
+    when it was not available.
+
+  * Fix a bug in dependency detection that stopped packed
+    dependencies from being detected.
+
+  * Fix a bug where the temporary file created for an external
+    diff might have the wrong line endings.
+
+  For the full details of changes in this version, check out the
+  CHANGELOG.md file.
