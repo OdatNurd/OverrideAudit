@@ -1,6 +1,12 @@
 OverrideAudit ChangeLog
 =======================
 
+Version 2.1.1 (????-??-??)
+--------------------------
+  * Fix an oversight in which, after restarting Sublime from a
+    closed state we didn't check all open files to re-apply the
+    underlying file as the mini diff reference target.
+
 Version 2.1.0 (2019-09-15)
 --------------------------
   * New command to create an override or promote a view opened

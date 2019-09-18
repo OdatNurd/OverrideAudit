@@ -18,7 +18,7 @@ import re
 
 from ..lib.packages import PackageInfo, PackageList, PackageFileSet
 from ..lib.packages import override_display, check_potential_override
-from ..lib.packages import find_zip_entry
+from ..lib.packages import find_zip_entry, check_potential_override
 from ..lib.output_view import output_to_view
 from ..lib.threads import BackgroundWorkerThread
 from ..lib.utils import SettingsGroup
@@ -71,6 +71,14 @@ def loaded():
     }
 
     PackageInfo.init()
+
+    # Restore the diff in any open overrides; this also cleans any views that
+    # used to be overrides but no longer aren't (e.g. if the sublime-package
+    # file was deleted while the plugin was not loaded).
+    for window in sublime.windows():
+        for view in window.views():
+            setup_override_minidiff(view)
+
     AutoReportTrigger()
 
 
@@ -216,6 +224,35 @@ def decorate_pkg_name(pkg_info, name_only=False):
                "U" if pkg_info.unpacked_path is not None else " ",
                pkg_name,
                suffix)
+
+
+def setup_override_minidiff(view):
+    """
+    Check the view provided to see if it represents an edit session on a
+    package resource that is an override. If it isn't, or if the settings are
+    not set to indicate that the user wants the mini diff, this does nothing.
+
+    Otherwise, it will set up the reference document for this override to track
+    the base file.
+    """
+    settings = sublime.load_settings("Preferences.sublime-settings")
+    mini_diff = settings.get("mini_diff")
+
+    mini_diff_underlying = oa_setting("mini_diff_underlying") and mini_diff is True
+
+    filename = view.file_name()
+    if (not mini_diff_underlying or
+        filename is None or not filename.startswith(sublime.packages_path()) or
+        not os.path.isfile(filename)):
+        return
+
+    result = check_potential_override(filename, deep=True, get_content=mini_diff_underlying)
+    if result is not None:
+        override_group.apply(view, result[0], result[1], False)
+        if result[2] is not None:
+            view.set_reference_document(result[2])
+    else:
+        override_group.remove(view)
 
 
 def open_override(window, pkg_name, override):
