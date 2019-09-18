@@ -1,6 +1,6 @@
 %YAML 1.2
 ---
-name: OverrideAudit
+name: OverrideAudit Diff Report
 scope: text.override-audit.diff
 hidden: true
 variables:

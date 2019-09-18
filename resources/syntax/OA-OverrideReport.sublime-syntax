@@ -1,6 +1,6 @@
 %YAML 1.2
 ---
-name: OverrideAudit
+name: OverrideAudit Override Report
 scope: text.override-audit.overridereport
 hidden: true
 contexts:

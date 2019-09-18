@@ -1,6 +1,6 @@
 %YAML 1.2
 ---
-name: OverrideAudit
+name: OverrideAudit Package Report
 scope: text.override-audit.pkgreport
 hidden: true
 variables:

@@ -343,8 +343,13 @@ def diff_override(window, pkg_info, override,
         prefix = diff.hdr if diff.is_empty and empty_diff_hdr else ""
         content = prefix + "No differences found" if result == "" else result
 
+        # Output and temporarily make sure that tabs are not expanded, since
+        # append will modify them but they might be important in the diff
+        # later.
         view = output_to_view(window, title, content, reuse, clear,
-                              "Packages/Diff/Diff.tmLanguage")
+                              oa_syntax("OA-DiffPatch"),
+                              {"translate_tabs_to_spaces": False})
+        view.settings().erase("translate_tabs_to_spaces")
 
         override_group.apply(view, pkg_info.name, override, True)
 
@@ -850,9 +855,14 @@ class ReportGenerationThread(BackgroundWorkerThread):
         reuse = True if force_reuse else oa_setting("reuse_views")
         clear = True if force_reuse else oa_setting("clear_existing")
 
+        # Output and temporarily make sure that tabs are not replaced with
+        # spaces, since they may be important and we don't want to let the user
+        # break anything.
         view = output_to_view(self.window, self.caption, self.content,
                               reuse, clear, self.syntax,
+                              {"translate_tabs_to_spaces": False},
                               current_view=self.current_view)
+        view.settings().erase("translate_tabs_to_spaces")
         view.settings().set("override_audit_report_type", self.report_type)
 
         if self.settings is not None:

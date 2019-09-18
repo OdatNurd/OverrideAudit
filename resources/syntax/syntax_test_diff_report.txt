@@ -1,4 +1,4 @@
-# SYNTAX TEST "Packages/OverrideAudit/resources/syntax/OA-Diff.sublime-syntax"
+# SYNTAX TEST "Packages/OverrideAudit/resources/syntax/OA-DiffReport.sublime-syntax"
 
 WARNING: Text
 # <- keyword.control.expired

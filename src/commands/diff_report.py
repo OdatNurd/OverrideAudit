@@ -98,7 +98,7 @@ class BulkDiffReportThread(ReportGenerationThread):
             else:
                 result.append("No packages with modified resources were found")
 
-        self._set_content(title, result, report_type, oa_syntax("OA-Diff"),
+        self._set_content(title, result, report_type, oa_syntax("OA-DiffReport"),
                           {
                             "override_audit_report_packages": packages,
                             "override_audit_expired_pkgs": expired_pkgs,

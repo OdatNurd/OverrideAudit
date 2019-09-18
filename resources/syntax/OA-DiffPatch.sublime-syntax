@@ -1,0 +1,11 @@
+%YAML 1.2
+---
+name: OverrideAudit Diff/Patch
+scope: text.override-audit.patch
+file_extensions:
+  - oapatch
+first_line_match: '^oadiff'
+
+contexts:
+  main:
+    - include: scope:source.diff
