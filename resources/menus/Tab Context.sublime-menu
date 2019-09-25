@@ -2,6 +2,7 @@
     { "caption": "-" },
 
     { "command": "override_audit_context_create_override", "args": { "group": -1, "index": -1, "always_visible": false } },
+    { "command": "override_audit_context_create_patch",    "args": { "group": -1, "index": -1, "always_visible": false } },
     { "command": "override_audit_edit_override",           "args": { "group": -1, "index": -1, "always_visible": false } },
     { "command": "override_audit_diff_override",           "args": { "group": -1, "index": -1, "always_visible": false } },
     { "command": "override_audit_revert_override",         "args": { "group": -1, "index": -1, "always_visible": false } },

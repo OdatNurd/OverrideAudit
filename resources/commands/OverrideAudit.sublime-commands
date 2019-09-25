@@ -83,6 +83,16 @@
         "command": "override_audit_context_create_override"
     },
     {
+        "caption": "OverrideAudit: Create Patch (Package)",
+        "command": "override_audit_create_patch",
+        "args": {"pkg_only": true}
+    },
+    {
+        "caption": "OverrideAudit: Create Patch (Single File)",
+        "command": "override_audit_create_patch",
+        "args": {"pkg_only": false}
+    },
+    {
         "caption": "OverrideAudit: Revert Current Override",
         "command": "override_audit_revert_override"
     },

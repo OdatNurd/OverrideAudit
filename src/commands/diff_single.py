@@ -8,6 +8,8 @@ from ..core import PackageListCollectionThread
 ###----------------------------------------------------------------------------
 
 
+# TODO: This could be refactored to use PackageResourceBrowser like the patch
+# command does
 class OverrideAuditDiffSingleCommand(sublime_plugin.WindowCommand):
     """
     Selective diff of a single override or package based on the provided
