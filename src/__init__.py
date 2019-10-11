@@ -1,6 +1,6 @@
 from ..override_audit import reload
 
-reload("src", ["core", "events", "contexts", "browse", "pkg_popup", "settings_proxy"])
+reload("src", ["core", "events", "contexts", "browse", "patch", "pkg_popup", "settings_proxy"])
 reload("src.commands")
 
 from . import core
@@ -15,6 +15,9 @@ __all__ = [
 
     # browse
     "browse",
+
+    # patch
+    "patch",
 
     # events/contexts
     "OverrideAuditEventListener",

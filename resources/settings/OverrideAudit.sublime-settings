@@ -137,5 +137,14 @@
     //
     // This setting only has an effect when the mini_diff setting in your User
     // preferences is set to True.
-    "mini_diff_underlying": true
+    "mini_diff_underlying": true,
+
+    // When using the patch creation commands, this specifies the location where
+    // patch files should be created by default. When this is the empty string
+    // the default location will be the Desktop.
+    //
+    // If the Desktop folder cannot be determined, the fall back will be your
+    // home directory instead; this also happens if the path set here does not
+    // exist or can't be accessed.
+    "default_patch_path": ""
 }
