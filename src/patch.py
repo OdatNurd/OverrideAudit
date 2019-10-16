@@ -4,7 +4,75 @@ import sublime_plugin
 import os
 import difflib
 
-from .core import oa_setting
+from datetime import datetime
+
+from .core import oa_setting, oa_syntax, log
+from ..lib.output_view import output_to_view
+
+
+###----------------------------------------------------------------------------
+
+
+def _patch_meta_line(pkg_info, version):
+    """
+    Generate the line that replicates what command was used to generate the
+    diff.
+    """
+    return "oadiff --pkg=%s --version=%s\n" % (pkg_info.name, version)
+
+
+# TODO: This generates stub information only
+def _do_binary_patch(pkg_info, resource, version):
+    """
+    Do a (potential) patch on a binary resource file. If the user file is
+    determined to have the same CRC32 value as the packed version of the file,
+    then this will return back an empty list. Otherwise it appends the user
+    version of the resource to the temporary sidecar and returns back a stub
+    entry to go in the patch.
+    """
+    packed = (
+        "%s Packages/%s/%s" % ("Shipped" if pkg_info.shipped_path else "Installed", pkg_info.name, resource),
+            datetime.fromtimestamp(0).strftime("%Y-%m-%d %H:%M:%S")
+        )
+    unpacked = (
+        "Packages/%s/%s" % (pkg_info.name, resource),
+            datetime.fromtimestamp(0).strftime("%Y-%m-%d %H:%M:%S")
+        )
+
+    return [
+        _patch_meta_line(pkg_info, version),
+        "--- %s\t%s\n" % (packed[0], packed[1]),
+        "+++ %s\t%s\n" % (unpacked[0], unpacked[1]),
+        "Binary files differ\n"
+    ]
+
+
+def _do_file_patch(pkg_info, resource, version):
+    """
+    Do a (potential) patch of a regular file; this will determine the diff (if
+    any) for the given resource. If there are differences, the return value is
+    appropriate diff output to append to the patch; this will be an empty list
+    if there are no differences.
+    """
+    packed   = pkg_info._get_packed_pkg_file_contents(resource, as_list=True)
+    unpacked = pkg_info._get_unpacked_override_contents(resource)
+
+    if packed is None:
+        packed = (
+            [],
+            "%s Packages/%s/%s" % ("Shipped" if pkg_info.shipped_path else "Installed", pkg_info.name, resource),
+            datetime.fromtimestamp(0).strftime("%Y-%m-%d %H:%M:%S")
+            )
+
+    if None not in (packed, unpacked):
+        diff = list(difflib.unified_diff(packed[0], unpacked[0],
+                                         packed[1], unpacked[1],
+                                         packed[2], unpacked[2]))
+        if diff:
+            diff.insert(0, _patch_meta_line(pkg_info, version))
+            return diff
+
+    return []
 
 
 ###----------------------------------------------------------------------------
@@ -45,6 +113,72 @@ def default_patch_name(pkg_info, patch_contents, pkg_only):
         base = base + "_" + os.path.splitext(res_name)[0]
 
     return base
+
+
+def create_patch_file(window, pkg_info, patch_contents, pkg_only,
+                      patch_path=None):
+    """
+    Create the appropriate patch file(s) for the content of the patch and the
+    package provided; pkg_only is used as an indication if the patch is meant
+    to be a full patch or only a single resource.
+
+    This will generate a view that contains textual patch information, as well
+    as an optional sidecar file if any binary files are a part of the patch.
+    The sidecar is stored as a temporary file until the patch is saved.
+    """
+    patch_path = patch_path or default_patch_base()
+    patch_name = default_patch_name(pkg_info, patch_contents, pkg_only)
+
+    # Only need to do this if the user has a specific setting
+    binary_patterns = oa_setting("binary_file_patterns")
+    if binary_patterns is not None:
+        pkg_info.set_binary_pattern(binary_patterns)
+
+    # Fix up the version numbers for default packages in our shipped metadata
+    pkg_version = pkg_info.metadata.get("version", "unknown")
+    if " " in pkg_version:
+        pkg_version = pkg_version.split(' ')[-1]
+
+    # TODO: Binary files need to go into a sidecar; currently we're just doing
+    #       a check to see if there are any.
+    result = []
+    has_binary = False
+    for res in patch_contents:
+        if pkg_info._override_is_binary(res):
+            patch = _do_binary_patch(pkg_info, res, pkg_version)
+            if patch:
+                has_binary = True
+        else:
+            patch = _do_file_patch(pkg_info, res, pkg_version)
+
+        result.extend(patch)
+
+    # If the patch ends up empty, we can leave without doing anything else.
+    if not result:
+        return log("No changes were found; patch file would be empty",
+                   status=True, dialog=True)
+
+    content = "".join(result)
+
+    # Output and temporarily make sure that tabs are not expanded, since
+    # append will modify them but they might be important in the diff
+    # later.
+    view = output_to_view(window, patch_name + ".oapatch", content, False, False,
+                          oa_syntax("OA-DiffPatch"),
+                          {
+                            "override_audit_patch_sidecar": has_binary,
+                            "translate_tabs_to_spaces": False,
+                            "default_dir": patch_path,
+                          })
+    view.settings().erase("translate_tabs_to_spaces")
+
+    # Our output code assumes the view is a report, so make it editable
+    view.set_read_only(False)
+    view.set_scratch(False)
+
+    # Put the cursor on the first line.
+    view.sel().clear()
+    view.sel().add(sublime.Region(0))
 
 
 ###----------------------------------------------------------------------------
