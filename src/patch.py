@@ -6,8 +6,17 @@ import difflib
 
 from datetime import datetime
 
+from .base64 import b85encode, b85decode
 from .core import oa_setting, oa_syntax, log
 from ..lib.output_view import output_to_view
+
+
+###----------------------------------------------------------------------------
+
+
+# Chunk up a long string into fixed width newline separated strings for
+# inclusion in the diff output.
+_chunk = lambda string, length: (">" + string[0+i:length+i] + "\n" for i in range(0, len(string), length))
 
 
 ###----------------------------------------------------------------------------
@@ -21,30 +30,41 @@ def _patch_meta_line(pkg_info, version):
     return "oadiff --pkg=%s --version=%s\n" % (pkg_info.name, version)
 
 
-# TODO: This generates stub information only
 def _do_binary_patch(pkg_info, resource, version):
     """
     Do a (potential) patch on a binary resource file. If the user file is
     determined to have the same CRC32 value as the packed version of the file,
-    then this will return back an empty list. Otherwise it appends the user
-    version of the resource to the temporary sidecar and returns back a stub
-    entry to go in the patch.
+    then this will return back an empty list. Otherwise it appends a base85
+    encoded version of the file as binary diff hunk.
     """
-    packed = (
-        "%s Packages/%s/%s" % ("Shipped" if pkg_info.shipped_path else "Installed", pkg_info.name, resource),
-            datetime.fromtimestamp(0).strftime("%Y-%m-%d %H:%M:%S")
-        )
-    unpacked = (
-        "Packages/%s/%s" % (pkg_info.name, resource),
-            datetime.fromtimestamp(0).strftime("%Y-%m-%d %H:%M:%S")
-        )
+    packed   = pkg_info._get_packed_bin_file_info(resource, contents=False)
+    unpacked = pkg_info._get_unpacked_bin_file_info(resource)
 
-    return [
+    if packed is None:
+        packed = (
+            None,
+            "%s Packages/%s/%s" % ("Shipped" if pkg_info.shipped_path else "Installed", pkg_info.name, resource),
+            datetime.fromtimestamp(0).strftime("%Y-%m-%d %H:%M:%S"),
+            None
+            )
+
+    # If both files have ths same CRC, consider them identical. This
+    # automatically fails when the packed file is missing because it's CRC is
+    # None in that case.
+    if packed[3] == unpacked[3]:
+        return []
+
+    patch = [
         _patch_meta_line(pkg_info, version),
-        "--- %s\t%s\n" % (packed[0], packed[1]),
-        "+++ %s\t%s\n" % (unpacked[0], unpacked[1]),
-        "Binary files differ\n"
+        "--- %s\t%s\n" % (packed[1], packed[2]),
+        "+++ %s\t%s\n" % (unpacked[1], unpacked[2]),
+        "Binary File: %d %d\n" % (len(unpacked[0]), unpacked[3])
     ]
+
+    patch.extend(_chunk(b85encode(unpacked[0]).decode("utf-8"), 78))
+    # b85decode("".join([line [1:] for line in content.splitlines()]))
+
+    return patch
 
 
 def _do_file_patch(pkg_info, resource, version):
@@ -122,9 +142,9 @@ def create_patch_file(window, pkg_info, patch_contents, pkg_only,
     package provided; pkg_only is used as an indication if the patch is meant
     to be a full patch or only a single resource.
 
-    This will generate a view that contains textual patch information, as well
-    as an optional sidecar file if any binary files are a part of the patch.
-    The sidecar is stored as a temporary file until the patch is saved.
+    This will generate a view that contains textual patch information with a
+    name based on the content of the patch and based in the default patch
+    location.
     """
     patch_path = patch_path or default_patch_base()
     patch_name = default_patch_name(pkg_info, patch_contents, pkg_only)
@@ -139,15 +159,10 @@ def create_patch_file(window, pkg_info, patch_contents, pkg_only,
     if " " in pkg_version:
         pkg_version = pkg_version.split(' ')[-1]
 
-    # TODO: Binary files need to go into a sidecar; currently we're just doing
-    #       a check to see if there are any.
     result = []
-    has_binary = False
     for res in patch_contents:
         if pkg_info._override_is_binary(res):
             patch = _do_binary_patch(pkg_info, res, pkg_version)
-            if patch:
-                has_binary = True
         else:
             patch = _do_file_patch(pkg_info, res, pkg_version)
 
@@ -166,7 +181,6 @@ def create_patch_file(window, pkg_info, patch_contents, pkg_only,
     view = output_to_view(window, patch_name + ".oapatch", content, False, False,
                           oa_syntax("OA-DiffPatch"),
                           {
-                            "override_audit_patch_sidecar": has_binary,
                             "translate_tabs_to_spaces": False,
                             "default_dir": patch_path,
                           })

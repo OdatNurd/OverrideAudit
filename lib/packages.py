@@ -3,6 +3,7 @@ import io
 import os
 import re
 import zipfile
+import zlib
 import codecs
 from datetime import datetime
 import difflib
@@ -599,6 +600,55 @@ class PackageInfo():
 
         except:
             print("Error loading %s; unknown error" % name)
+
+    def _get_packed_bin_file_info(self, override_file, contents=False):
+        try:
+            with zipfile.ZipFile(self.package_file()) as zFile:
+                info = find_zip_entry(zFile, override_file)
+                content = None
+                if contents:
+                    with zFile.open(info, "rb") as handle:
+                        content = handle.read()
+
+                source = "Shipped Packages"
+                if self.installed_path is not None:
+                    source = "Installed Packages"
+
+                source = os.path.join(source, self.name, override_file)
+                mtime = datetime(*info.date_time).strftime("%Y-%m-%d %H:%M:%S")
+
+                return (content, _fixPath(source), mtime, info.CRC)
+
+        except (KeyError, FileNotFoundError):
+            print("Error loading %s:%s; cannot find file in sublime-package" %
+                  (self.package_file(), override_file))
+            return None
+
+        except:
+            print("Error loading %s; unknown error" % name)
+
+
+    def _get_unpacked_bin_file_info(self, override_file):
+        name = os.path.join(self.unpacked_path, override_file)
+        try:
+            with open(name, "rb") as handle:
+                content = handle.read()
+
+            mtime = datetime.fromtimestamp(os.stat(name).st_mtime)
+            source = os.path.join("Packages", self.name, override_file)
+
+            return (content, _fixPath(source), mtime.strftime("%Y-%m-%d %H:%M:%S"), zlib.crc32(content))
+
+        except FileNotFoundError:
+            print("Error loading %s; cannot find file" % name)
+            return None
+
+        except PermissionError:
+            print("Error loading %s; permission denied" % name)
+
+        except:
+            print("Error loading %s; unknown error" % name)
+
 
     def _get_file_internal(self, resource, as_binary=True):
         """
