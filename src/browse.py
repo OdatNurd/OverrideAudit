@@ -62,7 +62,7 @@ class PackageBrowser():
 
         self.window.show_quick_panel(
             items=items,
-            on_select=lambda idx: on_done(items[idx] if idx >= 0 else None))
+            on_select=lambda idx: on_done(pkg_list[items[idx]] if idx >= 0 else None))
 
 
 ###---------------------------------------------------------------------------
@@ -246,21 +246,21 @@ class PackageResourceBrowser():
         if self.on_done is not None:
             sublime.set_timeout(lambda: self.on_done(pkg_info, resource_name))
 
-    def _res_select(self, pkg_name, file):
+    def _res_select(self, pkg_info, file):
         if file == "..":
             return self._start_browse(thread=None)
 
-        pkg_info = self.pkg_list[pkg_name] if file is not None else None
+        pkg_info = pkg_info if file is not None else None
         self._on_done(pkg_info, file)
 
-    def _pkg_select(self, pkg_name, return_to_pkg):
-        if pkg_name is not None:
+    def _pkg_select(self, pkg_info, return_to_pkg):
+        if pkg_info is not None:
             if self.resource is not None:
-                return self._on_done(self.pkg_list[pkg_name], self.resource)
+                return self._on_done(pkg_info, self.resource)
 
-            self.res_browser.browse(self.pkg_list[pkg_name],
+            self.res_browser.browse(pkg_info,
                 return_to_pkg,
-                lambda name: self._res_select(pkg_name, name))
+                lambda name: self._res_select(pkg_info, name))
         else:
             self._on_done(None, None)
 
@@ -269,10 +269,10 @@ class PackageResourceBrowser():
             self.pkg_list = thread.pkg_list
 
         if self.pkg_name is None:
-            return self.pkg_browser.browse(self.pkg_list, lambda name: self._pkg_select(name, True))
+            return self.pkg_browser.browse(self.pkg_list, lambda pkg_info: self._pkg_select(pkg_info, True))
 
         if self.pkg_name in self.pkg_list:
-            return self._pkg_select(self.pkg_name, False)
+            return self._pkg_select(self.pkg_list[self.pkg_name], False)
 
         log("Package '%s' does not exist" % self.pkg_name,
             status=True, dialog=True)

@@ -1,6 +1,13 @@
 OverrideAudit ChangeLog
 =======================
 
+Version 2.1.1 (2019-11-05)
+--------------------------
+  * Fix an issue with the new `mini_diff_underlying` setting in
+    which if an override was open when you quit Sublime, on
+    restart the incremental diff indicators would not properly
+    track the underlying package file.
+
 Version 2.1.0 (2019-09-15)
 --------------------------
   * New command to create an override or promote a view opened

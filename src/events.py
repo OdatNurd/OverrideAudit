@@ -4,7 +4,7 @@ import os
 
 from .pkg_popup import show_pkg_popup
 from .core import oa_setting, override_group, delete_packed_override
-from ..lib.packages import check_potential_override
+from .core import setup_override_minidiff
 
 
 ###----------------------------------------------------------------------------
@@ -16,33 +16,15 @@ class OverrideAuditEventListener(sublime_plugin.EventListener):
     override for a package, and set the variables that allow for our context
     menus to let you edit/diff the override.
     """
-    def _check_for_override(self, view):
-        filename = view.file_name()
-        if filename is None or not os.path.isfile(filename):
-            return
-
-        settings = sublime.load_settings("Preferences.sublime-settings")
-        mini_diff = settings.get("mini_diff")
-
-        mini_diff_underlying = oa_setting("mini_diff_underlying") and mini_diff is True
-
-        result = check_potential_override(filename, deep=True, get_content=mini_diff_underlying)
-        if result is not None:
-            override_group.apply(view, result[0], result[1], False)
-            if result[2] is not None:
-                view.set_reference_document(result[2])
-        else:
-            override_group.remove(view)
-
     def on_post_save_async(self, view):
         # Will remove existing settings if the view is no longer an override
-        self._check_for_override(view)
+        setup_override_minidiff(view)
 
     def on_load_async(self, view):
         # Things like PackageResourceViewer trigger on_load before the file
         # actually exists; context items are only allowed once the file is
         # actually saved.
-        self._check_for_override(view)
+        setup_override_minidiff(view)
 
     def on_close(self, view):
         tmp_base = view.settings().get("_oa_ext_diff_base", None)
