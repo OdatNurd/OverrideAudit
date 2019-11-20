@@ -129,6 +129,12 @@ _css = """
         margin-top: -0.8rem;
     }
 
+    .python {
+        font-size: 0.8rem;
+        line-height: 0.8rem;
+        margin-top: -0.8rem;
+    }
+
     .url {
         font-size: 0.8rem;
         line-height: 0.8rem;
@@ -237,6 +243,7 @@ def _popup_header(view, details):
     """
     metadata = details.get("metadata", {})
     version = metadata.get("version", "")
+    python_version = details.get("python_version", "")
     url = metadata.get("url", "")
 
     if version == "" and not details.get("is_shipped", False):
@@ -260,6 +267,7 @@ def _popup_header(view, details):
         <div class="{is_dependency}">This package is a dependency library</div>
         <div class="{has_version}">Version: {version}</div>
         <div class="{has_url}"><a href="{url}">{url}</a></div>
+        <div class="{has_python}">Python: {python_version}</div>
     """.format(
         name=name,
         is_complete=_class(is_complete, "complete"),
@@ -267,7 +275,9 @@ def _popup_header(view, details):
         is_disabled=_class(is_disabled, "disabled"),
         is_dependency=_class(is_dependency, "dependency"),
         has_version=_class(version != '', "version"),
+        has_python=_class(python_version != "", "python"),
         version=version,
+        python_version=python_version,
         has_url=_class(url != '', "url"),
         url=url
     )
