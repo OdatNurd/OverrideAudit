@@ -16,7 +16,7 @@ class OverrideAuditContextCreatePatchCommand(ContextHelper,sublime_plugin.TextCo
     anyway).
     """
     def run(self, edit, **kwargs):
-        ctx, r_type, is_pkg_diff = self._get_context(**kwargs)
+        ctx, r_type, is_pkg_diff, _ = self._get_context(**kwargs)
 
         self.view.window().run_command("override_audit_create_patch",
             {
