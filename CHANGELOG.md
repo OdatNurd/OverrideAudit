@@ -1,6 +1,12 @@
 OverrideAudit ChangeLog
 =======================
 
+Version ?.?.? (????-??-??)
+--------------------------
+  * Include a new command to open a resource for viewing, which
+    works the same as the PackageResourceViewer command of the
+    same name.
+
 Version 2.1.1 (2019-11-05)
 --------------------------
   * Fix an issue with the new `mini_diff_underlying` setting in
