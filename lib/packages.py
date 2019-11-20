@@ -7,6 +7,7 @@ import codecs
 from datetime import datetime
 import difflib
 from collections import MutableSet, OrderedDict
+import glob
 import fnmatch
 
 from .metadata import default_metadata
@@ -319,6 +320,7 @@ class PackageInfo():
 
         self.name = name
         self.metadata = {}
+        self.python_version = ""
 
         self.is_dependency = False
         self.is_disabled = True if name in ignored_list else False
@@ -509,6 +511,16 @@ class PackageInfo():
         except:
             return self.metadata.get("dependencies", [])
 
+    def __get_meta_file(self, resource):
+        try:
+            if self.contains_file(resource):
+                return self.get_file(resource)
+
+        except:
+            pass
+
+        return None
+
     def _load_metadata(self):
         res_name = "package-metadata.json"
         if self.is_dependency:
@@ -517,14 +529,20 @@ class PackageInfo():
         self.metadata = default_metadata(self)
 
         try:
-            if self.contains_file(res_name):
-                data = self.get_file(res_name)
+            data = self.__get_meta_file(res_name)
+            if data:
                 self.metadata = sublime.decode_value(data)
 
             if not self.is_dependency:
                 self.metadata["dependencies"] = self.__get_dependencies()
         except:
             pass
+
+        if self.contains_plugins():
+            self.python_version = "3.3"
+            data = self.__get_meta_file(".python-version")
+            if data:
+                self.python_version = data.strip()
 
     def _get_packed_pkg_file_contents(self, override_file, as_list=True):
         try:
@@ -849,6 +867,31 @@ class PackageInfo():
 
         return False
 
+    def contains_plugins(self):
+        """
+        Checks to see if this package contains any plugins or not, which is
+        defined as a .py file in the root of the package contents.
+        """
+        try:
+            if self.package_file() is not None:
+                with zipfile.ZipFile(self.package_file()) as zFile:
+                    for info in zFile.infolist():
+                        if info.filename.endswith(".py") and "/" not in info.filename:
+                            return True
+
+        except (FileNotFoundError):
+            pass
+
+        if self.unpacked_path:
+            res_spec = os.path.join(self.unpacked_path, "*.py")
+            try:
+                result = next(glob.iglob(res_spec))
+                return True
+            except:
+                pass
+
+        return False
+
     def get_file(self, resource):
         """
         Given a resource specification, get the contents of that resource and
@@ -927,6 +970,7 @@ class PackageInfo():
             # Core info
             "name": self.name,
             "metadata": self.metadata,
+            "python_version": self.python_version,
 
             # Installation Status
             "is_shipped":   bool(self.shipped_path),
