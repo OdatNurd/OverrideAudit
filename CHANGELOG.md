@@ -9,6 +9,8 @@ Version ?.?.? (????-??-??)
   * For packages that contain plugins, the hover popup on reports
     now indicates what version of Python the plugins in that
     package are running in.
+  * Fix a problem where some commands did not reload on package
+    update.
 
 Version 2.1.1 (2019-11-05)
 --------------------------
