@@ -27,7 +27,7 @@ class OverrideAuditDiffExternallyCommand(ContextHelper,sublime_plugin.TextComman
         diff_externally(window, pkg_list[package], override)
 
     def description(self, **kwargs):
-        return "OverrideAudit: Open Diff Externally"
+        return self.caption("Open Diff Externally", **kwargs)
 
     def is_visible(self, **kwargs):
         if self.always_visible(**kwargs):

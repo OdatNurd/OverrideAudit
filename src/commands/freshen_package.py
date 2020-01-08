@@ -21,9 +21,9 @@ class OverrideAuditFreshenPackageCommand(ContextHelper,sublime_plugin.TextComman
     def description(self, **kwargs):
         ctx = self.view_context(None, False, **kwargs)
         if ctx.package_only():
-            return "OverrideAudit: Freshen Expired Overrides in '%s'" % ctx.package
+            return self.caption("Freshen Expired Overrides in '%s'" % (ctx.package), **kwargs)
         else:
-            return "OverrideAudit: Freshen Expired Package"
+            return self.caption("Freshen Expired Package", **kwargs)
 
     def is_visible(self, **kwargs):
         if self.always_visible(**kwargs):

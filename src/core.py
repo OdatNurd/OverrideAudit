@@ -1131,6 +1131,14 @@ class ContextHelper():
     def always_visible(self, **kwargs):
         return kwargs.get("always_visible", True)
 
+    def caption(self, caption, **kwargs):
+        target = self.view_target(self.view, **kwargs)
+        menu = target.settings().get("context_menu", "")
+        if "OverrideAudit" in menu:
+            return caption
+
+        return "OverrideAudit: %s" % caption
+
     def override_exists(self, ctx):
         if ctx.has_target():
             relative_name = os.path.join(ctx.package, ctx.override)

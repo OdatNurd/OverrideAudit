@@ -13,6 +13,10 @@ Version 2.2.2 (????-??-??)
   * Fix an issue where attempting to Diff a package that has no
     sublime-package file or no unpacked files might cause an error.
 
+  * All reports now use a custom context menu that display only
+    OverrideAudit commands, so that working in them for users
+    that use the context menu is nicer.
+
   * Added a new option to Override reports to allow for
     skipping overrides that are unchanged from appearing
     in reports.

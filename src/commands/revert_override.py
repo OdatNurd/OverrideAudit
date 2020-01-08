@@ -29,13 +29,13 @@ class OverrideAuditRevertOverrideCommand(ContextHelper,sublime_plugin.TextComman
     def description(self, **kwargs):
         ctx = self.view_context(None, False, **kwargs)
         if ctx.source == "settings":
-            return "OverrideAudit: Revert this Override"
+            return self.caption("Revert this Override", **kwargs)
 
-        stub = "OverrideAudit: Revert Override"
+        stub = "Revert Override"
         if ctx.has_target():
-            return "%s '%s'" % (stub, ctx.override)
+            return self.caption("%s '%s'" % (stub, ctx.override), **kwargs)
         else:
-            return stub
+            return self.caption(stub, **kwargs)
 
     def is_visible(self, **kwargs):
         if self.always_visible(**kwargs):

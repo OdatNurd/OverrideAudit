@@ -68,7 +68,8 @@ class OverrideReportThread(ReportGenerationThread):
                             "override_audit_report_packages": packages,
                             "override_audit_expired_pkgs": expired_pkgs,
                             "override_audit_unknown_overrides": unknown_files,
-                            "override_audit_exclude_unchanged": exclude_unchanged
+                            "override_audit_exclude_unchanged": exclude_unchanged,
+                            "context_menu": "OverrideAuditReport.sublime-menu"                            
                           })
 
     def _output_package(self, result, pkg_info, only_expired, expired_pkgs,

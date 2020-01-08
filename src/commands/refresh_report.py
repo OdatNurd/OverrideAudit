@@ -37,7 +37,7 @@ class OverrideAuditRefreshReportCommand(ContextHelper,sublime_plugin.TextCommand
 
     def description(self, **kwargs):
         if self._report_type(**kwargs) is None:
-            return "OverrideAudit: Refresh Report"
+            return self.caption("Refresh Report", **kwargs)
 
         report = self._report_type(**kwargs)
         report = {
@@ -47,7 +47,7 @@ class OverrideAuditRefreshReportCommand(ContextHelper,sublime_plugin.TextCommand
             ":bulk_all":          "Bulk Diff Report"
         }.get(report, "Bulk Diff of '%s'" % report)
 
-        return "OverrideAudit: Refresh %s" % report
+        return self.caption("Refresh %s" % (report), **kwargs)
 
     def is_visible(self, **kwargs):
         if self.always_visible(**kwargs):
