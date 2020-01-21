@@ -872,20 +872,28 @@ class PackageInfo():
         Checks to see if this package contains any plugins or not, which is
         defined as a .py file in the root of the package contents.
         """
+        def is_plugin(name):
+            if name.endswith(".py") and "/" not in name:
+                # Exclude syntax test files in the shipped Python package
+                return False if name.startswith("syntax_test") and self.name == "Python" else True
+
+            return False
+
         try:
             if self.package_file() is not None:
                 with zipfile.ZipFile(self.package_file()) as zFile:
                     for info in zFile.infolist():
-                        if info.filename.endswith(".py") and "/" not in info.filename:
+                        if is_plugin(info.filename):
                             return True
 
         except (FileNotFoundError):
             pass
 
         if self.unpacked_path:
+            path_len = len(self.unpacked_path) + 1
             res_spec = os.path.join(self.unpacked_path, "*.py")
             try:
-                result = next(glob.iglob(res_spec))
+                next(f for f in glob.iglob(res_spec) if is_plugin(f[path_len:]))
                 return True
             except:
                 pass
