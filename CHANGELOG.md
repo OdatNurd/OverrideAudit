@@ -1,16 +1,25 @@
 OverrideAudit ChangeLog
 =======================
 
-Version ?.?.? (????-??-??)
+Version 2.2.0 (2020-01-21)
 --------------------------
   * Include a new command to open a resource for viewing, which
     works the same as the PackageResourceViewer command of the
-    same name.
+    same name. This is functionally somewhat similar to the built
+    in `View Package File` command, but prompts you for the file
+    in a different manner; overrides are also annotated in the
+    list.
+
   * For packages that contain plugins, the hover popup on reports
     now indicates what version of Python the plugins in that
-    package are running in.
+    package are running in. This provides an indication of that
+    package containing a plugin while also allowing for the
+    inclusion of newer versions of Python being supported in
+    Sublime in the future.
+
   * Fix a problem where some commands did not reload on package
-    update.
+    update properly. This is not a particularly big deal (and
+    restarting Sublime would resolve the issue anyway).
 
 Version 2.1.1 (2019-11-05)
 --------------------------
