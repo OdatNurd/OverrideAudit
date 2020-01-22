@@ -8,6 +8,14 @@ from .core import PackageListCollectionThread
 ###---------------------------------------------------------------------------
 
 
+# When annotation is turned on in the resource browser, this is the annotation
+# that is appended to the end of the resources that are currently overridden.
+_annotation = " [*Override*]"
+
+
+###---------------------------------------------------------------------------
+
+
 class ResourceType():
     """
     This class acts as a simple enumeration of the different styles of
@@ -80,6 +88,11 @@ class ResourceBrowser():
     appears in the unpacked content of the package but doesn't correspond to a
     packed file.
 
+    Specifying true for annotate_overrides will make overrides have extra data
+    appended to the end of their names in the quick panel so that the user can
+    determine that they're overrides. This is only active when the resource
+    browsing type is ALL.
+
     The browse will use hierarchy if the package content has a structure.
     """
 
@@ -93,11 +106,13 @@ class ResourceBrowser():
     # stack entry chosen.
     CURRENT='current'
 
-    def __init__(self, window=None, file_type=ResourceType.ALL, unknown=True):
+    def __init__(self, window=None, file_type=ResourceType.ALL, unknown=True,
+                 annotate_overrides=False):
         self.window = window or sublime.active_window()
         self.file_type = file_type
         self.unknown = unknown
         self.cache = {}
+        self.annotate = annotate_overrides
 
     def _explode_files(self, files):
         """
@@ -141,10 +156,14 @@ class ResourceBrowser():
             else:
                 contents = pkg_info.unpacked_contents()
 
+            overrides = pkg_info.override_files(simple=True)
             if self.file_type == ResourceType.ALL:
-                res_list = contents
+                if not self.annotate:
+                    res_list = contents
+                else:
+                    res_list = contents - overrides
+                    res_list |= {res + _annotation for res in overrides }
             else:
-                overrides = pkg_info.override_files(simple=True)
                 if self.file_type == ResourceType.OVERRIDE:
                     res_list = overrides
                 else:
@@ -171,6 +190,9 @@ class ResourceBrowser():
                 items[self.CURRENT] = selected
                 stack.append(items)
                 return self._display_panel(children, prior_text, stack)
+
+            if selected.endswith(_annotation):
+                selected = selected[:-len(_annotation)]
 
             resource = [entry[self.CURRENT] for entry in stack]
             resource.append(selected)
@@ -223,7 +245,8 @@ class PackageResourceBrowser():
 
     Depending on the options provided, the user will be able to browse for a
     package or just files within a given package. The list of resources is
-    filtered by the resource type provided.
+    filtered by the resource type provided and may annotate existing overrides
+    depending on the options provided.
 
     on_done is invoked when the user makes a selection and given the package
     and resource selected; both will be None if the browse was canceled by the
@@ -231,7 +254,7 @@ class PackageResourceBrowser():
     """
     def __init__(self, pkg_name=None, resource=None, window=None,
                  file_type=ResourceType.ALL, pkg_list=None, unknown=True,
-                 p_filter=None, on_done=None):
+                 annotate_overrides=False, p_filter=None, on_done=None):
         self.pkg_name = pkg_name
         self.resource = resource
         self.window = window or sublime.active_window()
@@ -240,7 +263,7 @@ class PackageResourceBrowser():
         self.on_done = on_done
         self.cache = {}
         self.pkg_browser = PackageBrowser(self.window, self.file_type, p_filter)
-        self.res_browser = ResourceBrowser(self.window, self.file_type, unknown)
+        self.res_browser = ResourceBrowser(self.window, self.file_type, unknown, annotate_overrides)
 
     def _on_done(self, pkg_info, resource_name):
         if self.on_done is not None:

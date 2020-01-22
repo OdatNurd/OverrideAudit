@@ -61,6 +61,11 @@
         "command": "override_audit_create_override"
     },
     {
+        "caption": "OverrideAudit: Open Resource",
+        "command": "override_audit_create_override",
+        "args": {"include_existing": true}
+    },
+    {
         "caption": "OverrideAudit: Override Current Resource",
         "command": "override_audit_context_create_override"
     },

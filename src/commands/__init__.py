@@ -4,7 +4,7 @@ reload("src.commands", ["package_report", "override_report", "diff_report",
        "refresh_report", "diff_single", "toggle_override", "create_override",
        "diff_override", "edit_override", "delete_override", "freshen_override",
        "diff_package", "diff_externally", "revert_override", "freshen_package",
-       "modify_mark"])
+       "modify_mark", "context_create_override"])
 
 from .package_report import OverrideAuditPackageReportCommand
 from .override_report import OverrideAuditOverrideReportCommand

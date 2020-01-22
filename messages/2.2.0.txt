@@ -1,0 +1,16 @@
+Version 2.2.0 (2020-01-21)
+--------------------------
+
+  * Include a new command to open a resource for viewing, which
+    works the same as the PackageResourceViewer command of the
+    same name.
+
+  * For packages that contain plugins, the hover popup on reports
+    now indicates what version of Python the plugins in that
+    package are running in.
+
+  * Fix a problem where some commands did not reload on package
+    update.
+
+  For the full details of changes in this version, check out the
+  CHANGELOG.md file.

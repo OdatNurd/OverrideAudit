@@ -281,6 +281,20 @@ gutter to diff against the base package file, allowing you to more easily track
 your changes.
 
 
+### `OverrideAudit: Open Resource` ###
+
+This command is available from the main menu and command palette and allows you
+to open any package resource for viewing (and potentially for creating an
+override). This works similarly to the `Create Override` command except that
+here all package resources are displayed, and any that are overrides will be
+annotated in the panel.
+
+WHen a resource is selected, that file is opened for viewing. If the file is an
+override, then you can edit the file as per normal; regular resources will be
+opened as read-only and require you to use the `Override Current Resource`
+command in order to make them editable.
+
+
 ### `OverrideAudit: Override Current Resource` ###
 
 This command is available from the main menu and the command palette whenever
