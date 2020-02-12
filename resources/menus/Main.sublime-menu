@@ -10,6 +10,7 @@
                     { "caption": "Open Resource…", "command": "override_audit_create_override", "args": {"include_existing": true }},
                     { "caption": "Create Override…", "command": "override_audit_create_override"},
                     { "caption": "Override Current Resource", "command": "override_audit_context_create_override"},
+                    { "caption": "Freshen All Expired Overrides", "command": "override_audit_freshen_all" },
                     { "caption": "-" },
                     { "caption": "Package Report", "command": "override_audit_package_report"},
                     { "caption": "Override Report", "command": "override_audit_override_report"},

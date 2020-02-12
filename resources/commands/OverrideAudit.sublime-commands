@@ -44,6 +44,9 @@
         "args": {"only_expired": true}
     },
     {
+        "caption": "OverrideAudit: Freshen All Expired Overrides",
+        "command": "override_audit_freshen_all" },
+    {
         "caption": "OverrideAudit: Diff Single Override",
         "command": "override_audit_diff_single"
     },

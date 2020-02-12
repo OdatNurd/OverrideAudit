@@ -37,6 +37,7 @@ __all__ = [
     "OverrideAuditFreshenOverrideCommand",
     "OverrideAuditDiffPackageCommand",
     "OverrideAuditFreshenPackageCommand",
+    "OverrideAuditFreshenAllCommand",
     "OverrideAuditDiffSingleCommand",
     "OverrideAuditModifyMarkCommand"
 ]

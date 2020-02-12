@@ -9,6 +9,8 @@
     { "command": "override_audit_delete_override",         "args": { "group": -1, "index": -1, "always_visible": false } },
 
     { "command": "override_audit_refresh_report", "args": { "group": -1, "index": -1, "always_visible": false } },
+    { "caption": "-" },
+    { "command": "override_audit_freshen_all",    "args": { "group": -1, "index": -1, "always_visible": false } },
 
     { "caption": "-" },
 ]
