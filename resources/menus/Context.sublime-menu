@@ -22,4 +22,8 @@
     { "command": "override_audit_freshen_package" , "args": { "always_visible": false }},
 
     { "caption": "-" },
+
+    { "command": "override_audit_freshen_all" , "args": { "always_visible": false } },
+
+    { "caption": "-" },
 ]
