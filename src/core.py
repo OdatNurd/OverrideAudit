@@ -715,10 +715,11 @@ class OverrideFreshenThread(BackgroundWorkerThread):
 
             # TODO: This command could take a list of overrides in the package
             # and handle them all at once.
-            view.run_command("override_audit_modify_mark", {
-                "package": pkg_name,
-                "override": override
-            })
+            if view:
+                view.run_command("override_audit_modify_mark", {
+                    "package": pkg_name,
+                    "override": override
+                })
 
             return True
         except:
@@ -729,6 +730,9 @@ class OverrideFreshenThread(BackgroundWorkerThread):
         return "%s '%s/%s'" % (prefix, pkg_name, override)
 
     def _clean_package(self, view, pkg_name):
+        if not view:
+            return
+
         pkg_list = view.settings().get("override_audit_expired_pkgs", [])
         if pkg_name in pkg_list:
             pkg_list.remove(pkg_name)
@@ -764,7 +768,7 @@ class OverrideFreshenThread(BackgroundWorkerThread):
         package = self.args.get("package", None)
         override = self.args.get("override", None)
 
-        if not view or not package:
+        if not package_list[0]:
             self.result = "Nothing done; missing parameters"
             return log("freshen thread not given a view or package")
 
