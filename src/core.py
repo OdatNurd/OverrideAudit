@@ -768,13 +768,13 @@ class OverrideFreshenThread(BackgroundWorkerThread):
             self.result = "Nothing done; missing parameters"
             return log("freshen thread not given a view or package")
 
-        pkg_info = PackageInfo(package)
+        pkg_info = PackageInfo(package) if isinstance(package, str) else package
         if not pkg_info.exists():
-            self.result = "Unable to freshen '%s'; no such package" % package
+            self.result = "Unable to freshen '%s'; no such package" % pkg_info.name
             return
 
         if not pkg_info.package_file():
-            self.result = "Unable to freshen '%s'; no overrides" % package
+            self.result = "Unable to freshen '%s'; no overrides" % pkg_info.name
             return
 
         try:
