@@ -283,16 +283,31 @@ def delete_override(window, pkg_name, override):
             log("Deleted %s", relative_name, status=True)
 
 
-def freshen_override(view, package, override=None):
+# TODO: During the multi-item rewrite, this was partially modified, but it
+# needs to be smart enough to display the confirm information, since there
+# is more of it now.
+#
+# Also it should infer a list of None the same length as the package_list
+# for the override_list if override_list is None, because we might just
+# want to pass in a list of packages and be done with it.
+def freshen_override(view, package_list, override_list=None):
     """
     Touch either the explicitly specified override in the provided package or
     all expired overrides in the package.
     """
+    if isinstance(package_list, list) != isinstance(override_list, list):
+        return log("Inconsistent freshen details given to freshen_override", status=True)
+
+    if not isinstance(package_list, list):
+        package_list = [package_list]
+        override_list = [override_list]
+
     if oa_setting("confirm_freshen"):
-        target = "Expired overrides in '%s'" % package
-        if override is not None:
-            relative_name = os.path.join(package, override)
-            target = override_display(relative_name)
+        target = "The stuff"
+        # target = "Expired overrides in '%s'" % ", ".join(package_list)
+        # if override is not None:
+        #     relative_name = os.path.join(package, override)
+        #     target = override_display(relative_name)
 
         msg = "Confirm freshen:\n\n{}".format(target)
         if sublime.yes_no_cancel_dialog(msg) != sublime.DIALOG_YES:
@@ -300,7 +315,8 @@ def freshen_override(view, package, override=None):
 
     callback = lambda thread: log(thread.result, status=True)
     OverrideFreshenThread(view.window(), "Freshening Files", callback,
-                       package=package, override=override, view=view).start()
+                       package_list=package_list, override_list=override_list,
+                       view=view).start()
 
 
 def diff_override(window, pkg_info, override,
@@ -742,7 +758,8 @@ class OverrideFreshenThread(BackgroundWorkerThread):
         result = self._touch_override(view, zFile, pkg_info.name, override)
         if result and not pkg_info.expired_override_files(simple=True):
             self._clean_package(view, pkg_info.name)
-        return self._msg(pkg_info.name, override, result)
+        log(self._msg(pkg_info.name, override, result))
+        return int(result)
 
     def _pkg(self, view, zFile, pkg_info):
         count = 0
@@ -761,34 +778,52 @@ class OverrideFreshenThread(BackgroundWorkerThread):
         else:
             prefix = "%d of %d" % (count, len(expired_list))
 
-        return "%s expired overrides freshened in '%s'" % (prefix, pkg_name)
+        log("%s expired overrides freshened in '%s'" % (prefix, pkg_name))
+        return count
 
     def _process(self):
         view = self.args.get("view", None)
-        package = self.args.get("package", None)
-        override = self.args.get("override", None)
+        package_list = self.args.get("package_list", None)
+        override_list = self.args.get("override_list", None)
+
+        if len(package_list) != len(override_list):
+            self.result = "Nothing done; inconsistent parameters"
+            return log("freshen thread given inconsistent freshen details")
 
         if not package_list[0]:
             self.result = "Nothing done; missing parameters"
             return log("freshen thread not given a view or package")
 
-        pkg_info = PackageInfo(package) if isinstance(package, str) else package
-        if not pkg_info.exists():
-            self.result = "Unable to freshen '%s'; no such package" % pkg_info.name
-            return
+        count = 0
+        errors = 0
+        for index, package in enumerate(package_list):
+            pkg_info = PackageInfo(package) if isinstance(package, str) else package
+            override = override_list[index]
 
-        if not pkg_info.package_file():
-            self.result = "Unable to freshen '%s'; no overrides" % pkg_info.name
-            return
+            if not pkg_info.exists():
+                log("Unable to freshen '%s'; no such package" % pkg_info.name)
+                continue
 
-        try:
-            with ZipFile(pkg_info.package_file()) as zFile:
-                if override is not None:
-                    self.result = self._single(view, zFile, pkg_info, override)
-                else:
-                    self.result = self._pkg(view, zFile, pkg_info)
-        except Exception as e:
-            self.result = "Error while freshening: %s" % str(e)
+            if not pkg_info.package_file():
+                log("Unable to freshen '%s'; no overrides" % pkg_info.name)
+                continue
+
+            try:
+                with ZipFile(pkg_info.package_file()) as zFile:
+                    if override is not None:
+                        count += self._single(view, zFile, pkg_info, override)
+                    else:
+                        count += self._pkg(view, zFile, pkg_info)
+            except Exception as e:
+                errors += 1
+                log("Error while freshening: %s" % str(e))
+
+        if count == 0:
+            self.result = "No files needed freshening"
+        else:
+            self.result = "Freshened %d package resource(s)" % count
+            if errors:
+                self.result += " (%d errors; see console)" % errors
 
 
 ###----------------------------------------------------------------------------
