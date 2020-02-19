@@ -15,8 +15,12 @@ class OverrideAuditFreshenAllCommand(ContextHelper,sublime_plugin.TextCommand):
     not just the one under the cursor.
     """
     def run(self, edit, **kwargs):
-        print("Refreshing, isn't it")
-        # freshen_override(self.view, ctx.package)
+        # TODO: This is freshening every expired overide in every package,
+        # but it should actually be executing a diff to determine what files
+        # are actually unmodified and then freshening those instead.
+        view = self.view_target(self.view, **kwargs)
+        pkg_list = view.settings().get("override_audit_expired_pkgs", [])
+        freshen_override(view, pkg_list, [None] * len(pkg_list))
 
     def description(self, **kwargs):
         return "OverrideAudit: Freshen All Expired Overrides"
@@ -31,7 +35,7 @@ class OverrideAuditFreshenAllCommand(ContextHelper,sublime_plugin.TextCommand):
         report = self._report_type(**kwargs)
         if report is not None and report != ":packages":
             view = self.view_target(self.view, **kwargs)
-            return bool(view.find_by_selector("entity.name.filename.override.expired"))
+            return len(view.settings().get("override_audit_expired_pkgs", [])) > 0
 
         return False
 
