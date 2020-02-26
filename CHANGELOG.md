@@ -1,6 +1,16 @@
 OverrideAudit ChangeLog
 =======================
 
+Version 2.2.1 (2020-02-26)
+--------------------------
+  * The `Open Resource` command was incorrectly hiding
+    packages that are not represented by a `sublime-package`
+    file.
+
+    This made it impossible to open a package resource from
+    a purely unpacked package (such as the `User` package).
+    This is now resolved.
+
 Version 2.2.0 (2020-01-21)
 --------------------------
   * Include a new command to open a resource for viewing, which
