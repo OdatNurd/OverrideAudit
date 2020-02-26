@@ -1,0 +1,9 @@
+Version 2.2.1 (2020-02-26)
+--------------------------
+
+  * Fix the `Open Resource` command, which was incorrectly hiding
+    packages that are not represented by a `sublime-package` file
+    (such as the `User` package).
+
+  For the full details of changes in this version, check out the
+  CHANGELOG.md file.

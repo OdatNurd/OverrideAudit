@@ -26,13 +26,15 @@ class OverrideAuditCreateOverrideCommand(sublime_plugin.WindowCommand):
             if include_existing:
                 res_type = ResourceType.ALL
                 annotate = True
+                p_filter = lambda p: not p.is_disabled
             else:
                 res_type = ResourceType.NONOVERRIDE
                 annotate = False
+                p_filter = lambda p: bool(p.package_file()) and not p.is_disabled
 
             return PackageResourceBrowser(package, file, self.window,
                 res_type, unknown=False, annotate_overrides=annotate,
-                p_filter=lambda p: bool(p.package_file()) and not p.is_disabled,
+                p_filter=p_filter,
                 on_done=lambda p,r: self.pick(p, r)).browse()
 
         # Open normally if an unpacked copy exists; fallback for manual calls
