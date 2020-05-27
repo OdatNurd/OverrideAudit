@@ -70,8 +70,6 @@ def loaded():
         "binary_file_patterns": None
     }
 
-    PackageInfo.init()
-
     # Restore the diff in any open overrides; this also cleans any views that
     # used to be overrides but no longer aren't (e.g. if the sublime-package
     # file was deleted while the plugin was not loaded).
