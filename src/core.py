@@ -353,6 +353,20 @@ def diff_override(window, pkg_info, override,
                        pkg_info=pkg_info, override=override).start()
 
 
+def filter_unmodified_overrides(pkg_info, overrides):
+    """
+    Given a list of overrides from a particular package, return a copy of the
+    list that's filtered so that any overrides that have not been changed from
+    the underlying file are removed.
+    """
+    for override in overrides:
+        result = pkg_info.override_diff(override, 1)
+        if result.is_empty:
+            overrides.remove(override)
+
+    return overrides
+
+
 def diff_externally(window, pkg_info, override):
     """
     Launch the configured external diff tool to diff the override from the

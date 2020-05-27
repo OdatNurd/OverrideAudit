@@ -3,8 +3,16 @@ OverrideAudit ChangeLog
 
 Version 2.2.2 (????-??-??)
 --------------------------
-  * When creating reports, make sure that the cursor ends up
-    at the top of the buffer.
+  * Previously, when creating or refreshing a report, the cursor
+    would be left at the bottom of the view, which can cause some
+    unwanted scroll on cursor move.
+
+    Report creation and refreshing now puts the cursor at the top
+    of the buffer, similar to the behaviour of opening a file.
+
+  * Added a new option to Override reports to allow for
+    skipping overrides that are unchanged from appearing
+    in reports.
 
 Version 2.2.1 (2020-02-26)
 --------------------------

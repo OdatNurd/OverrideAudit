@@ -24,6 +24,9 @@ class OverrideAuditRefreshReportCommand(ContextHelper,sublime_plugin.TextCommand
         }.get(report_type, "override_audit_diff_report")
         args = {"force_reuse": True}
 
+        if target_view.settings().get("override_audit_exclude_unchanged", False):
+            args["exclude_unchanged"] = True
+
         if report_type[0] != ":":
             args["package"] = report_type
         elif report_type == ":overrides_expired":

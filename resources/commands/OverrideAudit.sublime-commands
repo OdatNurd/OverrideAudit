@@ -31,6 +31,14 @@
         "command": "override_audit_override_report"
     },
     {
+        "caption": "OverrideAudit: Override Report (Exclude unchanged)",
+        "command": "override_audit_override_report",
+        "args": {
+            "exclude_unchanged": true
+        },
+    },
+
+    {
         "caption": "OverrideAudit: Override Report (Only expired)",
         "command": "override_audit_override_report",
         "args": {"only_expired": true}

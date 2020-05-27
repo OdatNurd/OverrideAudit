@@ -2,7 +2,7 @@ import sublime
 import sublime_plugin
 
 from ..core import oa_syntax, oa_setting, decorate_pkg_name, log
-from ..core import get_ignore_unknown_patterns
+from ..core import get_ignore_unknown_patterns, filter_unmodified_overrides
 from ..core import ReportGenerationThread
 from ...lib.packages import PackageList
 
@@ -22,6 +22,7 @@ class OverrideReportThread(ReportGenerationThread):
 
         only_expired = self.args["only_expired"]
         ignore_empty = self.args["ignore_empty"]
+        exclude_unchanged = self.args["exclude_unchanged"]
 
         if only_expired:
             title = "OverrideAudit: Expired Override Report"
@@ -39,6 +40,10 @@ class OverrideReportThread(ReportGenerationThread):
         if only_expired:
             result.append("WARNING: Showing only expired overrides!\n"
                           "WARNING: Non-expired overrides may exist!\n")
+        if exclude_unchanged:
+            result.append("WARNING: Showing only modified overrides!\n"
+                          "WARNING: Overrides with unchanged content may exist!\n")
+
         result.append(self._generation_time())
 
         displayed = 0
@@ -46,6 +51,7 @@ class OverrideReportThread(ReportGenerationThread):
             if pkg_name not in ignored:
                 if self._output_package(result, pkg_info, only_expired,
                                         expired_pkgs, unknown_files,
+                                        exclude_unchanged,
                                         ignore_patterns):
                     packages[pkg_name] = pkg_info.status(detailed=True)
                     displayed += 1
@@ -61,10 +67,12 @@ class OverrideReportThread(ReportGenerationThread):
                           {
                             "override_audit_report_packages": packages,
                             "override_audit_expired_pkgs": expired_pkgs,
-                            "override_audit_unknown_overrides": unknown_files
+                            "override_audit_unknown_overrides": unknown_files,
+                            "override_audit_exclude_unchanged": exclude_unchanged
                           })
 
-    def _output_package(self, result, pkg_info, only_expired, expired_pkgs, unknown_files, ignore_patterns):
+    def _output_package(self, result, pkg_info, only_expired, expired_pkgs,
+                        unknown_files, exclude_unchanged, ignore_patterns):
         shipped_override = pkg_info.has_possible_overrides(simple=False)
         normal_overrides = pkg_info.override_files(simple=True)
 
@@ -73,6 +81,10 @@ class OverrideReportThread(ReportGenerationThread):
 
         unknown_overrides = pkg_info.unknown_override_files()
         pkg_files = pkg_info.unpacked_contents_unknown_filtered(ignore_patterns)
+
+        # TODO: What should we do for a binary file? We're not diffing yet.
+        if exclude_unchanged:
+            normal_overrides = filter_unmodified_overrides(pkg_info, normal_overrides)
 
         # No need to do anything if there are no overrides at all
         if not normal_overrides and not shipped_override and not unknown_overrides:
@@ -112,6 +124,11 @@ class OverrideReportThread(ReportGenerationThread):
                 fmt = "  `- [X] {}"
             elif item in unknown:
                 fmt = "  `- [?] {}"
+            elif item not in overrides:
+                # If we're filtering unchanged, this item might not be in the
+                # list, but neither are unknown things, so we need to do this
+                # last.
+                continue
             result.append(fmt.format(item))
 
     def _empty_msg(self):
@@ -131,12 +148,14 @@ class OverrideAuditOverrideReportCommand(sublime_plugin.WindowCommand):
     if any. The report always includes expired packages and overrides, but the
     optional parameter filters this to only show expired results if desired.
     """
-    def run(self, force_reuse=False, only_expired=False, ignore_empty=False):
+    def run(self, force_reuse=False, only_expired=False, ignore_empty=False,
+            exclude_unchanged=False):
         OverrideReportThread(self.window, "Generating Override Report",
                              self.window.active_view(),
                              force_reuse=force_reuse,
                              only_expired=only_expired,
-                             ignore_empty=ignore_empty).start()
+                             ignore_empty=ignore_empty,
+                             exclude_unchanged=exclude_unchanged).start()
 
 
 ###----------------------------------------------------------------------------

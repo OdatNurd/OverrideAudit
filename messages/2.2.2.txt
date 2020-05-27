@@ -4,5 +4,7 @@ Version 2.2.1 (2020-02-26)
   * When creating reports, make sure that the cursor ends up
     at the top of the buffer.
 
+  * Add support for skipping unmodified overrides in reports.
+
   For the full details of changes in this version, check out the
   CHANGELOG.md file.
