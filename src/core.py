@@ -845,6 +845,8 @@ class ReportGenerationThread(BackgroundWorkerThread):
             for setting,value in self.settings.items():
                 view.settings().set(setting, value)
 
+        view.run_command("move_to", {"to": "bof"})
+
     def _set_content(self, caption, content, report_type, syntax,
                      settings=None):
         self.caption = caption

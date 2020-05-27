@@ -1,6 +1,11 @@
 OverrideAudit ChangeLog
 =======================
 
+Version 2.2.2 (????-??-??)
+--------------------------
+  * When creating reports, make sure that the cursor ends up
+    at the top of the buffer.
+
 Version 2.2.1 (2020-02-26)
 --------------------------
   * The `Open Resource` command was incorrectly hiding
