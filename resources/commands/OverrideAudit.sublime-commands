@@ -57,6 +57,11 @@
         "command": "override_audit_diff_report"
     },
     {
+        "caption": "OverrideAudit: Bulk Diff All Packages (Excluding unchanged)",
+        "command": "override_audit_diff_report",
+        "args": {"exclude_unchanged": true }
+    },
+    {
         "caption": "OverrideAudit: Refresh Report",
         "command": "override_audit_refresh_report"
     },

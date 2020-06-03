@@ -14,6 +14,10 @@ Version 2.2.2 (????-??-??)
     skipping overrides that are unchanged from appearing
     in reports.
 
+  * Added in a new option to Package Diff reports to allow for
+    skipping overrides that are unchanged from appearing in
+    reports.
+
 Version 2.2.1 (2020-02-26)
 --------------------------
   * The `Open Resource` command was incorrectly hiding

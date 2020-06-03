@@ -28,16 +28,18 @@ class OverrideAuditDiffSingleCommand(sublime_plugin.WindowCommand):
             items=override_list,
             on_select=lambda i: self._file_pick(pkg_info, override_list, i))
 
-    def _pkg_pick(self, pkg_list, pkg_override_list, index, bulk):
+    def _pkg_pick(self, pkg_list, pkg_override_list, index, bulk, exclude_unchanged):
         if index >= 0:
             pkg_info = pkg_list[pkg_override_list[index]]
             if not bulk:
                 self._show_override_list(pkg_info)
             else:
-                self.window.run_command("override_audit_diff_report",
-                                        {"package": pkg_info.name})
+                self.window.run_command("override_audit_diff_report", {
+                                            "package": pkg_info.name,
+                                            "exclude_unchanged": exclude_unchanged
+                                        })
 
-    def _show_pkg_list(self, pkg_list, bulk):
+    def _show_pkg_list(self, pkg_list, bulk, exclude_unchanged):
         items = packages_with_overrides(pkg_list)
 
         if not items:
@@ -46,13 +48,13 @@ class OverrideAuditDiffSingleCommand(sublime_plugin.WindowCommand):
 
         self.window.show_quick_panel(
             items=items,
-            on_select=lambda i: self._pkg_pick(pkg_list, items, i, bulk))
+            on_select=lambda i: self._pkg_pick(pkg_list, items, i, bulk, exclude_unchanged))
 
-    def _loaded(self, thread, package, override, bulk):
+    def _loaded(self, thread, package, override, bulk, exclude_unchanged):
         pkg_list = thread.pkg_list
 
         if package is None:
-            self._show_pkg_list(pkg_list, bulk)
+            self._show_pkg_list(pkg_list, bulk, exclude_unchanged)
         else:
             if package in pkg_list:
                 pkg_info = pkg_list[package]
@@ -68,14 +70,18 @@ class OverrideAuditDiffSingleCommand(sublime_plugin.WindowCommand):
                 log("Unable to diff; no package '%s'" % package,
                      status=True, dialog=True)
 
-    def run(self, package=None, override=None, bulk=False):
+    def run(self, package=None, override=None, bulk=False,
+            exclude_unchanged=False):
         # Shortcut for bulk diffing a single package
         if bulk and package is not None:
-            self.window.run_command("override_audit_diff_report",
-                                    {"package": package})
+            self.window.run_command("override_audit_diff_report", {
+                                        "package": package,
+                                        "exclude_unchanged": exclude_unchanged
+                                    })
             return
 
-        callback = lambda thread: self._loaded(thread, package, override, bulk)
+        callback = lambda thread: self._loaded(thread, package, override,
+                                               bulk, exclude_unchanged)
         PackageListCollectionThread(self.window, "Collecting Package List",
                                     callback, get_overrides=True).start()
 

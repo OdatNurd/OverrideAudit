@@ -1,5 +1,10 @@
 # SYNTAX TEST "Packages/OverrideAudit/resources/syntax/OA-Diff.sublime-syntax"
 
+WARNING: Text
+# <- keyword.control.expired
+#^^^^^^^ keyword.control.expired
+#       ^^^^^^ text.override-audit
+
 [S U] Objective-C
     Objective-C++.sublime-syntax
 #   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ entity.name.filename.override

@@ -8,6 +8,8 @@ variables:
 
 contexts:
   main:
+    - match: '^WARNING:'
+      scope: keyword.control.expired
     - include: package_type
     - include: diff
 

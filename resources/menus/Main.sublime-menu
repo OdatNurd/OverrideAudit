@@ -18,6 +18,7 @@
                     { "caption": "Diff Single Override…", "command": "override_audit_diff_single"},
                     { "caption": "Bulk Diff: Single Package…", "command": "override_audit_diff_single", "args": {"bulk": true}},
                     { "caption": "Bulk Diff: All Packages", "command": "override_audit_diff_report"},
+                    { "caption": "Bulk Diff: All Packages (Excluding unchanged)", "command": "override_audit_diff_report", "args": {"exclude_unchanged": true }},
                     { "caption": "Refresh Current Report", "command": "override_audit_refresh_report"},
                     { "caption": "Swap Diff/Edit of Current Override", "command": "override_audit_toggle_override"},
                     { "caption": "-" }
