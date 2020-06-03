@@ -30,6 +30,10 @@ class BulkDiffReportThread(ReportGenerationThread):
                 return log("Cannot diff package '%s'; not found" % package,
                             status=True, dialog=True)
 
+            if not pkg_list[package].package_file():
+                return log("Cannot diff package '%s'; no sublime-package file" % package,
+                            status=True, dialog=True)
+
             items = [package]
         else:
             items = packages_with_overrides(pkg_list)
@@ -107,7 +111,7 @@ class BulkDiffReportThread(ReportGenerationThread):
         override_list = pkg_info.override_files(simple=True)
         expired_list = pkg_info.expired_override_files(simple=True)
         unknown_overrides = pkg_info.unknown_override_files()
-        pkg_files = pkg_info.unpacked_contents_unknown_filtered(ignore_patterns)
+        pkg_files = pkg_info.unpacked_contents_unknown_filtered(ignore_patterns) or []
 
         empty_diff_hdr = oa_setting("diff_empty_hdr")
 

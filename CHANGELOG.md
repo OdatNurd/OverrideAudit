@@ -10,6 +10,9 @@ Version 2.2.2 (????-??-??)
     Report creation and refreshing now puts the cursor at the top
     of the buffer, similar to the behaviour of opening a file.
 
+  * Fix an issue where attempting to Diff a package that has no
+    sublime-package file or no unpacked files might cause an error.
+
   * Added a new option to Override reports to allow for
     skipping overrides that are unchanged from appearing
     in reports.
