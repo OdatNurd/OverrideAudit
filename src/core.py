@@ -792,7 +792,7 @@ class OverrideFreshenThread(BackgroundWorkerThread):
 
         if not package_list[0]:
             self.result = "Nothing done; missing parameters"
-            return log("freshen thread not given a view or package")
+            return log("freshen thread not given a package")
 
         count = 0
         errors = 0

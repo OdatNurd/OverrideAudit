@@ -18,12 +18,15 @@ class OverrideAuditFreshenAllCommand(ContextHelper,sublime_plugin.TextCommand):
         # TODO: This is freshening every expired overide in every package,
         # but it should actually be executing a diff to determine what files
         # are actually unmodified and then freshening those instead.
+        #
+        # If we actually filter the list to things that are only unchanged,
+        # we need to handle the idea that there might not be any.
         view = self.view_target(self.view, **kwargs)
         pkg_list = view.settings().get("override_audit_expired_pkgs", [])
         freshen_override(view, pkg_list, [None] * len(pkg_list))
 
     def description(self, **kwargs):
-        return "OverrideAudit: Freshen All Expired Overrides"
+        return "OverrideAudit: Freshen All Expired (Unchanged) Overrides"
 
     def is_visible(self, **kwargs):
         if self.always_visible(**kwargs):
