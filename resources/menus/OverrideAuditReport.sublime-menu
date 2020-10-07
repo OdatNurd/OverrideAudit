@@ -20,6 +20,7 @@
     // Freshen actions for expired items
     { "command": "override_audit_freshen_override" , "args": { "always_visible": false }},
     { "command": "override_audit_freshen_package" , "args": { "always_visible": false }},
+    { "command": "override_audit_freshen_all" , "args": { "always_visible": false } },
 
     { "caption": "-", "id": "override_audit", },
 
