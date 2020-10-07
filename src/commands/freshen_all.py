@@ -50,9 +50,10 @@ class OverrideAuditFreshenAllCommand(ContextHelper,sublime_plugin.TextCommand):
 
     def description(self, **kwargs):
         only_unchanged = kwargs.get("only_unchanged", True)
-        return "OverrideAudit: Freshen All Expired %sOverrides" % (
-            "(Unchanged) " if only_unchanged else ""
-            )
+        text = "Freshen All Expired %sOverrides" % (
+                    "(Unchanged) " if only_unchanged else ""
+                )
+        return self.caption(text, **kwargs)
 
     def is_visible(self, **kwargs):
         if self.always_visible(**kwargs):
