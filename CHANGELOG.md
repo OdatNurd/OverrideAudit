@@ -21,6 +21,11 @@ Version 2.2.2 (????-??-??)
     skipping overrides that are unchanged from appearing in
     reports.
 
+  * Fix the context menu in tabs potentially displaying errors in
+    the console if the tab prior to an override tab was an image or
+    HTML sheet, which throws off the view index calculation.
+
+
 Version 2.2.1 (2020-02-26)
 --------------------------
   * The `Open Resource` command was incorrectly hiding

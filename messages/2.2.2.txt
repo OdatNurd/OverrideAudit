@@ -9,5 +9,8 @@ Version 2.2.1 (2020-02-26)
 
   * Add support for skipping unmodified overrides in reports.
 
+  * Fix tab context menus causing errors when image sheets are open
+    in the window.
+
   For the full details of changes in this version, check out the
   CHANGELOG.md file.

@@ -1086,7 +1086,7 @@ class ContextHelper():
         Get target view specified by group and index, if needed.
         """
         window = view.window()
-        return view if group == -1 else window.views_in_group(group)[index]
+        return view if group == -1 else window.sheets_in_group(group)[index].view()
 
     def view_context(self, view, expired, event=None, **kwargs):
         """
