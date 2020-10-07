@@ -12,6 +12,9 @@
     { "command": "override_audit_diff_externally", "args": { "always_visible": false }},
     { "command": "override_audit_delete_override" , "args": { "always_visible": false }},
 
+    // Create a patch
+    { "command": "override_audit_context_create_patch", "args": { "always_visible": false }},
+
     // Bulk diffing of a single package in a report
     { "command": "override_audit_diff_package" , "args": { "always_visible": false }},
 

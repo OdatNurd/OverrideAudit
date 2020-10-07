@@ -41,14 +41,15 @@ class OverrideAuditContextCreatePatchCommand(ContextHelper,sublime_plugin.TextCo
         return ctx, r_type, is_pkg_diff, self.view_target(self.view, **kwargs)
 
     def description(self, **kwargs):
-        stub = "OverrideAudit: Create Patch"
+        stub = "Create Patch"
         ctx, r_type, is_pkg_diff, _ = self._get_context(**kwargs)
 
         if ctx.has_target() or ctx.package_only() or is_pkg_diff:
-            return "%s for '%s'" % (stub,
+            text =  "%s for '%s'" % (stub,
                 ctx.override if ctx.has_target() else ctx.package or r_type)
+            return self.caption(text, **kwargs)
         else:
-            return stub
+            return self.caption(stub, **kwargs)
 
     def is_visible(self, **kwargs):
         if self.always_visible(**kwargs):
