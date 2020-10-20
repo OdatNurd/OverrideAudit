@@ -25,7 +25,7 @@ up to date for the release.
  * New file in messages/ for PackageControl updates
  * Update messages.json to reference new message file
  * Merge branch to `stable`
- * Tag release with -A
+ * Tag release with -a (message: "Release Version x.x.x")
  * Push tag and new stable branch
 
 # GitHub
