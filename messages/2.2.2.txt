@@ -1,18 +1,19 @@
-Version 2.2.1 (2020-02-26)
+Version 2.2.2 (????-??-??)
 --------------------------
 
-  * When creating reports, make sure that the cursor ends up
-    at the top of the buffer.
+  * Ensure that the cursor is at the top of the file when creating
+    or refreshing a report.
 
-  * Fix a bug if manual diffing of packages with no package file
-    or unpacked files.
+  * Fix an issue where attempting to Diff a package that has no
+    sublime-package file or no unpacked files might cause an error.
 
-  * Add support for skipping unmodified overrides in reports.
+  * Use a custom context menu in reports.
 
-  * Reports now use a custom context menu that's less cluttered.
+  * New option for Override and Diff reports to skip overrides that are
+    unchanged.
 
-  * Fix tab context menus causing errors when image sheets are open
-    in the window.
+  * Fix context menu on tabs displaying errors in the console if an image
+    is open.
 
   For the full details of changes in this version, check out the
   CHANGELOG.md file.
