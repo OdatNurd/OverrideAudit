@@ -52,6 +52,19 @@ _fixPath = (lambda value: value.replace("\\", "/")) if sublime.platform() == "wi
 ###----------------------------------------------------------------------------
 
 
+def _shipped_packages_path():
+    """
+    Get the location for shipped packages in Sublime; this lazy-loads the path
+    on first call, and requires that the plugin host be set up completely
+    before being called.
+    """
+    if not hasattr(_shipped_packages_path, "pkg_path"):
+        exe_path = os.path.dirname(sublime.executable_path())
+        _shipped_packages_path.pkg_path = os.path.join(exe_path, "Packages")
+
+    return _shipped_packages_path.pkg_path
+
+
 def _pkg_scan(path, filename, recurse=False):
     """
     Scan the given path for a filename with the name provided. If found, the
@@ -177,7 +190,7 @@ def check_potential_override(filename, deep=False, get_content=False):
     pkg_name = parts[0]
     pkg_file = pkg_name + ".sublime-package"
 
-    shipped = os.path.join(PackageInfo.shipped_packages_path, pkg_file)
+    shipped = os.path.join(_shipped_packages_path(), pkg_file)
     installed = _pkg_scan(sublime.installed_packages_path(), pkg_file, True)
 
     if os.path.isfile(shipped) or installed is not None:
@@ -303,17 +316,6 @@ class PackageInfo():
     class know to look in the package file being used by Sublime in this case
     when looking up overriden file contents.
     """
-
-    # The location where packages that ship with sublime live; you must call
-    # the init() class method at plugin load time to set this or things will
-    # not work.
-    shipped_packages_path = None
-
-    @classmethod
-    def init(cls):
-        exe_path = os.path.dirname(sublime.executable_path())
-        cls.shipped_packages_path = os.path.join(exe_path, "Packages")
-
     def __init__(self, name, scan=True):
         settings = sublime.load_settings("Preferences.sublime-settings")
         ignored_list = settings.get("ignored_packages", [])
@@ -411,7 +413,7 @@ class PackageInfo():
 
         # Scan for the shipped package so we can collect the proper case on
         # case insensitive systems.
-        self._add_package(_pkg_scan(self.shipped_packages_path, pkg_filename), True)
+        self._add_package(_pkg_scan(_shipped_packages_path(), pkg_filename), True)
         self._add_package(_pkg_scan(sublime.installed_packages_path(), pkg_filename, True))
         self._add_path(pkg_path)
 
@@ -1035,7 +1037,7 @@ class PackageList():
             if _wrap("Abc") == _wrap("abc"):
                 name_list = [_wrap(name) for name in name_list]
 
-        self._shipped = self.__find_pkgs(PackageInfo.shipped_packages_path, name_list, shipped=True)
+        self._shipped = self.__find_pkgs(_shipped_packages_path(), name_list, shipped=True)
         self._installed = self.__find_pkgs(sublime.installed_packages_path(), name_list)
         self._unpacked = self.__find_pkgs(sublime.packages_path(), name_list, packed=False)
 

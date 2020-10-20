@@ -22,13 +22,13 @@ class OverrideAuditDeleteOverrideCommand(ContextHelper,sublime_plugin.TextComman
     def description(self, **kwargs):
         ctx = self.view_context(None, False, **kwargs)
         if ctx.source == "settings":
-            return "OverrideAudit: Delete this Override"
+            return self.caption("Delete this Override", **kwargs)
 
-        stub = "OverrideAudit: Delete Override"
+        stub = "Delete Override"
         if ctx.has_target():
-            return "%s '%s'" % (stub, ctx.override)
+            return self.caption("%s '%s'" % (stub, ctx.override), **kwargs)
         else:
-            return stub
+            return self.caption(stub, **kwargs)
 
     def is_visible(self, **kwargs):
         if self.always_visible(**kwargs):

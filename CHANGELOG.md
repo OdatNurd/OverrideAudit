@@ -1,6 +1,35 @@
 OverrideAudit ChangeLog
 =======================
 
+Version 2.2.2 (2020-10-20)
+--------------------------
+  * Previously, when creating or refreshing a report, the cursor
+    would be left at the bottom of the view, which can cause some
+    unwanted scroll on cursor move.
+
+    Report creation and refreshing now puts the cursor at the top
+    of the buffer, similar to the behaviour of opening a file.
+
+  * Fix an issue where attempting to Diff a package that has no
+    sublime-package file or no unpacked files might cause an error.
+
+  * All reports now use a custom context menu that display only
+    OverrideAudit commands, so that working in them for users
+    that use the context menu is nicer.
+
+  * Added a new option to Override reports to allow for
+    skipping overrides that are unchanged from appearing
+    in reports.
+
+  * Added in a new option to Package Diff reports to allow for
+    skipping overrides that are unchanged from appearing in
+    reports.
+
+  * Fix the context menu in tabs potentially displaying errors in
+    the console if the tab prior to an override tab was an image or
+    HTML sheet, which throws off the view index calculation.
+
+
 Version 2.2.1 (2020-02-26)
 --------------------------
   * The `Open Resource` command was incorrectly hiding

@@ -26,9 +26,9 @@ class OverrideAuditContextCreateOverrideCommand(ContextHelper,sublime_plugin.Tex
 
     def description(self, **kwargs):
         if self.package is not None:
-            return "OverrideAudit: Create Override in '%s'" % self.package
+            return self.caption("Create Override in '%s'" % (self.package), **kwargs)
 
-        return "OverrideAudit: Override this resource"
+        return self.caption("Override this resource", **kwargs)
 
     def _ctx_package(self, **kwargs):
         """

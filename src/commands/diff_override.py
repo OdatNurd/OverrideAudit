@@ -40,13 +40,13 @@ class OverrideAuditDiffOverrideCommand(ContextHelper,sublime_plugin.TextCommand)
     def description(self, **kwargs):
         ctx = self.view_context(None, False, **kwargs)
         if ctx.source == "settings":
-            return "OverrideAudit: Diff this Override"
+            return self.caption("Diff this Override", **kwargs)
 
-        stub = "OverrideAudit: Diff Override"
+        stub = "Diff Override"
         if ctx.has_target():
-            return "%s '%s'" % (stub, ctx.override)
+            return self.caption("%s '%s'" % (stub, ctx.override), **kwargs)
         else:
-            return stub
+            return self.caption(stub, **kwargs)
 
     def is_visible(self, **kwargs):
         if self.always_visible(**kwargs):

@@ -124,6 +124,17 @@ This allows you to focus solely on those overrides which may require your more
 immediate attention.
 
 
+### `OverrideAudit: Override Report (Exclude unchanged)` ###
+
+This command operates the same as the standard `Override Report` command, but
+overrides whose contents match the underlying file are excluded from appearing
+in the report. This can cause a package with such overrides to not appear in
+the report at all.
+
+This exclusion does not apply to overrides that are binary, unknown or expired;
+those overrides will continue to appear in the report.
+
+
 ### `OverrideAudit: Diff Single Override` ###
 
 This will display a quick panel that lists all packages with at least one

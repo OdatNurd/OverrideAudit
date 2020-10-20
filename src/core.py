@@ -70,8 +70,6 @@ def loaded():
         "binary_file_patterns": None
     }
 
-    PackageInfo.init()
-
     # Restore the diff in any open overrides; this also cleans any views that
     # used to be overrides but no longer aren't (e.g. if the sublime-package
     # file was deleted while the plugin was not loaded).
@@ -353,6 +351,20 @@ def diff_override(window, pkg_info, override,
     callback = lambda thread: _process_diff(thread)
     OverrideDiffThread(window, "Diffing Override", callback,
                        pkg_info=pkg_info, override=override).start()
+
+
+def filter_unmodified_overrides(pkg_info, overrides):
+    """
+    Given a list of overrides from a particular package, return a copy of the
+    list that's filtered so that any overrides that have not been changed from
+    the underlying file are removed.
+    """
+    for override in overrides:
+        result = pkg_info.override_diff(override, 1)
+        if result.is_empty:
+            overrides.remove(override)
+
+    return overrides
 
 
 def diff_externally(window, pkg_info, override):
@@ -847,6 +859,8 @@ class ReportGenerationThread(BackgroundWorkerThread):
             for setting,value in self.settings.items():
                 view.settings().set(setting, value)
 
+        view.run_command("move_to", {"to": "bof"})
+
     def _set_content(self, caption, content, report_type, syntax,
                      settings=None):
         self.caption = caption
@@ -1072,7 +1086,7 @@ class ContextHelper():
         Get target view specified by group and index, if needed.
         """
         window = view.window()
-        return view if group == -1 else window.views_in_group(group)[index]
+        return view if group == -1 else window.sheets_in_group(group)[index].view()
 
     def view_context(self, view, expired, event=None, **kwargs):
         """
@@ -1116,6 +1130,14 @@ class ContextHelper():
 
     def always_visible(self, **kwargs):
         return kwargs.get("always_visible", True)
+
+    def caption(self, caption, **kwargs):
+        target = self.view_target(self.view, **kwargs)
+        menu = target.settings().get("context_menu", "")
+        if "OverrideAudit" in menu:
+            return caption
+
+        return "OverrideAudit: %s" % caption
 
     def override_exists(self, ctx):
         if ctx.has_target():

@@ -1,0 +1,19 @@
+Version 2.2.2 (2020-10-20)
+--------------------------
+
+  * Ensure that the cursor is at the top of the file when creating
+    or refreshing a report.
+
+  * Fix an issue where attempting to Diff a package that has no
+    sublime-package file or no unpacked files might cause an error.
+
+  * Use a custom context menu in reports.
+
+  * New option for Override and Diff reports to skip overrides that are
+    unchanged.
+
+  * Fix context menu on tabs displaying errors in the console if an image
+    is open.
+
+  For the full details of changes in this version, check out the
+  CHANGELOG.md file.

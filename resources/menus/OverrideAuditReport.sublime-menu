@@ -1,0 +1,31 @@
+[
+    // Refresh an existing report window
+    { "command": "override_audit_refresh_report" , "args": { "always_visible": false } },
+
+    { "caption": "-" },
+
+    // Core override operations
+    { "command": "override_audit_context_create_override", "args": { "always_visible": false}},
+    { "command": "override_audit_edit_override" , "args": { "always_visible": false }},
+    { "command": "override_audit_diff_override" , "args": { "always_visible": false }},
+    { "command": "override_audit_revert_override" , "args": { "always_visible": false }},
+    { "command": "override_audit_diff_externally", "args": { "always_visible": false }},
+    { "command": "override_audit_delete_override" , "args": { "always_visible": false }},
+
+    // Bulk diffing of a single package in a report
+    { "command": "override_audit_diff_package" , "args": { "always_visible": false }},
+
+    { "caption": "-" },
+
+    // Freshen actions for expired items
+    { "command": "override_audit_freshen_override" , "args": { "always_visible": false }},
+    { "command": "override_audit_freshen_package" , "args": { "always_visible": false }},
+
+    { "caption": "-", "id": "override_audit", },
+
+    { "caption": "-", "id": "clipboard" },
+    { "command": "copy" },
+    { "caption": "-", "id": "selection" },
+    { "command": "select_all" },
+
+]
