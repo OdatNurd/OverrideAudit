@@ -1,7 +1,7 @@
 OverrideAudit ChangeLog
 =======================
 
-Version 2.2.2 (????-??-??)
+Version 2.2.2 (2020-10-20)
 --------------------------
   * Previously, when creating or refreshing a report, the cursor
     would be left at the bottom of the view, which can cause some

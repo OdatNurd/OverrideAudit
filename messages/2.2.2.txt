@@ -1,4 +1,4 @@
-Version 2.2.2 (????-??-??)
+Version 2.2.2 (2020-10-20)
 --------------------------
 
   * Ensure that the cursor is at the top of the file when creating
