@@ -1,0 +1,8 @@
+Version 2.2.3 (????-??-??)
+--------------------------
+
+  * Correct the version of the User package Pthon interpreter
+    in newer builds of Sublime.
+
+  For the full details of changes in this version, check out the
+  CHANGELOG.md file.
