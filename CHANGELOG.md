@@ -1,6 +1,16 @@
 OverrideAudit ChangeLog
 =======================
 
+Version 2.2.3 (2021-07-13)
+--------------------------
+
+  * Correct the version of the User package Python interpreter
+    in newer builds of Sublime.
+
+  * Fix context sensitive commands throwing errors if they are
+    invoked from the tab context menu.
+
+
 Version 2.2.2 (2020-10-20)
 --------------------------
   * Previously, when creating or refreshing a report, the cursor

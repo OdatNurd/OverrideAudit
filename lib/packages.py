@@ -49,6 +49,11 @@ _wrap = (lambda value: value) if sublime.platform() == "linux" else (lambda valu
 _fixPath = (lambda value: value.replace("\\", "/")) if sublime.platform() == "windows" else (lambda value: value)
 
 
+# Determine what plugin host the User package runs in, which is always 3.3 in
+# Sublime Text 3 builds, but is in the newer 3.8 host in the 4k build series.
+_userPlugin = "3.8" if int(sublime.version()) >= 4000 else "3.3"
+
+
 ###----------------------------------------------------------------------------
 
 
@@ -541,7 +546,7 @@ class PackageInfo():
             pass
 
         if self.contains_plugins():
-            self.python_version = "3.3"
+            self.python_version = _userPlugin if self.name == "User" else "3.3"
             data = self.__get_meta_file(".python-version")
             if data:
                 self.python_version = data.strip()

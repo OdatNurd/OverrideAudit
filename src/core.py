@@ -1118,7 +1118,9 @@ class ContextHelper():
             source = "settings"
 
         # Check for context clicks on a package or override name as a fallback
-        elif event is not None:
+        # Note: In ST4, commands in the tab context menu will get an event, but
+        #       it will only have modifier key information
+        elif event is not None and "x" in event:
             source = "context"
             package = self._package_at_point(event)
             if package is None:
