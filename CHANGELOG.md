@@ -4,8 +4,11 @@ OverrideAudit ChangeLog
 Version 2.2.3 (????-??-??)
 --------------------------
 
-  * Correct the version of the User package Pthon interpreter
+  * Correct the version of the User package Python interpreter
     in newer builds of Sublime.
+
+  * Fix context sensitive commands throwing errors if they are
+    invoked from the tab context menu.
 
 
 Version 2.2.2 (2020-10-20)
