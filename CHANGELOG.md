@@ -1,7 +1,7 @@
 OverrideAudit ChangeLog
 =======================
 
-Version 2.2.3 (????-??-??)
+Version 2.2.3 (2021-07-13)
 --------------------------
 
   * Correct the version of the User package Python interpreter
