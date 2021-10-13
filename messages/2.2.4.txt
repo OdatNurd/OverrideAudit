@@ -1,0 +1,9 @@
+Version 2.2.4 (2021-10-12)
+--------------------------
+
+  * Fix a bug in which unknown overrides were not openable
+    via the command palette's Open Resource command, courtesy
+    of Keith Hall.
+
+  For the full details of changes in this version, check out the
+  CHANGELOG.md file.

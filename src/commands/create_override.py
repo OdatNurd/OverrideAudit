@@ -19,7 +19,7 @@ class OverrideAuditCreateOverrideCommand(sublime_plugin.WindowCommand):
     create an override on save.
     """
     def run(self, package=None, file=None, include_existing=False):
-        # If a packge or file name is missing, prompt for the given item and
+        # If a package or file name is missing, prompt for the given item and
         # reinvoke ourselves. When given a file but no package, the file is
         # ignored and the user will be prompted to pick the file.
         if package is None or file is None:
@@ -33,7 +33,7 @@ class OverrideAuditCreateOverrideCommand(sublime_plugin.WindowCommand):
                 p_filter = lambda p: bool(p.package_file()) and not p.is_disabled
 
             return PackageResourceBrowser(package, file, self.window,
-                res_type, unknown=False, annotate_overrides=annotate,
+                res_type, unknown=include_existing, annotate_overrides=annotate,
                 p_filter=p_filter,
                 on_done=lambda p,r: self.pick(p, r)).browse()
 
