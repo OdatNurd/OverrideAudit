@@ -1,6 +1,16 @@
 OverrideAudit ChangeLog
 =======================
 
+Version 2.2.4 (2021-10-12)
+--------------------------
+
+  * Resolve an issue with the Open Resource command, which
+    did not allow you to open unknown override files. This
+    makes various workflows problematic.
+
+    The fix comes courtesy of Keith Hall.
+
+
 Version 2.2.3 (2021-07-13)
 --------------------------
 
