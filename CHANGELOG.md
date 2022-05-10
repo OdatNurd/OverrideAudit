@@ -1,6 +1,15 @@
 OverrideAudit ChangeLog
 =======================
 
+Version 2.2.5 (????-??-??)
+--------------------------
+
+  * Update the hover popup that displays package information
+    to make it clearer that the commands that are implemented
+    in the Default package are available in all plugin hosts
+    and not just the one that it natively runs in.
+
+
 Version 2.2.4 (2021-10-12)
 --------------------------
 

@@ -1,0 +1,9 @@
+Version 2.2.5 (????-??-??)
+--------------------------
+
+  * The hover popup for package information has been updated
+    so that the Default package appears to be available in all
+    of the plugin hosts.
+
+  For the full details of changes in this version, check out the
+  CHANGELOG.md file.
