@@ -5,5 +5,9 @@ Version 2.2.5 (????-??-??)
     so that the Default package appears to be available in all
     of the plugin hosts.
 
+  * More hover popup help has been added to reports to give some
+    easily accessible documentation on the package type legends
+    and override types.
+
   For the full details of changes in this version, check out the
   CHANGELOG.md file.

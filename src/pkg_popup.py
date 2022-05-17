@@ -63,6 +63,194 @@ _help = {
 }
 
 
+# Help information associated with hover popups that provide more information
+# on things in reports, such as the [X] expired override marker and the like.
+_info = {
+    "[SIU]":
+    """
+    <h1>Package Type Specifier</h1>
+    <div class="help_text">
+        <p>
+            This field provides a shorthand for letting you know the different
+            states in which this package might exist; A package is always in at
+            least one of these states, but it could be in two or even all three
+            of them at once. The different states are:
+        </p>
+        <p>
+            <ul>
+                <li><strong>S</strong> marks packages that ships with Sublime
+                Text itself. Packages of this type are not installed in the
+                <a href="browse_data_dir">data directory</a>, and are instead
+                stored in the location where Sublime Text is installed.</li><br />
+
+                <li><strong>I</strong> marks user installed packages, installed
+                into the <code>Installed Packages</code> folder in a
+                <code>sublime-package</code> file. This includes package files
+                you install manually as well as those installed by Package
+                Control.</li><br/>
+
+                <li><strong>U</strong> marks packages that appears as named
+                folders in the <code>Packages</code> folder.</li>
+            </ul>
+        </p>
+    </div>
+    """,
+
+    "[X]":
+    """
+    <h1>Expired Override</h1>
+    <div class="help_text">
+        <p>
+            This override is <strong><em>expired</em></strong>.
+        </p>
+        <p>
+            An override is considered to be expired if the underlying package
+            that contains it has been updated since the override was created.
+            This could mean that the override is now out of date; it might
+            need to be changed or it may no longer be needed at all.
+        </p>
+        <p>
+            You can use the <a href="diff_report:{pkg}">Diff report</a>
+            to determine if you need to make any changes or incorporate new
+            fixes. While expired, your override may block new bug fixes and
+            features in the source package, since overriden resources are
+            always used if they exist, even if they're out of date.
+        </p>
+    </div>
+    """,
+
+    "[?]":
+    """
+    <h1>Unknown Override</h1>
+    <div class="help_text">
+        <p>
+            This override is <strong><em>unknown</em></strong>.
+        </p>
+        <p>
+            An override is considered to be <code>unknown</code> when there is
+            no file in the underlying <code>sublime-package</code> file that
+            shares it's name and location within the package.
+        </p>
+        <p>
+            In a technical sense this is not actually an override and is just a
+            regular package resource, though they could still be an issue. For
+            example files like this may be old overrides that are no longer
+            needed because the underlying file was removed.
+        </p>
+    </div>
+    """,
+
+    "[S]":
+    """
+    <h1>Package Type Specifier</h1>
+    <div class="help_text">
+        <p>
+            This is a package that ships with Sublime Text itself and is common
+            for all users of Sublime. Packages of this type provide much of the
+            core functionality that you get "out of the box".
+        </p>
+        <p>
+            Shipped packages are stored in a folder inside of the Sublime
+            installation folder; don't be alarmed if you can't find them
+            anywhere.
+        </p>
+        <p>
+            You should <strong><em>NEVER</em></strong> directly modify a shipped
+            package; rather, if you want or need to change default behaviour, you
+            should <a href="override:{pkg}">create an override</a> instead.
+        </p>
+    </div>
+    """,
+
+    "[I]":
+    """
+    <h1>Package Type Specifier</h1>
+    <div class="help_text">
+        <p>
+            This is a package that is installed as a <code>sublime-package</code>
+            file inside of the <code>Installed Packages</code> folder; normally
+            this would be done by Package Control, but you can also install
+            packages in this format manually as well.
+        </p>
+        <p>
+            You should <strong><em>NEVER</em></strong> directly modify a
+            package installed in this manner unless you manually put it there;
+            on a future upgrade your changes <strong><em>WILL</em></strong> be
+            discarded.
+        </p>
+        <p>
+            If you want or need to modify the behaviour of the package, you
+            should <a href="override:{pkg}">create an override</a> instead.
+        </p>
+    </div>
+    """,
+
+    "[U]":
+    """
+    <h1>Package Type Specifier</h1>
+    <div class="help_text">
+        <p>
+            This is a package that appears as a named folder in the
+            <code>Packages</code> folder; the contents of the folder represent
+            the contents of the package.
+        </p>
+        <p>
+            If a package is installed in the <code>Installed Packages</code>
+            folder or shipped with Sublime and also appears in the
+            <code>Packages</code> folder, any files in the folder will
+            <strong>override</strong> similarly named files in the underlying
+            package.
+        </p>
+    </div>
+    """,
+
+    "<Complete Override>":
+    """
+    <h1>Complete Package Override</h1>
+    <div class="help_text">
+        <p>
+            A <code>Complete Override</code> is an override that replaces the
+            entire contents of a package that ships with Sublime Text with a
+            new package, such as a version from a different build of Sublime,
+            or one in which package resources are removed (e.g. snippets that
+            are no longer desired).
+        </p>
+        <p>
+            To be a complete override, a <code>sublime-package</code> file for
+            a package needs to exist in the <code>Installed Packages</code>
+            folder as well as having the name of one of the packages that ship
+            with Sublime Text.
+        </p>
+        <p>
+            For a complete override, Sublime will ignore it's own version of
+            such a package in favor of the one that is user installed. This
+            type of override is powerful, but uncommon.
+        </p>
+    </div>
+    """,
+
+    "[EXPIRED]":
+    """
+    <h1>Expired Complete Package Override</h1>
+    <div class="help_text">
+        <p>
+            This override is an <strong><em>expired, complete override</em></strong>.
+        </p>
+        <p>
+            Similar to a regular override, a complete override is considered to
+            be expired if the shipped package that it is overriding has been
+            updated (via an update to Sublime Text) since the override was
+            created.
+        </p>
+        <p>
+            This could mean that the override is now out of date; it
+            might contain files that no longer exist or be missing new files
+            and bug fixes/features.
+        </p>
+    </div>
+    """,
+}
+
 ###----------------------------------------------------------------------------
 
 
@@ -168,7 +356,6 @@ _css = """
 
     .help_text {
         font-size: 0.9rem;
-        margin: 1rem;
     }
 
     .status {
@@ -458,6 +645,13 @@ def _render_popup(view, link_name, is_detailed):
         help_text = _help.get(topic, None)
         return None if help_text is None else help_text.format(pkg=pkg)
 
+    if link_name.startswith("info:"):
+        link_name = link_name[len("info:"):]
+        topic, pkg = link_name.split(':')
+
+        help_text = _info.get(topic, None)
+        return None if help_text is None else help_text.format(pkg=pkg)
+
     return None
 
 
@@ -469,12 +663,21 @@ def _popup_link(view, point, link_name, is_detailed):
     """
     if link_name == "override_report":
         view.window().run_command("override_audit_override_report")
+    elif link_name == "browse_data_dir":
+        view.window().run_command('open_dir', {"dir": "${packages}/.."})
     elif link_name.startswith("diff_report:"):
         package = link_name[len("diff_report:"):]
-        view.window().run_command("override_audit_diff_report", {"package": package})
+        if package != "":
+            view.window().run_command("override_audit_diff_report", {"package": package})
+        else:
+            view.window().run_command("override_audit_diff_report")
     elif link_name.startswith("override:"):
         package = link_name[len("override:"):]
-        view.window().run_command("override_audit_create_override", {"package": package})
+        if package != "":
+            view.window().run_command("override_audit_create_override", {"package": package})
+        else:
+            view.window().run_command("override_audit_create_override")
+
     elif link_name.startswith("http"):
         view.window().run_command("open_url", {"url": link_name})
 

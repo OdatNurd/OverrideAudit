@@ -670,9 +670,9 @@ of the package comes from the name of the directory the package is stored in.
 ### Shipped Package ###
 
 A *Shipped* Package is a *Packed* package that ships with Sublime Text itself.
-These packages provide the core functionality of Sublime Text itself, and are
-stored in a special location alongside the Sublime executable.This makes them
-common to all users of Sublime on the same computer.
+These packages provide the core functionality of Sublime Text, and are stored
+in a special location alongside the Sublime executable. This makes them common
+to all users of Sublime on the same computer.
 
 > The shipped package `Default.sublime-package` provides the set of default key
 > bindings, settings, menu entries and so on that all other packages modify.

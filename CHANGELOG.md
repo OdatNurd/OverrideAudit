@@ -9,6 +9,11 @@ Version 2.2.5 (????-??-??)
     in the Default package are available in all plugin hosts
     and not just the one that it natively runs in.
 
+  * Include extra hover popups on different parts of the
+    various reports that are available to help explain what is
+    being seen, such as the different package types and the
+    text that marks different types of overrides.
+
 
 Version 2.2.4 (2021-10-12)
 --------------------------
