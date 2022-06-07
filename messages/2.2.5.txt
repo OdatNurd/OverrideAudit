@@ -1,4 +1,4 @@
-Version 2.2.5 (????-??-??)
+Version 2.2.5 (2022-06-06)
 --------------------------
 
   * The hover popup for package information has been updated
@@ -9,5 +9,8 @@ Version 2.2.5 (????-??-??)
     easily accessible documentation on the package type legends
     and override types.
 
-  For the full details of changes in this version, check out the
-  CHANGELOG.md file.
+  * This will be the last release of OverrideAudit for Sublime
+    Text 3.
+
+  For the full details of changes in this version (including
+  the switch to Sublime Text 4), check out the CHANGELOG.md file.

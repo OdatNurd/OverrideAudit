@@ -1,7 +1,7 @@
 OverrideAudit ChangeLog
 =======================
 
-Version 2.2.5 (????-??-??)
+Version 2.2.5 (2022-06-06)
 --------------------------
 
   * Update the hover popup that displays package information
@@ -13,6 +13,12 @@ Version 2.2.5 (????-??-??)
     various reports that are available to help explain what is
     being seen, such as the different package types and the
     text that marks different types of overrides.
+
+  NOTE: This is the last version of OverrideAudit that will
+        be released for Sublime Text 3. With this release the
+        minimum required version of Sublime Text will be 4
+        in order to allow OverrideAudit to take advantage of
+        newer features in the application.
 
 
 Version 2.2.4 (2021-10-12)
