@@ -6,6 +6,12 @@ WARNING: Text
 #       ^^^^^^ text.override-audit
 
 [S U] Lua
+#<- meta.package.specifier
+#^^^^ meta.package.specifier
+#     ^^^ entity.name.package.enabled
+#        ^ text.override-audit
+
+[S U] Lua
 #<- storage.modifier
 #^^^^ storage.modifier
 #     ^^^ entity.name.package.enabled
@@ -14,12 +20,12 @@ WARNING: Text
 [S U] Lua <Complete Override>
 #     ^^^ entity.name.package.enabled
 #        ^ text.override-audit
-#         ^^^^^^^^^^^^^^^^^^^ comment
+#         ^^^^^^^^^^^^^^^^^^^ meta.package.override
 
 [S U] Lua <Complete Override> [EXPIRED]
 #     ^^^ entity.name.package.enabled.expired
 #        ^ text.override-audit
-#         ^^^^^^^^^^^^^^^^^^^ comment
+#         ^^^^^^^^^^^^^^^^^^^ meta.package.override
 #                             ^^^^^^^^^ meta.package.expired
 
 [S U] [Lua]

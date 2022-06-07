@@ -7,7 +7,7 @@ contexts:
   main:
     - match: '^(\[[SIU ]{3}]) '
       captures:
-        1: storage.modifier
+        1: meta.package.specifier storage.modifier
       push: [package_row, 'scope:text.override-audit.diff#package_name']
 
     - match: '^WARNING:'

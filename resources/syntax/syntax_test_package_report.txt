@@ -7,6 +7,11 @@
 #                                                  ^^^ entity.package.installed
 #                                                        ^^^ entity.package.unpacked
 
+| Default                                  | [S] | [I] | [U] |
+#                                            ^^^ meta.package.shipped
+#                                                  ^^^ meta.package.installed
+#                                                        ^^^ meta.package.unpacked
+
 | Color Scheme - Default                   | [S] | [ ] | [ ] |
 # ^^^^^^^^^^^^^^^^^^^^^^ entity.name.package.enabled
 #                       ^ text.override-audit

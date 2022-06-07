@@ -1,0 +1,16 @@
+Version 2.2.5 (2022-06-06)
+--------------------------
+
+  * The hover popup for package information has been updated
+    so that the Default package appears to be available in all
+    of the plugin hosts.
+
+  * More hover popup help has been added to reports to give some
+    easily accessible documentation on the package type legends
+    and override types.
+
+  * This will be the last release of OverrideAudit for Sublime
+    Text 3.
+
+  For the full details of changes in this version (including
+  the switch to Sublime Text 4), check out the CHANGELOG.md file.

@@ -5,7 +5,22 @@ WARNING: Text
 #^^^^^^^ keyword.control.expired
 #       ^^^^^^ text.override-audit
 
+[S U] Objective-C <Complete Override>
+#                 ^^^^^^^^^^^^^^^^^^^ meta.package.override
+
+[S U] Objective-C <Complete Override> [EXPIRED]
+#                 ^^^^^^^^^^^^^^^^^^^ meta.package.override
+#                                     ^^^^^^^^^ meta.package.expired
+
 [S U] Objective-C
+    Objective-C++.sublime-syntax
+#   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ entity.name.filename.override
+        No differences found
+#       ^^^^^^^^^^^^^^^^^^^^^ text.override-audit
+
+[S U] Objective-C
+# <- meta.package.specifier
+#^^^^ meta.package.specifier
     Objective-C++.sublime-syntax
 #   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^ entity.name.filename.override
         No differences found

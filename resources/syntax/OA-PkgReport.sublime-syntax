@@ -45,13 +45,13 @@ contexts:
       scope: comment
 
     - match: '{{shipped_pkg}}'
-      scope: entity.package.shipped storage.type
+      scope: meta.package.shipped entity.package.shipped storage.type
 
     - match: '{{installed_pkg}}'
-      scope: entity.package.installed storage.type
+      scope: meta.package.installed entity.package.installed storage.type
 
     - match: '{{unpacked_pkg}}'
-      scope: entity.package.unpacked storage.type
+      scope: meta.package.unpacked entity.package.unpacked storage.type
 
     - match: '$'
       pop: true

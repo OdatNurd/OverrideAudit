@@ -49,9 +49,16 @@ _wrap = (lambda value: value) if sublime.platform() == "linux" else (lambda valu
 _fixPath = (lambda value: value.replace("\\", "/")) if sublime.platform() == "windows" else (lambda value: value)
 
 
-# Determine what plugin host the User package runs in, which is always 3.3 in
-# Sublime Text 3 builds, but is in the newer 3.8 host in the 4k build series.
-_userPlugin = "3.8" if int(sublime.version()) >= 4000 else "3.3"
+# Some packages always run in specific plugin hosts, and that can't be changed.
+# This maps the names of such packages to the versions of the plugin host that
+# the plugins in those packages will run in.
+#
+# The value of these is determined by the build, since in pre 4k builds there
+# was only a single plugin host.
+_predefined_pkg_version_map = {
+    "User": "3.8" if int(sublime.version()) >= 4000 else "3.3",
+    "Default": "3.8 / 3.3" if int(sublime.version()) >= 4000 else "3.3"
+}
 
 
 ###----------------------------------------------------------------------------
@@ -546,10 +553,11 @@ class PackageInfo():
             pass
 
         if self.contains_plugins():
-            self.python_version = _userPlugin if self.name == "User" else "3.3"
-            data = self.__get_meta_file(".python-version")
-            if data:
-                self.python_version = data.strip()
+            self.python_version = _predefined_pkg_version_map.get(self.name, "3.3")
+            if self.name not in _predefined_pkg_version_map:
+                data = self.__get_meta_file(".python-version")
+                if data:
+                    self.python_version = data.strip()
 
     def _get_packed_pkg_file_contents(self, override_file, as_list=True):
         try:

@@ -1,5 +1,7 @@
 import sublime
 import sublime_plugin
+
+from bisect import bisect
 import os
 
 from .pkg_popup import show_pkg_popup
@@ -35,12 +37,29 @@ class OverrideAuditEventListener(sublime_plugin.EventListener):
         if hover_zone != sublime.HOVER_TEXT:
             return
 
-        if not view.match_selector(point, "text.override-audit entity.name.package"):
+        if not view.match_selector(point, "text.override-audit & (entity.name.package, meta.override, meta.package)"):
             return None
 
-        report_type = view.settings().get("override_audit_report_type", "??")
-        pkg_name = view.substr(view.extract_scope(point))
-        show_pkg_popup(view, point, "pkg:" + pkg_name, report_type != ":packages")
+        hover_text = view.substr(view.extract_scope(point))
+        is_detailed = False
+
+        if view.match_selector(point, "entity.name.package"):
+            is_detailed = view.settings().get("override_audit_report_type", "??")
+            link = "pkg:%s" % hover_text
+        else:
+            packages = view.find_by_selector("entity.name.package")
+            if packages:
+                p_lines = [view.rowcol(p.begin())[0] for p in packages]
+                pkg_region = packages[bisect(p_lines, view.rowcol(point)[0]) - 1]
+
+                pkg = view.substr(pkg_region)
+
+            if view.match_selector(point, "meta.package.specifier"):
+                hover_text = '[SIU]'
+
+            link = "info:%s:%s" % (hover_text, pkg)
+
+        show_pkg_popup(view, point, link, is_detailed)
 
 
 ###----------------------------------------------------------------------------
