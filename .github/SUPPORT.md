@@ -17,13 +17,14 @@ what version of OverrideAudit you're running.
 If you're not sure how to use OverrideAudit, don't panic! There is help
 available to guide you through.
 
-All of the features of OverrideAudit (including a [Quick Start](http://odatnurd.net/overrideaudit/docs/start.html))
-are available in the [online documentation](http://odatnurd.net/overrideaudit/docs/).
+All of the features of OverrideAudit (including a [Quick Start](https://overrideaudit.odatnurd.net/docs/start.html))
+are available in the [online documentation](https://overrideaudit.odatnurd.net/docs/).
 There are also [official videos](https://www.youtube.com/playlist?list=PLGfKZJVuHW91bZTA53SZWIdRvU5QZ5xtS)
-available on my [YouTube Channel](https://www.youtube.com/channel/UCJAB_XF3kAMqwF85y0hxcXQ).
+available on my [YouTube Channel](https://www.youtube.com/c/@OdatNurd).
 
 You can get in touch via the following options:
 
  * Twitter: [@OdatNurd](https://twitter.com/OdatNurd)
  * Sublime Text Forum: [@OdatNurd](https://forum.sublimetext.com/users/odatnurd/activity)
+ * Discord: [https://discord.gg/b3x5AuwVVY](https://discord.gg/b3x5AuwVVY)
  * [odatnurd.net](https://odatnurd.net)

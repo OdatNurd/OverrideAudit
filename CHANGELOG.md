@@ -1,6 +1,21 @@
 OverrideAudit ChangeLog
 =======================
 
+Version 2.2.6 (2023-09-15)
+--------------------------
+
+  * Update links to documentation pages, which have been
+    moved to different hosting in preparation for some
+    upcoming changes.
+
+    This release has no functional changes, and has been
+    released for both ST3 and ST4 versions of OverrideAudit
+    in order to make sure the documentation is available.
+
+    The next round of changes will include some ST4 specific
+    upgrades, such as running in the Python 3.8 plugin host.
+
+
 Version 2.2.5 (2022-06-06)
 --------------------------
 

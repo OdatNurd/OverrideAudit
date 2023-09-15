@@ -1,0 +1,7 @@
+Version 2.2.6 (2023-09-15)
+--------------------------
+
+  * Update links to documentation pages on the web.
+
+  For the full details of changes in this version, check out the
+  CHANGELOG.md file.

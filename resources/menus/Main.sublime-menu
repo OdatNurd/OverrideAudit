@@ -47,7 +47,7 @@
                                 "caption": "Documentation",
                                 "command": "open_url",
                                 "args": {
-                                    "url": "https://odatnurd.net/overrideaudit/docs/"
+                                    "url": "https://overrideaudit.odatnurd.net/docs/"
                                 }
                             },
 
