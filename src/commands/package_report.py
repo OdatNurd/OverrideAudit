@@ -16,7 +16,7 @@ class PackageReportThread(ReportGenerationThread):
         pkg_list = PackageList()
         pkg_counts = pkg_list.package_counts()
 
-        title = "{} Total Packages".format(len(pkg_list))
+        title = f"{len(pkg_list)} Total Packages"
         t_sep = "=" * len(title)
 
         fmt = '{{:>{}}}'.format(len(str(max(pkg_counts))))

@@ -472,11 +472,7 @@ def extract_packed_override(pkg_info, override):
                     pkg_info.name, override)
 
     name,ext = os.path.splitext(override)
-    prefix = "{pre}_{pkg}_{name}_".format(
-        pre=override_type,
-        pkg=pkg_info.name,
-        name=name.replace("/", "_")
-        )
+    prefix = f"{override_type}_{pkg_info.name}_{name.replace('/', '_')}_"
 
     try:
         fd, base_name = mkstemp(prefix=prefix, suffix=ext)

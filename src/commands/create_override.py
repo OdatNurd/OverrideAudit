@@ -44,11 +44,10 @@ class OverrideAuditCreateOverrideCommand(sublime_plugin.WindowCommand):
 
         # No unpacked file; verify the package contains the resource
         res = '/'.join([package, file])
-        if "Packages/" + res not in sublime.find_resources(res.split('/')[-1]):
-            return log("'{0}' not found; cannot create override".format(
-                       file), dialog=True)
+        if f"Packages/{res}" not in sublime.find_resources(res.split('/')[-1]):
+            return log(f"'{file}' not found; cannot create override", dialog=True)
 
-        self.window.run_command("open_file", {"file": "${packages}/" + res})
+        self.window.run_command("open_file", {"file": f"${{packages}}/{res}"})
 
         # Get the active view and set it up as a potential new override.
         view = self.window.active_view()
