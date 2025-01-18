@@ -1,0 +1,7 @@
+Version 3.0.0 (?.?.?.?)
+--------------------------
+
+  * Update the package to use the newest Python plugin host
+
+  For the full details of changes in this version, check out the
+  CHANGELOG.md file.

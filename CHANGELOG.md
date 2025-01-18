@@ -1,6 +1,13 @@
 OverrideAudit ChangeLog
 =======================
 
+Version 3.0.0 (????-??-??)
+--------------------------
+
+  * Update OverrideAudit to officially use the Python 3.8
+    plugin host rather than the legacy plugin host.
+
+
 Version 2.2.7 (2024-02-21)
 
   * Fix the documentation link in the command palette, which
