@@ -563,7 +563,7 @@ class PackageInfo():
         try:
             with zipfile.ZipFile(self.package_file()) as zFile:
                 info = find_zip_entry(zFile, override_file)
-                file = codecs.EncodedFile(zFile.open(info, mode="rU"), "utf-8")
+                file = codecs.EncodedFile(zFile.open(info, mode="r"), "utf-8")
                 if as_list:
                     content = io.TextIOWrapper(file, encoding="utf-8").readlines()
                 else:
@@ -643,7 +643,7 @@ class PackageInfo():
             if self.package_file() is not None:
                 with zipfile.ZipFile(self.package_file()) as zFile:
                     info = find_zip_entry(zFile, resource)
-                    file = codecs.EncodedFile(zFile.open(info, mode="rU"), "utf-8")
+                    file = codecs.EncodedFile(zFile.open(info, mode="r"), "utf-8")
                     if as_binary:
                         return file.read()
 
