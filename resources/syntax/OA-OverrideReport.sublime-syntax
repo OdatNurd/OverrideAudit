@@ -2,6 +2,7 @@
 ---
 name: OverrideAudit
 scope: text.override-audit.overridereport
+version: 2
 hidden: true
 contexts:
   main:
