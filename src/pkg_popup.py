@@ -283,6 +283,11 @@ _css = """
         color: var(--orangish);
     }
 
+    .code {
+        font-family: monospace;
+        color: var(--bluish);
+    }
+
     h1 span {
         font-size: 0.80rem;
         position: relative;
@@ -533,8 +538,13 @@ def _override_details(view, details):
     has_unknown = details["unknown_overrides"] > 0
     has_filtered = details["unknowns_filtered"] > 0
 
+    # Possible overrides controls the second section, for when we know there
+    # might be overrides, but we don't know how many there are; so only flag
+    # it when we know there are some but don't know how many there are.
+    possible_overrides = details["has_possible_overrides"] and details["overrides"] < 0
+
     return """
-        <div class="{override_class}">
+        <div class="{has_overrides_class}">
             {overrides} overridden package {o_desc}
             <span class="{expired_class}">({expired} expired)</span>
             <br>
@@ -542,9 +552,12 @@ def _override_details(view, details):
                 <span class={filtered_class}> ({filtered} being filtered)</span>
             </span>
         </div>
+        <div class="{possible_overrides_class}">
+            This package may contain overrides; use <span class="code">View Diferences</span> to perform a scan.
+        </div>
         """.format(
             pkg=details["name"],
-            override_class=_class(has_overrides, "overrides"),
+            has_overrides_class=_class(has_overrides, "overrides"),
             overrides=details["overrides"],
             o_desc=_p(details["overrides"]),
 
@@ -554,6 +567,8 @@ def _override_details(view, details):
             unknown_class=_class(has_unknown, "overrides"),
             unknown=details["unknown_overrides"],
             u_desc=_p(details["unknown_overrides"]),
+
+            possible_overrides_class=_class(possible_overrides, "overrides"),
 
             filtered_class=_class(has_filtered, "filtered"),
             filtered=details["unknowns_filtered"])
@@ -580,7 +595,12 @@ def _package_links(view, details):
     section is hidden.
     """
     can_create = details.get("is_shipped", False) or details.get("is_installed", False)
-    has_overrides = details.get("overrides", 0) > 0
+
+    # Only consider that we have overrides (and thus should allow you to open
+    # a diff of them) if it's possible to have overrides and the number is
+    # either -1 (did not check) or some number > 0 (there are some). A value of
+    # 0 means we looked and there are none.
+    has_overrides = details.get("has_possible_overrides", False) and details.get("overrides", -1) != 0
 
     return """
         <div class="{link_class}">

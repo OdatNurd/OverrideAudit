@@ -7,6 +7,9 @@ Version 3.0.0 (????-??-??)
   * Update OverrideAudit to officially use the Python 3.8
     plugin host rather than the legacy plugin host.
 
+  * Fix an issue with the package hover popup for some
+    reports displaying an incorrect count of overrides.
+
 
 Version 2.2.7 (2024-02-21)
 

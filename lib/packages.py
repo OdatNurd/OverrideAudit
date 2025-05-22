@@ -976,7 +976,10 @@ class PackageInfo():
         Return a status dictionary for the status of this package. When
         detailed is True, the resulting dictionary will contain complete
         override details. False provides only information on whether overrides
-        are possible or not.
+        are possible or not; in this case the count of all overrides is -1
+        so that it is definitive that there is no count (rather than using
+        0, which is indistinguishable from it being possible but there not
+        being any even during a detailed scan).
 
         This detail requires gathering package contents and thus is a more
         heavy-weight call.
@@ -986,8 +989,7 @@ class PackageInfo():
             expired_overrides = len(self.expired_override_files(simple=True))
             unknown_overrides = len(self.unknown_override_files())
         else:
-            overrides = 1 if self.has_possible_overrides() else 0
-            expired_overrides = unknown_overrides = overrides
+            overrides = expired_overrides = unknown_overrides = overrides = -1
 
         return {
             # Core info
@@ -1010,10 +1012,11 @@ class PackageInfo():
 
             # Override information; may contain false positives if detailed is
             # False
-            "overrides":         overrides,
-            "expired_overrides": expired_overrides,
-            "unknown_overrides": unknown_overrides,
-            "unknowns_filtered": self.unknowns_filtered
+            "has_possible_overrides": self.has_possible_overrides(),
+            "overrides":              overrides,
+            "expired_overrides":      expired_overrides,
+            "unknown_overrides":      unknown_overrides,
+            "unknowns_filtered":      self.unknowns_filtered
         }
 
 
