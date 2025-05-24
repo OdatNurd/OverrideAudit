@@ -16,6 +16,11 @@ Version 3.0.0 (????-??-??)
     more correct based on upcoming changes to the Python
     version used by Sublime.
 
+  * If a package declares an invalid Python version,
+    mention in the hover popup that plugins are ignored in
+    that package as a result (Sublime displays a message to
+    this effect in the console when the package loads).
+
 
 Version 2.2.7 (2024-02-21)
 

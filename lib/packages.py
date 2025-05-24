@@ -7,8 +7,10 @@ import codecs
 from datetime import datetime
 import difflib
 from collections import MutableSet, OrderedDict
-import glob
+from glob import glob, iglob
 import fnmatch
+
+from sys import version_info as host_version
 
 from .metadata import default_metadata
 
@@ -49,19 +51,49 @@ _wrap = (lambda value: value) if sublime.platform() == "linux" else (lambda valu
 _fixPath = (lambda value: value.replace("\\", "/")) if sublime.platform() == "windows" else (lambda value: value)
 
 
-# Some packages always run in specific plugin hosts, and that can't be changed.
-# This maps the names of such packages to the versions of the plugin host that
-# the plugins in those packages will run in.
-#
-# The value of these is determined by the build, since in pre 4k builds there
-# was only a single plugin host.
-_predefined_pkg_version_map = {
-    "User": "3.8" if int(sublime.version()) >= 4000 else "3.3",
-    "Default": "3.8 / 3.3" if int(sublime.version()) >= 4000 else "3.3"
-}
-
-
 ###----------------------------------------------------------------------------
+
+
+def _python_host_versions():
+    """
+    Determine the version of all known versions of Python that the currently
+    running version of Sublime knows how to handle and return them back as a
+    list of strings in "major.minor" format, sorted by version number.
+
+    The first time this is called, the full information is gathered; after
+    this point, the data from the cached data from the initial call is
+    returned back.
+    """
+    if not hasattr(_python_host_versions, 'versions'):
+        versions = [f"{host_version.major}.{host_version.minor}"]
+
+        exe_path = os.path.dirname(sublime.executable_path())
+        hosts = glob(os.path.join(exe_path, "plugin_host*"))
+
+        # Plugin hosts are either "plugin_host-X.Y" or "plugin_host"; so
+        # iterate, turn the latter part into a float, and store it. If there
+        # is no -X.Y, then do nothing because if there's only one plugin host,
+        # we already captured its version above.
+        for host in hosts:
+            filename = os.path.basename(host)
+            try:
+                version = str(abs(float(filename[len("plugin_host"):])))
+                if version not in versions:
+                    versions.append(version)
+            except:
+                pass
+
+        settings = sublime.load_settings("Preferences.sublime-settings").to_dict()
+
+        for key in [k for k in settings if k.startswith("disable_plugin_host_")]:
+            version = key[len("disable_plugin_host_"):]
+            if version in versions:
+                versions.remove(version)
+
+        # Present versions in ascending order.
+        _python_host_versions.versions = sorted(versions, key=float)
+
+    return _python_host_versions.versions
 
 
 def _shipped_packages_path():
@@ -535,6 +567,36 @@ class PackageInfo():
 
         return None
 
+
+    def _get_package_python_version(self):
+        versions = _python_host_versions()
+        if not self.contains_plugins():
+            return ""
+
+        # The User package always runs in the most recent plugin host version.
+        if self.name == "User":
+            return versions[-1]
+
+        # The Default package is loaded in all available hosts.
+        if self.name == "Default":
+            return " / ".join(versions)
+        if len(versions) == 1:
+            return versions[0]
+
+        data = self.__get_meta_file(".python-version")
+        if data:
+            version = data.strip()
+            # If the version is not valid, Sublime ignores plugins in the
+            # package.
+            if version not in versions:
+                return f"{version} (invalid version; plugins are ignored in this package)"
+
+            return version
+
+        # Default to lowest available version.
+        return versions[0]
+
+
     def _load_metadata(self):
         res_name = "package-metadata.json"
         if self.is_dependency:
@@ -552,12 +614,8 @@ class PackageInfo():
         except:
             pass
 
-        if self.contains_plugins():
-            self.python_version = _predefined_pkg_version_map.get(self.name, "3.3")
-            if self.name not in _predefined_pkg_version_map:
-                data = self.__get_meta_file(".python-version")
-                if data:
-                    self.python_version = data.strip()
+        self.python_version = self._get_package_python_version()
+
 
     def _get_packed_pkg_file_contents(self, override_file, as_list=True):
         try:
@@ -908,7 +966,7 @@ class PackageInfo():
             path_len = len(self.unpacked_path) + 1
             res_spec = os.path.join(self.unpacked_path, "*.py")
             try:
-                next(f for f in glob.iglob(res_spec) if is_plugin(f[path_len:]))
+                next(f for f in iglob(res_spec) if is_plugin(f[path_len:]))
                 return True
             except:
                 pass
@@ -1163,3 +1221,13 @@ class PackageList():
 
 
 ###----------------------------------------------------------------------------
+
+
+# invoke the function that will gather the plugin hosts, so that this happens
+# at package load time and freezes the interpreter list with the versions that
+# would be active based on the current preferences.
+#
+# This way we don't need to worry about someone changing settings before the
+# first call to anything OverrideAudit related without restarting Sublime first
+# which might make us report an incorrect version.
+_python_host_versions()
