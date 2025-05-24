@@ -10,6 +10,12 @@ Version 3.0.0 (????-??-??)
   * Fix an issue with the package hover popup for some
     reports displaying an incorrect count of overrides.
 
+  * Update handling of the Python version that displays in
+    the hover popup so that it always displays even if
+    there are no plugins, and make the reported version
+    more correct based on upcoming changes to the Python
+    version used by Sublime.
+
 
 Version 2.2.7 (2024-02-21)
 
