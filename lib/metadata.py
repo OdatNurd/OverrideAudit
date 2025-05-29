@@ -1,5 +1,4 @@
 import sublime
-from collections import defaultdict
 
 
 ###----------------------------------------------------------------------------
@@ -84,6 +83,9 @@ _shipped_metadata = {
     "ASP": {
         "description": "Support for working with ASP"
     },
+    "Binary": {
+        "description": "Support for distinguishing Binary files from Text files"
+    },
     "Batch File": {
         "description": "Support for working with Batch Files"
     },
@@ -128,6 +130,9 @@ _shipped_metadata = {
     },
     "HTML": {
         "description": "Support for working with HTML"
+    },
+    "JSON": {
+        "description": "Support for working with JSON"
     },
     "Java": {
         "description": "Support for working with Java"
@@ -216,6 +221,9 @@ _shipped_metadata = {
     "Textile": {
         "description": "Support for working with Textile"
     },
+    "TOML": {
+        "description": "Support for working with TOML files"
+    },
     "Vintage": {
         "description": "<b><em>vi</em></b> mode editing package for Sublime Text 3",
         "url": "https://github.com/sublimehq/Vintage"
@@ -256,7 +264,7 @@ def default_metadata(pkg_info):
 
     if pkg_info.name in _shipped_metadata:
         metadata = dict(_default_pkg_metadata)
-        metadata.update(_shipped_metadata.get(pkg_info.name))
+        metadata.update(_shipped_metadata.get(pkg_info.name, {}))
 
         if not pkg_info.has_possible_overrides(simple=False):
             metadata["version"] = "Sublime %s" % sublime.version()

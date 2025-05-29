@@ -21,6 +21,11 @@ Version 3.0.0 (????-??-??)
     that package as a result (Sublime displays a message to
     this effect in the console when the package loads).
 
+  * Update the metadata that's used to provide information
+    for packages that ship with Sublime directly to include
+    new packages that have been added to the standard
+    Sublime distribution.
+
 
 Version 2.2.7 (2024-02-21)
 
