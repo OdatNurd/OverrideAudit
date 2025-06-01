@@ -23,7 +23,7 @@ class PackageReportThread(ReportGenerationThread):
                  "{0} [I]nstalled (user) sublime-package files\n"
                  "{0} [U]npacked in Packages\\ directory\n"
                  "{0} Currently in ignored_packages\n"
-                 "{0} Installed Dependencies\n").format(fmt).format(*pkg_counts)
+                 "{0} Installed Legacy-style Dependencies\n").format(fmt).format(*pkg_counts)
 
         r_sep = "+------------------------------------------+-----+-----+-----+"
 

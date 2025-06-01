@@ -29,6 +29,11 @@ Version 3.0.0 (????-??-??)
     new packages that have been added to the standard
     Sublime distribution.
 
+  * Mark the dependencies that display in the package report
+    as "legacy-style" dependencies, since with PC 4+, all
+    most all dependencies are installed as actual libraries
+    outside of the Packages folder.
+
 
 Version 2.2.7 (2024-02-21)
 
