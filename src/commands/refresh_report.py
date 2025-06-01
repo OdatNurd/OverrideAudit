@@ -1,4 +1,5 @@
-import sublime
+from typing import Any, Dict
+
 import sublime_plugin
 
 from ..core import ContextHelper
@@ -22,7 +23,7 @@ class OverrideAuditRefreshReportCommand(ContextHelper,sublime_plugin.TextCommand
             ":overrides":         "override_audit_override_report",
             ":overrides_expired": "override_audit_override_report"
         }.get(report_type, "override_audit_diff_report")
-        args = {"force_reuse": True}
+        args: Dict[str, Any] = {"force_reuse": True}
 
         if target_view.settings().get("override_audit_exclude_unchanged", False):
             args["exclude_unchanged"] = True
@@ -32,8 +33,9 @@ class OverrideAuditRefreshReportCommand(ContextHelper,sublime_plugin.TextCommand
         elif report_type == ":overrides_expired":
             args["only_expired"] = True
 
-        window.focus_view(target_view)
-        window.run_command(command, args)
+        if window:
+            window.focus_view(target_view)
+            window.run_command(command, args)
 
     def description(self, **kwargs):
         if self._report_type(**kwargs) is None:

@@ -1,4 +1,3 @@
-import sublime
 import sublime_plugin
 
 from ..core import diff_override, packages_with_overrides, log

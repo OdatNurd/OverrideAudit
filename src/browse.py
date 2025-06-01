@@ -52,7 +52,7 @@ class PackageBrowser():
         if self.file_type == ResourceType.OVERRIDE:
             return packages_with_overrides(pkg_list)
         else:
-            return [name for name, pkg in pkg_list]
+            return [name for name, _ in pkg_list]
 
     def browse(self, pkg_list, on_done):
         """
@@ -228,7 +228,7 @@ class ResourceBrowser():
 
         items = self._get_pkg_content(pkg_info)
         if not items:
-            log("Package '%s' has no resources of the selected type" % pkg_name,
+            log("Package '%s' has no resources of the selected type" % pkg_info.name,
                 status=True, dialog=True)
             return on_done(None)
 
@@ -267,7 +267,7 @@ class PackageResourceBrowser():
 
     def _on_done(self, pkg_info, resource_name):
         if self.on_done is not None:
-            sublime.set_timeout(lambda: self.on_done(pkg_info, resource_name))
+            sublime.set_timeout(lambda on_done=self.on_done: on_done(pkg_info, resource_name))
 
     def _res_select(self, pkg_info, file):
         if file == "..":
@@ -289,12 +289,12 @@ class PackageResourceBrowser():
 
     def _start_browse(self, thread):
         if thread is not None:
-            self.pkg_list = thread.pkg_list
+            self.pkg_list = thread.pkg_list or {}
 
         if self.pkg_name is None:
             return self.pkg_browser.browse(self.pkg_list, lambda pkg_info: self._pkg_select(pkg_info, True))
 
-        if self.pkg_name in self.pkg_list:
+        if self.pkg_list is not None and self.pkg_name in self.pkg_list:
             return self._pkg_select(self.pkg_list[self.pkg_name], False)
 
         log("Package '%s' does not exist" % self.pkg_name,

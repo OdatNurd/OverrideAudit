@@ -5,7 +5,8 @@ from bisect import bisect
 import os
 
 from .pkg_popup import show_pkg_popup
-from .core import oa_setting, override_group, delete_packed_override
+from .core import log
+from .core import delete_packed_override
 from .core import setup_override_minidiff
 
 
@@ -82,7 +83,11 @@ class CreateOverrideEventListener(sublime_plugin.ViewEventListener):
         unpacked folder; doing so marked this as no longer a potential new
         override.
         """
-        path = os.path.dirname(self.view.file_name())
+        view_filename = self.view.file_name()
+        if view_filename is None:
+            return
+
+        path = os.path.dirname(view_filename)
         try:
             os.makedirs(path, exist_ok=True)
             self.view.settings().erase("_oa_is_new_override")

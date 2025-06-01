@@ -54,6 +54,19 @@ _fixPath = (lambda value: value.replace("\\", "/")) if sublime.platform() == "wi
 ###----------------------------------------------------------------------------
 
 
+class NoSuchSublimePackageException(Exception):
+    """
+    Exceptions of this type are raised to indicate that an operation has been
+    undertaken that strictly requires that a package be represented, at least
+    in part, by a sublime-package file, but there is no such known file for
+    the referenced package.
+    """
+    pass
+
+
+###----------------------------------------------------------------------------
+
+
 def _python_host_versions():
     """
     Determine the version of all known versions of Python that the currently
@@ -117,7 +130,7 @@ def _pkg_scan(path, filename, recurse=False):
     recurse controls if the search will also scan subfolders of the provided
     path.
     """
-    for (path, dirs, files) in os.walk(path, followlinks=True):
+    for (path, _, files) in os.walk(path, followlinks=True):
         for name in files:
             if _wrap(name) == _wrap(filename):
                 return os.path.join(path, name)
@@ -320,7 +333,7 @@ class OverrideDiffResult():
     The optional indent value will be used to indent all values.
     """
     def __init__(self, packed, unpacked, result, is_binary=False,
-                 empty_msg=None, indent=None):
+                 empty_msg=None, indent=""):
         if packed is not None and unpacked is not None:
             self.hdr =  indent + "--- %s    %s\n" % (packed[1], packed[2])
             self.hdr += indent + "+++ %s    %s\n" % (unpacked[1], unpacked[2])
@@ -387,7 +400,8 @@ class PackageInfo():
         self.unknown_overrides = None
         self.unknowns_filtered = 0
 
-        self.binary_patterns = settings.get("binary_file_patterns", [])
+        patterns = settings.get("binary_file_patterns", [])
+        self.binary_patterns = patterns if isinstance(patterns, list) else []
 
         if scan:
             self.__scan()
@@ -494,7 +508,7 @@ class PackageInfo():
 
     def __get_pkg_dir_contents(self, pkg_path):
         results = PackageFileSet()
-        for (path, dirs, files) in os.walk(pkg_path, followlinks=True):
+        for (path, _, files) in os.walk(pkg_path, followlinks=True):
             rPath = os.path.relpath(path, pkg_path) if path != pkg_path else ""
             for name in files:
                 results.add(_fixPath(os.path.join(rPath, name)))
@@ -552,7 +566,14 @@ class PackageInfo():
 
         try:
             data = self.get_file("dependencies.json")
-            return self.__select_dependencies(sublime.decode_value(data))
+            if not isinstance(data, str):
+                raise ValueError("dependencies.json does not exist")
+
+            dependency_data = sublime.decode_value(data)
+            if not isinstance(dependency_data, dict):
+                raise ValueError("dependencies.json is not an object")
+
+            return self.__select_dependencies(dependency_data)
 
         except:
             return self.metadata.get("dependencies", [])
@@ -606,8 +627,13 @@ class PackageInfo():
 
         try:
             data = self.__get_meta_file(res_name)
-            if data:
-                self.metadata = sublime.decode_value(data)
+            if isinstance(data, str):
+                meta_dict = sublime.decode_value(data)
+
+            if not isinstance(meta_dict, dict):
+                raise ValueError(f'{res_name} does not contain an object')
+
+            self.metadata = meta_dict
 
             if not self.is_dependency:
                 self.metadata["dependencies"] = self.__get_dependencies()
@@ -619,7 +645,11 @@ class PackageInfo():
 
     def _get_packed_pkg_file_contents(self, override_file, as_list=True):
         try:
-            with zipfile.ZipFile(self.package_file()) as zFile:
+            package_file = self.package_file()
+            if package_file is None:
+                raise NoSuchSublimePackageException(f'package {self.name} has no sublime-package file')
+
+            with zipfile.ZipFile(package_file) as zFile:
                 info = find_zip_entry(zFile, override_file)
                 file = codecs.EncodedFile(zFile.open(info, mode="r"), "utf-8")
                 if as_list:
@@ -636,6 +666,11 @@ class PackageInfo():
 
                 return (content, _fixPath(source), mtime)
 
+        except NoSuchSublimePackageException:
+            print("Error loading %s; no such package file" %
+                  self.package_file())
+            return None
+
         except (KeyError, FileNotFoundError):
             print("Error loading %s:%s; cannot find file in sublime-package" %
                   (self.package_file(), override_file))
@@ -646,7 +681,11 @@ class PackageInfo():
                   (self.package_file(), override_file))
             return None
 
+
     def _get_unpacked_override_contents(self, override_file):
+        if self.unpacked_path is None:
+            return None
+
         name = os.path.join(self.unpacked_path, override_file)
         try:
             with open(name, "r", encoding="utf-8") as handle:
@@ -698,8 +737,9 @@ class PackageInfo():
                 pass
 
         try:
-            if self.package_file() is not None:
-                with zipfile.ZipFile(self.package_file()) as zFile:
+            package = self.package_file()
+            if package is not None:
+                with zipfile.ZipFile(package) as zFile:
                     info = find_zip_entry(zFile, resource)
                     file = codecs.EncodedFile(zFile.open(info, mode="r"), "utf-8")
                     if as_binary:
@@ -716,7 +756,8 @@ class PackageInfo():
             return None
 
     def _override_is_binary(self, override_file):
-        for pattern in self.binary_patterns:
+        pattern_list = self.binary_patterns or []
+        for pattern in pattern_list:
             if fnmatch.fnmatch(override_file, pattern):
                 return True
         return False
@@ -801,11 +842,11 @@ class PackageInfo():
             return self.overrides[simple]
 
         if not simple:
-            base_list = self.installed_contents()
-            over_list = self.shipped_contents()
+            base_list = self.installed_contents() or PackageFileSet()
+            over_list = self.shipped_contents() or PackageFileSet()
         else:
-            base_list = self.package_contents()
-            over_list = self.unpacked_contents()
+            base_list = self.package_contents() or PackageFileSet()
+            over_list = self.unpacked_contents() or PackageFileSet()
 
         self.overrides[simple] = over_list & base_list
         return self.overrides[simple]
@@ -822,8 +863,8 @@ class PackageInfo():
         if self.unknown_overrides is not None:
             return self.unknown_overrides
 
-        base_list = self.package_contents()
-        over_list = self.unpacked_contents()
+        base_list = self.package_contents() or PackageFileSet()
+        over_list = self.unpacked_contents() or PackageFileSet()
 
         self.unknown_overrides = over_list - base_list
         return self.unknown_overrides
@@ -874,13 +915,15 @@ class PackageInfo():
 
         result = PackageFileSet()
         if not simple:
-            if self.shipped_mtime > self.installed_mtime:
+            if (self.shipped_mtime is not None and
+                self.installed_mtime is not None and
+                self.shipped_mtime > self.installed_mtime):
                 result = PackageFileSet(self.override_files(simple))
 
         else:
             base_path = os.path.join(sublime.packages_path(), self.name)
             overrides = self.override_files(simple)
-            pkg_time = self.installed_mtime or self.shipped_mtime
+            pkg_time = self.installed_mtime or self.shipped_mtime or -1
 
             for name in overrides:
                 zipinfo = self.override_file_zipinfo(name, simple)
@@ -927,8 +970,9 @@ class PackageInfo():
         comes from.
         """
         try:
-            if self.package_file() is not None:
-                with zipfile.ZipFile(self.package_file()) as zFile:
+            package = self.package_file()
+            if package is not None:
+                with zipfile.ZipFile(package) as zFile:
                     if find_zip_entry(zFile, resource) is not None:
                         return True
 
@@ -953,8 +997,9 @@ class PackageInfo():
             return False
 
         try:
-            if self.package_file() is not None:
-                with zipfile.ZipFile(self.package_file()) as zFile:
+            package = self.package_file()
+            if package is not None:
+                with zipfile.ZipFile(package) as zFile:
                     for info in zFile.infolist():
                         if is_plugin(info.filename):
                             return True
@@ -1188,7 +1233,7 @@ class PackageList():
         pkg = self.__get_pkg(os.path.splitext(name)[0])
         pkg._add_package(pkg_file, shipped)
 
-    def __unpacked_package(self, path, name, shipped):
+    def __unpacked_package(self, path, name):
         pkg_path = os.path.join(path, name)
         pkg = self.__get_pkg(name)
         pkg._add_path(pkg_path)
@@ -1211,7 +1256,7 @@ class PackageList():
                     dirs = [d for d in dirs if _wrap(d) in name_list]
 
                 for name in dirs:
-                    self.__unpacked_package(path, name, shipped)
+                    self.__unpacked_package(path, name)
                     count += 1
 
             if shipped or not packed:

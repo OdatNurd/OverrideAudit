@@ -1,6 +1,4 @@
 import sublime
-import sublime_plugin
-import os
 
 from .core import oa_setting
 
@@ -423,7 +421,7 @@ def _get_dependant_packages(view, details):
     return dependants
 
 
-def _popup_header(view, details):
+def _popup_header(details):
     """
     Given the status details of a package, return back the header for the
     popup that describes this package. This contains the name of the package
@@ -507,7 +505,7 @@ def _metadata(view, details):
         )
 
 
-def _can_have_overrides(view, details):
+def _can_have_overrides(details):
     """
     For non-detailed hover popups, this returns an indication of whether or not
     the package in the details can possibly contain overrides or not.
@@ -528,7 +526,7 @@ def _can_have_overrides(view, details):
         """.format(pkg=details["name"])
 
 
-def _override_details(view, details):
+def _override_details(details):
     """
     For detailed hover popups, this returns information on the count of
     overrides and their various types.
@@ -574,7 +572,7 @@ def _override_details(view, details):
             filtered=details["unknowns_filtered"])
 
 
-def _popup_footer(view, details):
+def _popup_footer(details):
     """
     Generate a footer for the package popup that indicates how the package is
     installed.
@@ -588,7 +586,7 @@ def _popup_footer(view, details):
             installed="\u2611" if details["is_installed"] else "\u2610",
             unpacked="\u2611" if details["is_unpacked"] else "\u2610")
 
-def _package_links(view, details):
+def _package_links(details):
     """
     Generate a set of links for taking actions with this package. Each of the
     links hides itself when it's not valid, and if none are valid the entire
@@ -628,11 +626,11 @@ def _expand_details(view, details, is_detailed):
     {links}
     {footer}
     """.format(
-        header=_popup_header(view, details),
+        header=_popup_header(details),
         metadata=_metadata(view, details),
-        overrides=_override_details(view, details) if is_detailed else _can_have_overrides(view, details),
-        links=_package_links(view, details),
-        footer=_popup_footer(view, details)
+        overrides=_override_details(details) if is_detailed else _can_have_overrides(details),
+        links=_package_links(details),
+        footer=_popup_footer(details)
         )
 
     return result

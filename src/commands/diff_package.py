@@ -1,4 +1,3 @@
-import sublime
 import sublime_plugin
 
 from ..core import ContextHelper
@@ -16,8 +15,10 @@ class OverrideAuditDiffPackageCommand(ContextHelper,sublime_plugin.TextCommand):
     def run(self, edit, **kwargs):
         ctx = self.view_context(None, False, **kwargs)
 
-        self.view.window().run_command("override_audit_diff_report",
-                                       {"package": ctx.package})
+        window = self.view.window()
+        if window is not None:
+            window.run_command("override_audit_diff_report",
+                               {"package": ctx.package})
 
     def description(self, **kwargs):
         stub = "Bulk Diff Package"

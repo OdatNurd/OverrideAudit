@@ -2,8 +2,8 @@ import sublime
 import sublime_plugin
 from os.path import isfile
 
-from ..core import oa_setting, setup_new_override_view
-from ..core import PackageListCollectionThread, ContextHelper
+from ..core import setup_new_override_view
+from ..core import ContextHelper
 
 
 ###----------------------------------------------------------------------------
@@ -17,8 +17,9 @@ class OverrideAuditContextCreateOverrideCommand(ContextHelper,sublime_plugin.Tex
     """
     def run(self, edit, **kwargs):
         target = self.view_target(self.view, **kwargs)
-        if self.package is not None:
-            target.window().run_command("override_audit_create_override", {
+        window = target.window()
+        if self.package is not None and window is not None:
+            window.run_command("override_audit_create_override", {
                 "package": self.package
                 })
         else:

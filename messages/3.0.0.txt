@@ -5,6 +5,7 @@ Version 3.0.0 (?.?.?.?)
   * Fix the hover popup to display more meaningful override counts
   * Fix and Enhance Python version reporting in the hover popup
   * Update shipped package metadata used in the package report
+  * Various minor edge case bug fixes
 
   For the full details of changes in this version, check out the
   CHANGELOG.md file.

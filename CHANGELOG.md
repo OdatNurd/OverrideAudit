@@ -7,6 +7,9 @@ Version 3.0.0 (????-??-??)
   * Update OverrideAudit to officially use the Python 3.8
     plugin host rather than the legacy plugin host.
 
+  * Fix some minor edge case bugs that could trigger in
+    obscure cases and cause console errors.
+
   * Fix an issue with the package hover popup for some
     reports displaying an incorrect count of overrides.
 

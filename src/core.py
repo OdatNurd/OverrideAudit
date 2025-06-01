@@ -1,7 +1,8 @@
-import sublime
-import sublime_plugin
+from typing import TYPE_CHECKING, cast
 
-from collections import OrderedDict
+
+import sublime
+
 from operator import itemgetter
 from datetime import datetime
 from time import time
@@ -10,7 +11,6 @@ from zipfile import ZipFile
 from tempfile import mkstemp
 import stat
 import os
-import threading
 import subprocess
 import sys
 import re
@@ -19,6 +19,7 @@ import re
 from ..lib.packages import PackageInfo, PackageList, PackageFileSet
 from ..lib.packages import override_display, check_potential_override
 from ..lib.packages import find_zip_entry, check_potential_override
+from ..lib.packages import NoSuchSublimePackageException
 from ..lib.output_view import output_to_view
 from ..lib.threads import BackgroundWorkerThread
 from ..lib.utils import SettingsGroup
@@ -96,7 +97,7 @@ def log(message, *args, status=False, dialog=False):
     message = message % args
     print("OverrideAudit:", message)
     if status:
-        sublime.status_message(message)
+        sublime.active_window().status_message(message)
     if dialog:
         sublime.message_dialog(message)
 
@@ -261,7 +262,7 @@ def open_override(window, pkg_name, override):
     window.open_file(filename)
 
 
-def delete_override(window, pkg_name, override):
+def delete_override(pkg_name, override):
     """
     Delete the provided override from the given package name.
     """
@@ -308,7 +309,6 @@ def diff_override(window, pkg_info, override,
     """
     Generate a diff for the given package and override in a background thread,
     """
-    context_lines = oa_setting("diff_context_lines")
     action = "diff" if diff_only else oa_setting("diff_unchanged")
     empty_diff_hdr = oa_setting("diff_empty_hdr")
 
@@ -321,8 +321,8 @@ def diff_override(window, pkg_info, override,
     def _process_diff(thread):
         diff = thread.diff
         if diff is None:
-            return log("Unable to diff %s/%s\n\n"
-                        "Error loading file contents of one or both files.\n"
+            return log("Unable to diff %s/%s\n\n" +
+                        "Error loading file contents of one or both files.\n" +
                         "Check the console for more information",
                         pkg_info.name, override, dialog=True)
 
@@ -381,8 +381,8 @@ def diff_externally(window, pkg_info, override):
         diff_args = oa_setting("external_diff")
 
     if None in (base_file, override_file):
-        return log("Unable to externally diff %s/%s\n\n"
-                    "Error loading file contents of one or both files.\n"
+        return log("Unable to externally diff %s/%s\n\n" +
+                    "Error loading file contents of one or both files.\n" +
                     "Check the console for more information",
                     pkg_info.name, override, dialog=True)
 
@@ -585,6 +585,7 @@ class AutoReportTrigger():
             log("Sublime version is unchanged; skipping automatic report")
             return
 
+        reason = "no reason"
         if self.last_build != sublime.version():
             if self.last_build == "0":
                 reason = "Initial plugin installation"
@@ -593,7 +594,7 @@ class AutoReportTrigger():
         elif self.force_report:
             reason = "Sublime restarted during a package upgrade"
 
-        log(reason + "; generating automatic report")
+        log(f"{reason}; generating automatic report")
         sublime.set_timeout(lambda: self.__execute_auto_report(), 1000)
 
     def __save_status(self, force):
@@ -774,11 +775,16 @@ class OverrideFreshenThread(BackgroundWorkerThread):
             return
 
         try:
-            with ZipFile(pkg_info.package_file()) as zFile:
+            package_file = pkg_info.package_file()
+            if package_file is None:
+                raise NoSuchSublimePackageException(f'package {pkg_info.name} has no sublime-package file')
+
+            with ZipFile(package_file) as zFile:
                 if override is not None:
                     self.result = self._single(view, zFile, pkg_info, override)
                 else:
                     self.result = self._pkg(view, zFile, pkg_info)
+
         except Exception as e:
             self.result = "Error while freshening: %s" % str(e)
 
@@ -800,16 +806,16 @@ class OverrideRevertThread(BackgroundWorkerThread):
             return log("revert thread not given a package or override")
 
         if not pkg_info.exists():
-            self.result = "Unable to revert '%s'; no such package" % package
+            self.result = "Unable to revert '%s'; no such package" % pkg_info.name
             return
 
         if not pkg_info.package_file():
-            self.result = "Unable to revert '%s'; no overrides" % package
+            self.result = "Unable to revert '%s'; no overrides" % pkg_info.name
             return
 
         try:
             fname = os.path.join(sublime.packages_path(), pkg_info.name, override)
-            o_type, contents = pkg_info.packed_override_contents(override, as_list=False)
+            _, contents = pkg_info.packed_override_contents(override, as_list=False)
 
             with open(fname, 'wb') as file:
                 file.write(contents.encode("utf-8"))
@@ -890,8 +896,8 @@ class DiffExternallyThread(BackgroundWorkerThread):
         variables["override"] = override
 
         # Don't expand vars in env; we let python do that for us.
-        shell_cmd = sublime.expand_variables(shell_cmd, variables)
-        working_dir = sublime.expand_variables(working_dir, variables)
+        shell_cmd = cast(str, sublime.expand_variables(shell_cmd, variables))
+        working_dir = cast(str, sublime.expand_variables(working_dir, variables))
 
         if working_dir == "" and self.window.active_view():
             path = os.path.dirname(self.window.active_view().file_name() or "")
@@ -1034,6 +1040,9 @@ class ContextHelper():
     Finds the appropriate target view and package/override/diff options based
     on where it is used.
     """
+    if TYPE_CHECKING:
+        view: sublime.View
+
     def _extract(self, scope, event):
         if event is None:
             return None
@@ -1070,14 +1079,14 @@ class ContextHelper():
 
     def _report_type(self, **kwargs):
         target = self.view_target(self.view, **kwargs)
-        return target.settings().get("override_audit_report_type")
+        return cast(str, target.settings().get("override_audit_report_type"))
 
     def _pkg_contains_expired(self, pkg_name, **kwargs):
         target = self.view_target(self.view, **kwargs)
         expired = target.settings().get("override_audit_expired_pkgs", [])
         return pkg_name in expired
 
-    def view_target(self, view, group=-1, index=-1, **kwargs):
+    def view_target(self, view, group=-1, index=-1, **kwargs) -> sublime.View:
         """
         Get target view specified by group and index, if needed.
         """
@@ -1131,7 +1140,7 @@ class ContextHelper():
 
     def caption(self, caption, **kwargs):
         target = self.view_target(self.view, **kwargs)
-        menu = target.settings().get("context_menu", "")
+        menu = cast(str, target.settings().get("context_menu", ""))
         if "OverrideAudit" in menu:
             return caption
 

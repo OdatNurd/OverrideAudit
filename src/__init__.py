@@ -4,6 +4,7 @@ reload("src", ["core", "events", "contexts", "browse", "pkg_popup", "settings_pr
 reload("src.commands")
 
 from . import core
+from . import browse
 from .core import *
 from .events import *
 from .contexts import *

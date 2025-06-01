@@ -1,4 +1,3 @@
-import sublime
 import sublime_plugin
 
 from ..core import ContextHelper, open_override

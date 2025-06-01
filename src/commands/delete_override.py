@@ -1,8 +1,4 @@
-import sublime
 import sublime_plugin
-
-import os
-
 
 from ..core import ContextHelper, delete_override
 
@@ -17,7 +13,7 @@ class OverrideAuditDeleteOverrideCommand(ContextHelper,sublime_plugin.TextComman
     def run(self, edit, **kwargs):
         target = self.view_target(self.view, **kwargs)
         ctx = self.view_context(target, False, **kwargs)
-        delete_override(target.window(), ctx.package, ctx.override)
+        delete_override(ctx.package, ctx.override)
 
     def description(self, **kwargs):
         ctx = self.view_context(None, False, **kwargs)

@@ -1,8 +1,6 @@
-import sublime
 import sublime_plugin
-from os.path import isfile
 
-from ..core import oa_setting, revert_override
+from ..core import revert_override
 from ..core import PackageListCollectionThread, ContextHelper
 
 

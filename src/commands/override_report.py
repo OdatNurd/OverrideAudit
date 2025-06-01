@@ -38,10 +38,10 @@ class OverrideReportThread(ReportGenerationThread):
         packages = {}
         result = []
         if only_expired:
-            result.append("WARNING: Showing only expired overrides!\n"
+            result.append("WARNING: Showing only expired overrides!\n" +
                           "WARNING: Non-expired overrides may exist!\n")
         if exclude_unchanged:
-            result.append("WARNING: Showing only modified overrides!\n"
+            result.append("WARNING: Showing only modified overrides!\n" +
                           "WARNING: Overrides with unchanged content may exist!\n")
 
         result.append(self._generation_time())
@@ -58,7 +58,7 @@ class OverrideReportThread(ReportGenerationThread):
 
         if displayed == 0:
             if ignore_empty:
-                return sublime.set_timeout(self._notify_empty(), 10)
+                return sublime.set_timeout(self._notify_empty, 10)
 
             result.append(self._empty_msg())
 
@@ -69,7 +69,7 @@ class OverrideReportThread(ReportGenerationThread):
                             "override_audit_expired_pkgs": expired_pkgs,
                             "override_audit_unknown_overrides": unknown_files,
                             "override_audit_exclude_unchanged": exclude_unchanged,
-                            "context_menu": "OverrideAuditReport.sublime-menu"                            
+                            "context_menu": "OverrideAuditReport.sublime-menu"
                           })
 
     def _output_package(self, result, pkg_info, only_expired, expired_pkgs,

@@ -3,8 +3,8 @@ import sublime_plugin
 
 import os
 
-from ..core import diff_override, packages_with_overrides, log
-from ..core import setup_new_override_view, PackageListCollectionThread
+from ..core import log
+from ..core import setup_new_override_view
 from ..browse import ResourceType, PackageResourceBrowser
 
 

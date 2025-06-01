@@ -1,4 +1,3 @@
-import sublime
 import sublime_plugin
 
 from ..core import oa_syntax, oa_setting, decorate_pkg_name, log
@@ -20,7 +19,6 @@ class BulkDiffReportThread(ReportGenerationThread):
     """
     def _process(self):
         package = self.args["package"]
-        force_reuse = self.args["force_reuse"]
         exclude_unchanged = self.args["exclude_unchanged"]
 
         pkg_list = PackageList(package)
@@ -38,11 +36,9 @@ class BulkDiffReportThread(ReportGenerationThread):
         else:
             items = packages_with_overrides(pkg_list)
 
-        self._diff_packages(items, pkg_list, package is not None, force_reuse,
-                            exclude_unchanged)
+        self._diff_packages(items, pkg_list, package is not None, exclude_unchanged)
 
-    def _diff_packages(self, names, pkg_list, single_package, force_reuse,
-                       exclude_unchanged):
+    def _diff_packages(self, names, pkg_list, single_package, exclude_unchanged):
         context_lines = oa_setting("diff_context_lines")
         binary_patterns = oa_setting("binary_file_patterns")
 
@@ -57,7 +53,7 @@ class BulkDiffReportThread(ReportGenerationThread):
         packages = {}
 
         if exclude_unchanged:
-            result.append("WARNING: Showing only modified overrides!\n"
+            result.append("WARNING: Showing only modified overrides!\n" +
                           "WARNING: Overrides with unchanged content may exist!\n")
 
         if len(names) == 1 and single_package:

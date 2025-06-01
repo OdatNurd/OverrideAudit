@@ -1,4 +1,3 @@
-import sublime
 import sublime_plugin
 
 from ..core import ContextHelper
@@ -34,7 +33,7 @@ class OverrideAuditToggleOverrideCommand(ContextHelper,sublime_plugin.TextComman
             return True
 
         ctx = self.view_context(None, False, **kwargs)
-        return true if ctx.has_target() and ctx.has_diff() else False
+        return True if ctx.has_target() and ctx.has_diff() else False
 
     def is_enabled(self, **kwargs):
         ctx = self.view_context(None, False, **kwargs)

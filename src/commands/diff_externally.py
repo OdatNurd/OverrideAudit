@@ -1,4 +1,3 @@
-import sublime
 import sublime_plugin
 
 from ..core import oa_can_diff_externally, diff_externally
