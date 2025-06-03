@@ -1,0 +1,133 @@
+site_name: 'OverrideAudit'
+site_author: Terence Martin (OdatNurd)
+site_url: 'https://overrideaudit.odatnurd.net'
+repo_url: 'https://github.com/OdatNurd/OverrideAudit'
+edit_uri: !ENV [EDIT_URI, '']
+copyright: '&copy 2025 <a href="https://odatnurd.net">OdatNurd</a>'
+
+docs_dir: content
+site_dir: site
+
+nav:
+  - Home:
+    - "About": index.md
+  - Installation:
+    - "How to Install": install/index.md
+  - Configuration:
+    - "Package Setup": config/index.md
+    - "Settings": config/settings.md
+    - "Key Bindings": config/keybinds.md
+  - Usage:
+    - "QuickStart": usage/quickstart.md
+    - "Using OverrideAudit": usage/index.md
+  - "FAQ": faq.md
+  - Changelog:
+    - "Changelog": changelog.md
+
+extra:
+  social:
+    - icon: material/web
+      link: https://odatnurd.net
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/OdatNurd
+    - icon: fontawesome/brands/youtube
+      link: https://www.youtube.com/c/OdatNurd
+    - icon: fontawesome/brands/discord
+      link: https://discord.gg/b3x5AuwVVY
+    - icon: fontawesome/brands/twitch
+      link: https://twitch.tv/odatnurd
+    - icon: fontawesome/brands/stack-exchange
+      link: https://stackoverflow.com/users/814803/odatnurd?tab=profile
+    - icon: fontawesome/brands/github-alt
+      link: https://github.com/odatnurd
+  generator: true
+
+theme:
+  name: material
+  language: en
+  # Theme overrides can be used to alter the theme based on the build; used to
+  # make dev releases have a permanent banner. Empty means no overrides.
+  custom_dir: !ENV [THEME_OVERRIDE, '']
+  features:
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+    - content.tabs.link
+    - content.tooltips
+    - navigation.footer
+    - navigation.sections
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - search.highlight
+    - search.share
+    - search.suggest
+  font:
+    text: Roboto
+    code: Roboto Mono
+  icon:
+    logo: simple/sublimetext
+    repo: fontawesome/brands/github
+  favicon: /favicon.ico
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+      primary: orange
+      accent: light blue
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+      primary: orange
+      accent: indigo
+
+plugins:
+  - git-revision-date-localized:
+      fallback_to_build_date: true
+  - minify:
+      minify_html: true
+  - search
+  - social:
+      cards_dir: images/social
+      cards_layout_options:
+        font_family: Lilita One
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+  - pymdownx.tilde
+  - toc:
+      title: On this page
+      permalink: ⚓︎
+      permalink_title: Link to this section for future reference
