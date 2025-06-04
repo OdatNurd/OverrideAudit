@@ -15,7 +15,7 @@ the `Preferences: OverrideAudit Key Bindings` command from the Command Palette.
     bar.
 
 In the window that this command opens, the left hand pane contains the default
-key bindings that ship with OverrideAudit. If you would like to adjust either of
+key bindings that ship with OverrideAudit. If you would like to adjust any of
 them, copy the binding that you would like to change into the right hand pane
 and modify the key as appropriate.
 
@@ -35,7 +35,8 @@ and modify the key as appropriate.
 
 As shipped, OverrideAudit contains two key bindings, both of which have a
 [context](https://www.sublimetext.com/docs/key_bindings.html#context-key){: target="_blank" }
-applied to ensure that they are only active in the correct place.
+applied to ensure that they are only active in the correct place so that they
+do not get in the way of any other key bindings you might already be using.
 
 
 ### Toggle Override/Diff View

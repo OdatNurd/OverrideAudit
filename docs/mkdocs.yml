@@ -15,12 +15,19 @@ nav:
     - "How to Install": install/index.md
   - Configuration:
     - "Package Setup": config/index.md
-    - "Settings": config/settings.md
     - "Key Bindings": config/keybinds.md
+    - "Settings": config/settings.md
   - Usage:
-    - "QuickStart": usage/quickstart.md
-    - "Using OverrideAudit": usage/index.md
-  - "FAQ": faq.md
+    - "QuickStart": usage/index.md
+    - "Terminology": usage/terminology.md
+    - "Overrides": usage/overrides.md
+    - "Workflow": usage/workflow.md
+    - "Commands": usage/commands.md
+  - "Reports":
+    - "OverrideAudit Reports": reports/index.md
+    - "Package Report": reports/package.md
+    - "Override Report": reports/override.md
+    - "Bulk Diff Report": reports/bulkdiff.md
   - Changelog:
     - "Changelog": changelog.md
 
@@ -86,9 +93,14 @@ theme:
       primary: orange
       accent: indigo
 
+extra_css:
+  - stylesheets/custom.css
+
 plugins:
   - git-revision-date-localized:
       fallback_to_build_date: true
+  - glightbox:
+      auto_caption: true
   - minify:
       minify_html: true
   - search

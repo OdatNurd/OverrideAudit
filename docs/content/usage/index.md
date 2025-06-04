@@ -1,12 +1,113 @@
 ---
-title: Using OverrideAudit
-description: Using OverrideAudit to do the thing that it does
+title: QuickStart
+description: Getting up and running with OverrideAudit
 ---
 
-This is the part where the actual usage of the package &mdash; what it does and so
-on and so forth &mdash; would actually go.
 
-This particular page should be a short summary of what the package is and what
-it's for, the quickstart will have more details to get up and running quickly,
-and then there could in theory be quite a few pages in this section that drill
-in with more details.
+## Package Report
+
+To get your feet wet with OverrideAudit and what it can do for you, try
+creating a [Package Report](garbage). This report will give you information on
+all of the packages that are currently available to Sublime Text, with extra
+information for how they are installed.
+
+Select the `Package Report` command from the command palette or from the menu in
+`Tools > OverrideAudit` to bring up the report in a new tab
+
+### Package Report Sample
+
+![Sample Package Report](../images/reports/PackageReport1.png)
+
+This report shows you a list of all packages known to Sublime, along with an
+indicator that tells you whether it contains files that `[S]hip` with sublime,
+were `[I]installed as a sublime-package` file, or have `[U]npacked` files.
+
+The report shows all of the packages in roughly the order that Sublime loads
+them at startup. This can help you diagnose potential conflicts among packages
+that provide similar functionality (e.g. key bindings). The report also
+indicates via markup any package that is in your list of ignored packages or is
+a dependency package used by one of your installed packages.
+
+OverrideAudit has many context sensitive commands available via the context
+menu displayed when you ++right-button++ on text (on MacOS with a single button
+mouse, this is a ++control+"click"++). Here in the Package report, try it on
+one of the displayed package names as well as in the report body in general to
+see what happens.
+
+In addition, hovering the mouse over a package name in a report will display a
+popup that gives you more information about that package, including its version
+number, description, the dependency libraries it depends on (if any) and more.
+
+
+## Override Report
+
+Another useful report type in OverrideAudit is the [Override Report](garbage),
+which lets you know on a package by package basis what overrides you currently
+have defined.
+
+There are two versions of this report; one of them shows
+[all overrides](garbage) that exist, while the other shows you only
+[expired overrides](garbage). This allows you to focus on only those overrides
+that may need your immediate attention. This type of report is what
+OverrideAudit generates for you automatically when an upgrade operation occurs
+that causes some overrides to be out of date.
+
+Create a report of this type by using the `Override Report` command as you did
+for the previous report.
+
+### Override Report Sample
+
+![Sample Override Report](../images/reports/OverrideReport.png)
+
+This report will show you all current overrides, separated out by the package
+that they are defined in. Each package that is displayed shows a shortened list
+of the same markers used in the `Package Report` to indicate what kind of files
+this package contains.
+
+As in that report, you can hover the mouse on the package name to see more
+information on that package or use context menu items on the names of packages
+and in the report body itself to take various actions. There are also context
+menu operations on the names of any listed overrides.
+
+If your report shows any overrides, try selecting the `diff` context menu item
+for one of them, to see how your file is different from the one that is a part
+of the package.
+
+### Override Diff Sample
+
+![OverrideDiff](../images/reports/SingleOverrideDiff.png)
+
+From the context menu in an override diff, you can easily open your override
+for editing or delete it entirely. As you might expect, from a window showing
+you the contents of the override, context menu items are available to allow you
+switch to the diff as well.
+
+If you have a preferred external tool for performing diffs between files, you
+can use the [external_diff](garbage) setting to tell OverrideAudit about it. In
+this case, the content menu in the diff will also contain an option to open
+that diff in the configured external tool.
+
+Using the [mini_diff_underlying](garbage) setting, while editing an override
+the diff indications in the Sublime Text gutter can be used to see diffs inline
+as well, without having to open dedicated diff view.
+
+
+## Next Steps
+
+That's it for the basics of OverrideAudit! Hopefully this gives you a sense of
+the functionality that the package provides to help you keep track of and
+manage your overrides.
+
+For more information what what an override is and how you would create one,
+there is a complete explanation of [overrides](garbage) and how they work in
+Sublime Text.
+
+For more in depth information on how OverrideAudit can help you keep Sublime
+operating in tip-top shape, you can check out the OverrideAudit
+[workflow](garbage) and [report reference](garbage) to learn how to keep track
+of your overrides.
+
+The [command list](garbage) outlines all of the various commands in
+OverrideAudit. You may also be interested in the various options available to
+help you [configure](garbage) OverrideAudit to work in the way that's best for
+you and your work flow.
