@@ -7,7 +7,7 @@
                 "caption": "OverrideAudit",
                 "children":
                 [
-                    { "caption": "Open Resource…", "command": "override_audit_create_override", "args": {"include_existing": true }},
+                    { "caption": "Open Resource…", "command": "override_audit_create_override", "args": { "include_existing": true }},
                     { "caption": "Create Override…", "command": "override_audit_create_override"},
                     { "caption": "Override Current Resource", "command": "override_audit_context_create_override"},
                     { "caption": "-" },
@@ -47,7 +47,7 @@
                                 "caption": "Documentation",
                                 "command": "open_url",
                                 "args": {
-                                    "url": "https://overrideaudit.odatnurd.net/docs/"
+                                    "url": "https://overrideaudit.odatnurd.net/"
                                 }
                             },
 

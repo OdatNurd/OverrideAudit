@@ -3,7 +3,7 @@
         "caption": "OverrideAudit: View Documentation",
         "command": "open_url",
         "args": {
-            "url": "https://overrideaudit.odatnurd.net/docs/"
+            "url": "https://overrideaudit.odatnurd.net/"
         }
     },
     {
