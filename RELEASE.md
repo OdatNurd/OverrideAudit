@@ -11,8 +11,7 @@ These ensure that the web documentation and associated web pages are up to date
 for the new release.
 
  * Update the version banner on the main page
- * Update web ChangeLog
- * Modify web documentation as appropriate
+ * Modify web documentation as appropriate, including the changelog
 
 
 # Code Update

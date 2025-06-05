@@ -7,16 +7,20 @@ description: Getting up and running with OverrideAudit
 ## Package Report
 
 To get your feet wet with OverrideAudit and what it can do for you, try
-creating a [Package Report](garbage). This report will give you information on
-all of the packages that are currently available to Sublime Text, with extra
-information for how they are installed.
+creating a [Package Report](../reports/package.md). This report will give you
+information on all of the packages that are currently available to Sublime
+Text, with extra information for how they are installed.
 
 Select the `Package Report` command from the command palette or from the menu in
 `Tools > OverrideAudit` to bring up the report in a new tab
 
 ### Package Report Sample
 
-![Sample Package Report](../images/reports/PackageReport1.png)
+<div class="grid" markdown>
+  <figure markdown="span">
+    ![Sample Package Report](../images/reports/PackageReport1.png)
+  </figure>
+</div>
 
 This report shows you a list of all packages known to Sublime, along with an
 indicator that tells you whether it contains files that `[S]hip` with sublime,
@@ -41,23 +45,32 @@ number, description, the dependency libraries it depends on (if any) and more.
 
 ## Override Report
 
-Another useful report type in OverrideAudit is the [Override Report](garbage),
-which lets you know on a package by package basis what overrides you currently
-have defined.
+Another useful report type in OverrideAudit is the
+[Override Report](../reports/override.md), which lets you know on a package by
+package basis what overrides you currently have defined.
 
-There are two versions of this report; one of them shows
-[all overrides](garbage) that exist, while the other shows you only
-[expired overrides](garbage). This allows you to focus on only those overrides
-that may need your immediate attention. This type of report is what
+There are three versions of this report; one of them shows
+[all overrides](commands.md#override-report) that exist, one that shows you only
+[expired overrides](commands.md#override-report-only-expired), and one that
+shows you all overrides,
+[filtering out unchanged files](commands.md#override-report-exclude-unchanged).
+
+This allows you to focus on only those overrides that may need your immediate
+attention in a variety of situations. The `Expired Overrides` report is what
 OverrideAudit generates for you automatically when an upgrade operation occurs
 that causes some overrides to be out of date.
 
 Create a report of this type by using the `Override Report` command as you did
 for the previous report.
 
+
 ### Override Report Sample
 
-![Sample Override Report](../images/reports/OverrideReport.png)
+<div class="grid" markdown>
+  <figure markdown="span">
+    ![Sample Override Report](../images/reports/OverrideReport.png)
+  </figure>
+</div>
 
 This report will show you all current overrides, separated out by the package
 that they are defined in. Each package that is displayed shows a shortened list
@@ -73,9 +86,14 @@ If your report shows any overrides, try selecting the `diff` context menu item
 for one of them, to see how your file is different from the one that is a part
 of the package.
 
+
 ### Override Diff Sample
 
-![OverrideDiff](../images/reports/SingleOverrideDiff.png)
+<div class="grid" markdown>
+  <figure markdown="span">
+    ![Sample Override Diff](../images/reports/SingleOverrideDiff.png)
+  </figure>
+</div>
 
 From the context menu in an override diff, you can easily open your override
 for editing or delete it entirely. As you might expect, from a window showing
@@ -83,13 +101,14 @@ you the contents of the override, context menu items are available to allow you
 switch to the diff as well.
 
 If you have a preferred external tool for performing diffs between files, you
-can use the [external_diff](garbage) setting to tell OverrideAudit about it. In
-this case, the content menu in the diff will also contain an option to open
-that diff in the configured external tool.
+can use the [external_diff](../config/settings.md#external_diff) setting to
+tell OverrideAudit about it. In this case, the content menu in the diff will
+also contain an option to open that diff in the configured external tool.
 
-Using the [mini_diff_underlying](garbage) setting, while editing an override
-the diff indications in the Sublime Text gutter can be used to see diffs inline
-as well, without having to open dedicated diff view.
+Using the [mini_diff_underlying](../config/settings.md#mini_diff_underlying)
+setting, while editing an override the diff indications in the Sublime Text
+gutter can be used to see diffs inline as well, without having to open
+dedicated diff view.
 
 
 ## Next Steps
@@ -99,15 +118,15 @@ the functionality that the package provides to help you keep track of and
 manage your overrides.
 
 For more information what what an override is and how you would create one,
-there is a complete explanation of [overrides](garbage) and how they work in
-Sublime Text.
+there is a complete explanation of [overrides](../terminology/overrides.md) and
+how they work in Sublime Text.
 
 For more in depth information on how OverrideAudit can help you keep Sublime
 operating in tip-top shape, you can check out the OverrideAudit
-[workflow](garbage) and [report reference](garbage) to learn how to keep track
-of your overrides.
+[workflow](workflow.md) and [report reference](../reports/index.md) to learn
+how to keep track of your overrides.
 
-The [command list](garbage) outlines all of the various commands in
+The [command list](commands.md) outlines all of the various commands in
 OverrideAudit. You may also be interested in the various options available to
-help you [configure](garbage) OverrideAudit to work in the way that's best for
-you and your work flow.
+help you [configure](../config/settings.md) OverrideAudit to work in the way
+that's best for you and your work flow.

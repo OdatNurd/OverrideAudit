@@ -2,3 +2,17 @@ div.word-wrapped pre > code {
   white-space: pre-wrap !important;
   word-break: break-all !important;
 }
+
+/* Set a heading color for the dark theme. */
+[data-md-color-scheme="slate"] {
+  --heading-color: rgb(11, 196, 198);
+}
+
+/* For the light theme, use a darker version. */
+[data-md-color-scheme="default"] {
+  --heading-color: rgb(61, 119, 123);
+}
+
+article > :is(h1, h2, h3, h4, h5, h6) {
+  color: var(--heading-color) !important;
+}

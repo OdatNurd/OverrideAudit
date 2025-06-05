@@ -5,11 +5,11 @@ description: Available configuration settings for OverrideAudit
 
 ## Opening Settings
 
-In order to view OverrideAudit's settings, you can use the `Preferences >
-Settings > OverrideAudit >Settings` menu item or the `Preferences:
-OverrideAudit Settings` command from the Command Palette.
+In order to view OverrideAudit's settings, you can use the
+`Preferences > Settings > OverrideAudit >Settings` menu item or the
+`Preferences: OverrideAudit Settings` command from the Command Palette.
 
-!!! NOTE
+!!! NOTE "Differences in Menu layout on MacOS"
 
     On MacOS, the `Preferences` menu is under `Sublime Text` in the main menu
     bar.
@@ -19,7 +19,7 @@ setting that ship with OverrideAudit. If you would like to adjust any of them,
 copy the setting (or settings) that you would like to modify into the right
 hand pane and adjust as desired.
 
-!!! WARNING
+!!! WARNING "Maintain the format of the settings file!"
 
     `sublime-settings` files are `JSON` files which allow for comments of the
     `//` and `/* */` variety; they are also not sensitive to trailing commas in
@@ -33,18 +33,21 @@ hand pane and adjust as desired.
 
 ## Available Settings
 
+---
+
 ###  :material-cog: **reuse_views**
 
 - **`Boolean`**
 - ***Default:*** `true`
 
 OverrideAudit generally creates an output view to show you the results of
-operations. When this option is enabled (the default), OA will try to find the
-view created last time and reuse it for the new command. When disabled, a new
+commands. When this option is enabled (the default), OA will try to find the
+view created last time and reuse it for the same command. When disabled, a new
 view is created every time.
 
 Some OverrideAudit commands may ignore this setting.
 
+---
 
 ###  :material-cog: **clear_existing**
 
@@ -57,6 +60,7 @@ output is appended to the end of the existing view.
 
 Some OverrideAudit commands may ignore this setting.
 
+---
 
 ###  :material-cog: **ignore_overrides_in**
 
@@ -69,22 +73,24 @@ the same as the `ignored_packages` Sublime setting.
 
 This does not affect packages displayed in the general package list; it only
 hides packages from lists that show packages with overrides, such as the
-[Override Report](garbage) or the commands that find and diff overrides.
+[Override Report](../reports/override.md) or the commands that find and diff
+overrides.
 
 !!! WARNING
 
     Any overrides you create in packages in this list will be masked from you,
     so be very careful about what you add to the list.
 
+---
 
 ###  :material-cog: **diff_unchanged**
 
 - **`String`** (`"diff"`, `"ignore"`, `"open"`)
 - ***Default:*** `"diff"`
 
-When using the [Diff Single Override](garbage) command, this setting controls
-what happens when the selected override has no differences from the underlying
-file.
+When using the [Diff Single Override](../usage/commands.md#diff-single-override)
+command, this setting controls what happens when the selected override has no
+differences from the underlying file.
 
 The possible values of this setting are:
 
@@ -94,6 +100,7 @@ The possible values of this setting are:
 - `"open"` to open the file for editing, allowing you to see its contents or
   make new modifications.
 
+---
 
 ###  :material-cog: **diff_context_lines**
 
@@ -104,6 +111,7 @@ When displaying a diff for an override, this specifies how many unchanged lines
 before and after each difference are displayed to provide better context for
 the changes.
 
+---
 
 ###  :material-cog: **diff_empty_hdr**
 
@@ -114,10 +122,13 @@ When enabled, this allows you to see the source files and related time stamps
 of both files that participated in the diff even when there are no changes to
 display.
 
-This applies both to a bulk diff as well as a single file diff, but note that
+This applies both to a
+[bulk diff](../usage/commands.md#bulk-diff-report-all-packages) as well as a
+[single file diff](../usage/commands.md#diff-single-override), but note that
 for a single file diff this option will only have an effect if `diff_unchanged`
 is set to `"diff"`, as otherwise no diff is displayed.
 
+---
 
 ###  :material-cog: **save_on_diff**
 
@@ -133,6 +144,7 @@ file that no longer exists on disk (i.e. you have opened the override and then
 deleted it) to ensure that you don't accidentally resurrect a deleted file by
 saving it again.
 
+---
 
 ###  :material-cog: **confirm_deletion**
 
@@ -145,6 +157,7 @@ you to confirm the deletion before it happens or not.
 OverrideAudit uses the `send2trash` library that ships with Sublime Text to
 perform file deletions.
 
+---
 
 ###  :material-cog: **confirm_freshen**
 
@@ -156,8 +169,10 @@ OverrideAudit will prompt you to confirm the operation before it happens or
 not.
 
 Although this operation is not destructive, freshening an expired override will
-stop OverrideAudit from warning you that it's expired.
+stop OverrideAudit from warning you that it's expired, which might mask
+problems.
 
+---
 
 ###  :material-cog: **confirm_revert**
 
@@ -173,6 +188,7 @@ as a result of this action. Make sure that you have it safely backed up (for
 example in a version control system like `git`) if you wish to come back to it
 at a later date.
 
+---
 
 ###  :material-cog: **binary_file_patterns**
 
@@ -188,6 +204,7 @@ user settings, so you only need to specify a value in the *OverrideAudit*
 settings if you want to consider a different set of files binary for the
 purposes of diffs.
 
+---
 
 ###  :material-cog: **report_on_unignore**
 
@@ -204,10 +221,12 @@ been ignoring, this is also an indication that
 upgrading a package.
 
 When this option is turned off, checks for expired overrides only happen when
-Sublime starts or when you manually create an [Override Report](garbage).
+Sublime starts or when you manually create an
+[Override Report](../reports/override.md).
 
 When enabled, the report will only be shown if any expired overrides are found.
 
+---
 
 ###  :material-cog: **external_diff**
 
@@ -224,9 +243,10 @@ functionality.
 
 If you use the `Sublimerge Pro` or `Sublimerge 3` package in Sublime Text, you
 can set `external_diff` to the string `"sublimerge"` to open the external diff
-using that package.
+using that package. If either package is not detected, setting this setting to
+`"sublimerge"` will have no effect.
 
-!!! NOTE
+!!! NOTE "Packages no longer available"
 
     These packages no longer exist as they were redacted by their author; as a
     result, this particular setting is only available to anyone that had already
@@ -242,17 +262,19 @@ The variables that are standard in a `sublime-build` file are also valid here,
 as well as the variables `$base` and `$override` which represent the name of
 the base file and the override file respectively.
 
+---
 
 ###  :material-cog: **ignore_unknown_overrides**
 
 - **`Boolean`**/**`List`**
 - ***Default:*** `["\\.git/", "\\.svn/", "\\.hg/" ]`
 
-When displaying an [Override Report](garbage) or a [Bulk Diff Report](garbage),
-OverrideAudit can display files which appear in the Unpacked version of a
-package but not in the `sublime-package` file for that package.
+When displaying an [Override Report](../reports/override.md) or a
+[Bulk Diff Report](../reports/bulkdiff.md), OverrideAudit can display files
+which appear in the Unpacked version of a package but not in the
+`sublime-package` file for that package.
 
-These files are known as [unknown overrides](garbage), and are an indication
+These files are known as [unknown overrides](../terminology/index.md#unknown-override), and are an indication
 that a resource has been added to a package by you or that a file that used to
 be an override is no longer considered to be one due to a package update.
 
@@ -264,13 +286,14 @@ expressions to hide matching files.
 The default is to enable the setting by filtering away the control files that
 various version control systems use to be able to track files.
 
-!!! NOTE
+!!! NOTE "Watch for common pitfalls with path separators"
 
     Package resources always use the `posix` (unix-style) path separators, even
     on Windows. Additionally, when using the setting as a list of regular
     expressions, each expression is inherently anchored to the start of the
     resource name
 
+---
 
 ###  :material-cog: **mini_diff_underlying**
 
@@ -280,8 +303,9 @@ various version control systems use to be able to track files.
 When editing an overridden package resource, OverrideAudit can set up the
 `incremental diff` feature of Sublime to track the underlying package file being
 overridden. This allows the diff indicators in the gutter to show you changes
-as compared to the underlying file as well as being able to use native
-functionality to navigate between changes and revert hunks.
+as compared to the underlying file as well as being able to use the
+[native functionality in Sublime](https://www.sublimetext.com/docs/incremental_diff.html){: target="_blank" }
+to navigate between changes and revert hunks.
 
 When set to `true` (the default), every time you open or save a package override,
 the incremental diff will be set to track the packed version of the resource

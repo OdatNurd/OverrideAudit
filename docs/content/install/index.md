@@ -9,7 +9,7 @@ OverrideAudit supports Sublime Text on Windows, MacOS and Linux. The only
 requirement is Sublime Text with a build number of `4126` or higher; no other
 external software or packages are required.
 
-!!! NOTE
+!!! NOTE "Required builds of Sublime Text"
 
     Version 1.x of OverrideAudit supports builds of Sublime Text 3 prior to
     build 3197 while version 2.x supports Sublime Text builds through to 4136.
@@ -34,7 +34,7 @@ To install OverrideAudit using this method, open the command palette in Sublime
 `Package Control: Install Package` command, then select `OverrideAudit` from the
 list of packages presented.
 
-!!! NOTE
+!!! NOTE "OverrideAudit not in the list of packages to install"
 
     Don't see OverrideAudit in the list? Package Control will not list packages
     that are already installed. You may want to double check your
@@ -49,12 +49,12 @@ Package Control for you, while older versions require you to follow the
 installation instructions
 [here](https://packagecontrol.io/installation){: target="_blank" }.
 
-!!! NOTE
+!!! NOTE "Can't see menu entry to install Package Control"
 
     Although only newer builds of Sublime Text include a menu option to install
     Package Control, it is hidden if Package Control is already installed.
 
-!!! WARNING
+!!! WARNING "MacOS issues with installing Package Control"
 
     If you are using MacOS and installing Package Control does not work for you,
     you are likely running into a known issue with Package Control version 3 on
@@ -89,7 +89,7 @@ menu.
 This method of installation is more complicated and requires that you have a
 knowledge of `git` and how to use it in order to install the package.
 
-!!! WARNING
+!!! WARNING "Beware of manual installation"
 
     If you install OverrideAudit manually, it will be up to you to ensure that
     you check for and install any upgrades that may exist to ensure that your
@@ -102,12 +102,15 @@ knowledge of `git` and how to use it in order to install the package.
 ## First Steps
 
 The first thing that OverrideAudit does when it is installed is perform a
-background scan to see if you have any [expired overrides](garbage) that you
-might need to worry about. A similar check is done every time Sublime Text is
-updated and when Package Control updates or installs a package.
+background scan to see if you have any
+[expired overrides](../terminology/overrides.md#expired-override) that you might
+need to worry about. A similar check is done every time Sublime Text is updated
+and when Package Control updates or installs a package.
 
-If any expired overrides are found, a [report](garbage) will be created to tell
-you what they are so that you can take the [appropriate action](garbage). This
+If any expired overrides are found, a
+[report](../reports/override.md) will be created to tell
+you what they are so that you can take the
+[appropriate action](../usage/workflow.md). This
 might involve making changes to your override, deleting it or just indicating
 that it is OK as it is.
 
@@ -115,9 +118,9 @@ For many users, these automated checks and the tools that OverrideAudit
 provides to help you deal with them may be all that you need.
 
 
-!!! WARNING
+!!! WARNING "Upgrades OverrideAudit can't track"
 
     OverrideAudit does not perform this check for any package upgrades you
     perform manually or for upgrades which happen while Sublime Text is not
     running. In these cases, you may want to run the check manually. See the
-    [Report Page](garbage) for more information.
+    [Report Page](../reports/index.md) for more information.

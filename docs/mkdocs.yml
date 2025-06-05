@@ -10,17 +10,18 @@ site_dir: site
 
 nav:
   - Home:
-    - "About": index.md
+    - "About OverrideAudit": index.md
   - Installation:
     - "How to Install": install/index.md
   - Configuration:
     - "Package Setup": config/index.md
     - "Key Bindings": config/keybinds.md
     - "Settings": config/settings.md
+  - "Terminology":
+      "OverrideAudit Terminology": terminology/index.md
+      "What is an Override": terminology/overrides.md
   - Usage:
     - "QuickStart": usage/index.md
-    - "Terminology": usage/terminology.md
-    - "Overrides": usage/overrides.md
     - "Workflow": usage/workflow.md
     - "Commands": usage/commands.md
   - "Reports":
@@ -37,6 +38,8 @@ extra:
       link: https://odatnurd.net
     - icon: fontawesome/brands/twitter
       link: https://twitter.com/OdatNurd
+    - icon: fontawesome/brands/bluesky
+      link: https://bsky.app/profile/odatnurd.bsky.social
     - icon: fontawesome/brands/youtube
       link: https://www.youtube.com/c/OdatNurd
     - icon: fontawesome/brands/discord

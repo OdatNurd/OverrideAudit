@@ -9,7 +9,7 @@ In order to view the key bindings that ship directly with OverrideAudit, you can
 use the `Preferences > Settings > OverrideAudit > Key Bindings` menu item or
 the `Preferences: OverrideAudit Key Bindings` command from the Command Palette.
 
-!!! NOTE
+!!! NOTE "Differences in Menu layout on MacOS"
 
     On MacOS, the `Preferences` menu is under `Sublime Text` in the main menu
     bar.
@@ -19,7 +19,7 @@ key bindings that ship with OverrideAudit. If you would like to adjust any of
 them, copy the binding that you would like to change into the right hand pane
 and modify the key as appropriate.
 
-!!! WARNING
+!!! WARNING "Maintain the format of the keymap file!"
 
     `sublime-keymap` files are `JSON` files which allow for comments of the `//`
     and `/* */` variety; they are also not sensitive to trailing commas in
@@ -44,10 +44,10 @@ do not get in the way of any other key bindings you might already be using.
 - ++alt+o++ (Windows/Linux)
 - ++command+alt+up++ (MacOS)
 
-While viewing an [override](garbage), jump to a tab showing a [diff](garbage)
-of the current override against the underlying file, opening such a tab if it
-does not already exist, and refreshing its content if modifications have been
-made to  a file.
+While viewing an [override](../terminology/overrides.md), jump to a tab showing
+a `diff` of the current override against the underlying file, opening such a
+tab if it does not already exist, and refreshing its content if modifications
+have been made to  a file.
 
 This also works in the opposite direction; while viewing an override diff,
 this will jump to the tab that contains the override whose diff you're looking
@@ -58,5 +58,5 @@ at, opening the file if it is not already open.
 
 - ++f5++ (All Platforms)
 
-While viewing any [report](garbage), cause the report to refresh; all
+While viewing any [report](../reports/index.md), cause the report to refresh; all
 information being displayed in the report will be recalculated.
