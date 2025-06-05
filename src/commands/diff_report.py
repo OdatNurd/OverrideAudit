@@ -141,7 +141,7 @@ class BulkDiffReportThread(ReportGenerationThread):
                 content = prefix + diff.result
 
                 if exclude_unchanged and diff.is_empty:
-                    log("Excluded from report: %s", file)
+                    log(f"Excluded from report: {pkg_info.name}/{file}")
                     excluded = True
 
             if not excluded:

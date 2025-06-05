@@ -359,12 +359,15 @@ def filter_unmodified_overrides(pkg_info, overrides):
     list that's filtered so that any overrides that have not been changed from
     the underlying file are removed.
     """
+    filtered_overrides = PackageFileSet()
     for override in overrides:
         result = pkg_info.override_diff(override, 1)
         if result.is_empty:
-            overrides.remove(override)
+            log(f"Excluded from report: {pkg_info.name}/{override}")
+        else:
+            filtered_overrides.add(override)
 
-    return overrides
+    return filtered_overrides
 
 
 def diff_externally(window, pkg_info, override):
