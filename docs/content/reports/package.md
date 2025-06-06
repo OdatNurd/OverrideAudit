@@ -19,8 +19,9 @@ them such as:
 ## Creating a Package Report
 
 Create a Package Report by selecting the `Tools > OverrideAudit > Package Report`
-menu item or by selecting `OverrideAudit: Package Report` from the command
-palette.
+menu item or by selecting
+[OverrideAudit: Package Report](../usage/commands.md#package-report) from the
+command palette.
 
 The result of this is a tabular report listing all of your installed packages
 and their attributes.
@@ -47,10 +48,10 @@ conveying extra information about that package:
 
   - Packages in `[Square Brackets]` are currently being ignored by Sublime Text
     because you have placed them in the `ignored_packages` list, such as the
-    `Vintage` and `TypeScript` packages in the screen shot above.
+    `Vintage`package in the screen shot above.
 
   - Packages in `<Angle Brackets>` are dependency packages that are providing
-    support for packages you have installed, such as `dateutils` in the screen
+    support for packages you have installed, such as `sublime_lib` in the screen
     shot above
   - All other packages are just normal Sublime Text packages
 
@@ -58,7 +59,7 @@ conveying extra information about that package:
 
     As of Package Control 4, many package dependencies are installed as actual
     libraries rather than as special dependency packages. As such, you may not
-    see all dependencies in the report.
+    see all or even any dependencies in the report.
 
 Packages themselves can be represented in any or all of the following states:
 
@@ -75,9 +76,9 @@ unclear on what they are or how you would create one.
 
 The packages in the table are listed in ***roughly*** the order that Sublime
 loads them when it starts (see
-[Merging and Order of Precedence](https://docs.sublimetext.io/guide/extensibility/packages.html#merging-and-order-of-precedence){: target="_blank" }
+[Merging and Order of Precedence](https://docs.sublimetext.io/guide/extensibility/packages.html#merging-and-order-of-precedence){: target="_blank" class="external-link" }
 in the
-[Sublime Text Community Documentation](https://docs.sublimetext.io/){: target="_blank" }
+[Sublime Text Community Documentation](https://docs.sublimetext.io/){: target="_blank" class="external-link" }
 for full details).
 
 Hovering the mouse over the name of a package in a package report (or in any

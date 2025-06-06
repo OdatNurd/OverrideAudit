@@ -228,9 +228,9 @@ This is an updated version of OverrideAudit, targeting Sublime Text 3.2+
 ### 1.2.1 (2019-02-15)
 
   - Support using
-    [Sublimerge Pro](https://packagecontrol.io/packages/Sublimerge%20Pro){: target="_blank" }
+    [Sublimerge Pro](https://packagecontrol.io/packages/Sublimerge%20Pro){: target="_blank" class="external-link" }
     or
-    [Sublimerge 3](https://packagecontrol.io/packages/Sublimerge%203){: target="_blank" }
+    [Sublimerge 3](https://packagecontrol.io/packages/Sublimerge%203){: target="_blank" class="external-link" }
     as the external diff tool by setting `external_diff` to `"sublimerge"`.
 
   - Improve detection of an invalid `external_diff` setting that could lead to
@@ -255,13 +255,13 @@ This is an updated version of OverrideAudit, targeting Sublime Text 3.2+
 
 
   - Fix a bug introduced in 1.1.0 while fixing
-    [#24](https://github.com/OdatNurd/OverrideAudit/issues/24){: target="_blank" }
+    [#24](https://github.com/OdatNurd/OverrideAudit/issues/24){: target="_blank" class="external-link" }
     in which text in reports telling you that there are no overrides would
     incorrectly be treated as override file names.
 
   - Improved detection of dependency packages that are under development, which
     use a different metadata file than installed dependencies do.
-    ([#25](https://github.com/OdatNurd/OverrideAudit/issues/25){: target="_blank" })
+    ([#25](https://github.com/OdatNurd/OverrideAudit/issues/25){: target="_blank" class="external-link" })
 
   - Replace the menu item in the preferences menu and the entry in the command
     palette that open the README file with a version that opens this online
@@ -278,16 +278,16 @@ This is an updated version of OverrideAudit, targeting Sublime Text 3.2+
 
   - Implement the ability to `freshen` a single expired override or all
     within a package
-    ([#15](https://github.com/OdatNurd/OverrideAudit/issues/15){: target="_blank" })
+    ([#15](https://github.com/OdatNurd/OverrideAudit/issues/15){: target="_blank" class="external-link" })
     via a context menu option.
 
   - Implement the ability to show the diff header even if a diff is empty
-    ([#18](https://github.com/OdatNurd/OverrideAudit/issues/18){: target="_blank" })
+    ([#18](https://github.com/OdatNurd/OverrideAudit/issues/18){: target="_blank" class="external-link" })
     controlled via `diff_empty_hdr` option
 
   - Fix a problem with overrides starting with a period not being correctly
     recognized as an override
-    ([#24](https://github.com/OdatNurd/OverrideAudit/issues/24){: target="_blank" })
+    ([#24](https://github.com/OdatNurd/OverrideAudit/issues/24){: target="_blank" class="external-link" })
 
   - Fix a file case issue on Windows/MacOS where opening an override from a
     package folder with an incorrect case would not enable the commands to edit
@@ -302,7 +302,7 @@ This is an updated version of OverrideAudit, targeting Sublime Text 3.2+
   - Fix mixed path separators in diff output, delete confirmations and diff tab
     headers so they are always forward slashes (unix-style) to visually
     conform with how Sublime represents package path fragments internally
-    ([#14](https://github.com/OdatNurd/OverrideAudit/issues/14){: target="_blank" })
+    ([#14](https://github.com/OdatNurd/OverrideAudit/issues/14){: target="_blank" class="external-link" })
 
   - The Package Report, Override Report and Bulk Diff Reports now have word wrap
     turned off by default

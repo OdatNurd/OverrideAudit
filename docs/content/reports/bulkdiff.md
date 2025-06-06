@@ -18,13 +18,15 @@ the underlying version.
 ## Creating a Bulk Diff Report
 
 Create a Bulk Diff report by selecting the `Tools > Override Audit > Bulk Diff`
-menu item or via the `Override Audit: Bulk Diff` from the command palette. You
-may also obtain a bulk diff of any package by selecting the command from the
-context menu on any package name in any report.
+menu item or via the
+[Override Audit: Bulk Diff](../usage/commands.md#bulk-diff-report-all-packages)
+from the command palette. You may also obtain a bulk diff of any package by
+selecting the command from the context menu on any package name in any report.
 
 There are two versions of this command, allowing you to create either a bulk
-diff of all packages that contain overrides or only for a single package
-depending on your needs.
+diff of all packages that contain overrides, or only for a
+[single package](../usage/commands.md#bulk-diff-report-single-package) depending
+on your needs.
 
 When creating a bulk diff from a single package, a quick panel will be
 displayed to allow you to select the package to diff. This panel will display
@@ -60,10 +62,10 @@ only those packages that currently contain overrides.
 
 ## Report Contents
 
-A Bulk Diff Report is visually similar to an Override Report; it contains a
-list of all packages it has been told to diff (all packages with overrides or
-just a single package) along with a list of all simple overrides contained in
-those packages, if any.
+A Bulk Diff Report is visually similar to an [Override Report](override.md); it
+contains a list of all packages it has been told to diff (all packages with
+overrides or just a single package) along with a list of all simple overrides
+contained in those packages, if any.
 
 Where an Override Report only indicates that an override exists, a Bulk Diff
 report shows you a diff of that particular override against the version of the

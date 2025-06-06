@@ -41,11 +41,11 @@ In use the command opens up the content of the underlying package file in a new
 buffer and (if
 [mini_diff_underlying](../config/settings.md#mini_diff_underlying) is enabled)
 will also set up the
-[incremental diff](https://www.sublimetext.com/docs/incremental_diff.html){: target="_blank" }
+[incremental diff](https://www.sublimetext.com/docs/incremental_diff.html){: target="_blank" class="external-link" }
 functionality in Sublime Text to track changes to the file based on the Packed
 version of the file so that you can see what changes you've made.
 
-The override will not be created until you save the file for the first time,
+***The override will not be created until you save the file for the first time***,
 allowing you to change your mind without having to delete the override
 afterwards. If you close the file without making any changes, you won't be
 prompted to save; if you intend to create an override of the file that is
@@ -86,6 +86,8 @@ is different.
     `View Package File`); this facilitates the creation of a new override should
     that be desirable.
 
+    Making any modifications to the file and saving will automatically create
+    an override.
 
 ---
 
@@ -106,7 +108,9 @@ is different.
 
 This command is a shortcut to the [Create Override](#create-override) command,
 and can be used to convert an existing file buffer for a package resource into
-an override without having to navigate to it in the quick panel.
+an override without having to navigate to it in the quick panel. Just like that
+command, the resulting buffer ***requires you to save the file in order to
+create the override.***
 
 The command is only enabled while the current file in Sublime is an appropriate
 file; when selected it immediately makes the buffer editable and otherwise does
@@ -144,14 +148,17 @@ installed package is displayed in `<Angle Brackets>`.
 
 Each package name supports a context menu item which allows you to open a bulk
 diff report for that package, allowing you to quickly get an overview of the
-status of any overrides on that package. See the OverrideAudit: Bulk Diff
-Single Package command for more information.
+status of any overrides on that package. In addition, package names have a
+hover popup that provide more information about that package.
+
+See the [OverrideAudit: Bulk Diff Single Package](#bulk-diff-report-single-package)
+command for more information.
 
 !!! NOTE
 
     As of Package Control 4, many package dependencies are installed as actual
     libraries rather than as special dependency packages. As such, you may not
-    see all dependencies in the package report.
+    see all (or even any) dependencies in the package report.
 
 
 ---
@@ -183,9 +190,11 @@ All *simple* overrides for a package are displayed below the package name in the
 report, and may be prefixed with an `[X]` mark if they are currently *expired*.
 
 As with the `Package Report`, a context menu item is presented on package names
-to allow a quick bulk diff of overrides in that package. Additionally, override
-filenames include context commands to allow you to quickly edit, diff or delete
-that override.
+to allow a quick bulk diff of overrides in that package and can be hovered over
+with the mouse to get more package details.
+
+Additionally, override filenames include context commands to allow you to
+quickly edit, diff or delete that override.
 
 
 ---
@@ -261,7 +270,8 @@ use Sublime code folding to hide away parts of the report as you work.
 
 As in the [Override Report](../reports/override.md), the name of each package
 and the filenames of each override support context menus that allows you to
-quickly bulk diff, open or diff them in their own distinct view.
+quickly bulk diff, open or diff them in their own distinct view, and package
+names can be hovered over with the mouse to see more package details.
 
 
 ---
@@ -349,7 +359,7 @@ view or its associated editor tab and via the keyboard.
 
 This will display a quick panel that lists all packages with at least one
 *simple* override, and allows you to compare the differences between the base
-file and your override to see what is different between the two.
+file and the override you select to see what is different between the two.
 
 When the content of the file is different, the output is displayed in a Unified
 Diff format in a new buffer, allowing you to inspect the changes.
@@ -403,7 +413,7 @@ it's going to take.
 
 Additionally, OverrideAudit contains a key binding to the standard Sublime key
 for swapping between associated files that operates from within an appropriate
-file view; see [key bindings](../config/keybinds.md)).
+file view; see [key bindings](../config/keybinds.md).
 
 Regardless of how you trigger the command, any existing edit or diff view for
 this override will be switched to directly. In the case of a diff view, the

@@ -65,19 +65,19 @@ SOFTWARE.
 ## Credits
 
 OverrideAudit is primarily developed by
-[Terence Martin](https://github.com/OdatNurd){: target="_blank" },
+[Terence Martin](https://github.com/OdatNurd){: target="_blank" class="external-link" },
 but would not be possible without inspiration, creative input, and extensive
 design help from
-[Keith Hall](https://github.com/keith-hall){: target="_blank" },
+[Keith Hall](https://github.com/keith-hall){: target="_blank" class="external-link" },
 whose assistance and direction are greatly appreciated.
 
 A debt of gratitude is also owed to
-[Guillermo López-Anglada](https://github.com/guillermooo){: target="_blank" }
+[Guillermo López-Anglada](https://github.com/guillermooo){: target="_blank" class="external-link" }
 and
-[FichteFoll](https://github.com/FichteFoll){: target="_blank" },
+[FichteFoll](https://github.com/FichteFoll){: target="_blank" class="external-link" },
 whose work on the
-[Sublime Text Unofficial Documentation](https://docs.sublimetext.io/){: target="_blank" }
+[Sublime Text Unofficial Documentation](https://docs.sublimetext.io/){: target="_blank" class="external-link" }
 provide invaluable information about Sublime Text and its inner workings.
 
 This documentation uses
-[Material for MkDocs](https://squidfunk.github.io/mkdocs-material/){: target="_blank" }.
+[Material for MkDocs](https://squidfunk.github.io/mkdocs-material/){: target="_blank" class="external-link" }.

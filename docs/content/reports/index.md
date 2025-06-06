@@ -26,7 +26,7 @@ All reports share some common functionality:
     things are changing in the background or since the report was first created
 
   - Package names (and in many cases override names) are displayed in the
-    [Symbol List](https://docs.sublimetext.io/guide/usage/file-management/navigation.html#goto-anything){: target="_blank" },
+    [Symbol List](https://docs.sublimetext.io/guide/usage/file-management/navigation.html#goto-anything){: target="_blank" class="external-link" },
     allowing you to quickly jump to a location by name
 
   - Package and override names (in reports that contain them) support a context

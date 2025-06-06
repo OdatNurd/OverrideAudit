@@ -34,7 +34,7 @@ example, package names in Reports have a different set of context sensitive
 items than the names of overrides do.
 
 
-# Reports
+## Reports
 
 Most of the ways into the OverrideAudit workflow are by first generating a
 report of some kind in order to gather information about how best to proceed.
@@ -47,7 +47,7 @@ reports, you can use the available context sensitive commands to get at the
 information you need to keep Sublime running in tip top shape.
 
 
-## Automatic Reports
+### Automatic Reports
 
 For most users, working with overrides starts with an automatically generated
 [Override Report](../reports/override.md), which may happen after an update to
@@ -61,7 +61,7 @@ currently have and which ones may require your attention to ensure that you
 don't miss out on anything important.
 
 
-## Manual Reports
+### Manual Reports
 
 OverrideAudit can also generate various [Reports](../reports/index.md) on
 demand, including the expired override report that it automatically generates
@@ -70,7 +70,7 @@ report to help diagnose potential problems as well as to gain insight into your
 overrides at any time.
 
 
-# Overrides
+## Overrides
 
 
 Although the various reports help you to see what overrides you have and their
@@ -84,7 +84,7 @@ overriding, update them when they need changes, and even to remove them when
 you're done with them.
 
 
-## Finding Overrides
+### Finding Overrides
 
 Before you can start working with your overrides, you need to know that they
 exist in the first place. The easiest way to do that is via an
@@ -101,13 +101,14 @@ either for all packages all at once or for just a single package, depending on
 your needs.
 
 
-## Editing Overrides
+### Editing Overrides
 
 When working with OverrideAudit, you may determine that you would like to make
 changes to an override that already exists. From any report which is showing
 you the name of an override, you can open the context menu over an override and
-select the `OverrideAudit: Edit Override` command to automatically open the
-override for editing.
+select the
+[OverrideAudit: Edit Override](commands.md#swap-diffedit-view) command to
+automatically open the override for editing.
 
 If you have a diff view open for an override, you can open the context menu
 anywhere within the file contents or it's editor tab and select the
@@ -118,12 +119,12 @@ swap to an edit view for that override.
 
 It is also possible to open an override manually using the standard Sublime
 file operations or via another package such as
-[PackageResourceViewer](https://packagecontrol.io/packages/PackageResourceViewer){: target="_blank" }.
+[PackageResourceViewer](https://packagecontrol.io/packages/PackageResourceViewer){: target="_blank" class="external-link" }.
 Regardless of how you open an override, OverrideAudit will detect that it is an
 override and seamlessly integrate with it.
 
 
-## Diffing Overrides
+### Diffing Overrides
 
 Once you know you have an override, you often need to know exactly how your
 override is different from the underlying file that it is overriding. For this
@@ -134,9 +135,10 @@ There are a variety of ways to generate a diff for an existing override,
 allowing you to quickly get at the information you need with a minimum of
 effort.
 
-  - Selecting `OverideAudit: Diff Single Override` from the Command Palette or
-    `Tools > OverrideAudit > Diff Single Override` from the menu will prompt you
-    for an override and then show you a diff of it.
+  - Selecting [OverideAudit: Diff Single Override](commands.md#diff-single-override)
+    from the Command Palette or `Tools > OverrideAudit > Diff Single Override`
+    from the menu will prompt you for an override and then show you a diff of
+    it.
 
     This command automatically filters the list of packages and the contents
     of the selected package so that you only see relevant information.
@@ -168,7 +170,7 @@ effort.
     The [mini_diff_underlying](../config/settings.md#mini_diff_underlying)
     setting can be used to have
     OverrideAudit set up the Sublime Text
-    [incremental diff](https://www.sublimetext.com/docs/incremental_diff.html){: target="_blank" }
+    [incremental diff](https://www.sublimetext.com/docs/incremental_diff.html){: target="_blank" class="external-link" }
     functionality to show file differences based on the unpacked version of the
     file.
 
@@ -178,7 +180,7 @@ effort.
 
 
 
-## Freshening Expired Override
+### Freshening Expired Override
 
 OverrideAudit will warn you when you have any overrides that have
 [expired](../terminology/index.md#expired-override); that is, the file that
@@ -196,15 +198,16 @@ If you are viewing a [Report](../reports/index.md) that displays the names of
 existing overrides, you can also take the following actions:
 
   - Open the context menu on the name of an expired override and select the
-    `OverrideAudit: Freshen Override` command to freshen that single override.
+    [OverrideAudit: Freshen Override](commands.md#freshen-expired-overrides)
+    command to freshen that single override.
 
   - Open the context menu on the name of a package which contains at least one
     expired override and select the
-    `OverrideAudit: Freshen Package` command to freshen all expired overrides
-    within that package all at once.
+    [OverrideAudit: Freshen Package](commands.md#freshen-expired-overrides)
+    command to freshen all expired overrides within that package all at once.
 
 
-## Deleting Overrides
+### Deleting Overrides
 
 Sometimes overrides reach a point where they are no longer useful. This can be
 because you have decided that you don't like the change, or possibly the
@@ -215,8 +218,9 @@ it.
 Like most commands, this operation available in a variety of ways:
 
   - From within an Edit or Diff of an override, you can select the
-    `OverrideAudit: Delete this Override` command from the context menu or
-    `OverrideAudit: Delete Current Override` from the Command Palette.
+    [OverrideAudit: Delete this Override](commands.md#delete-override) command
+    from the context menu or `OverrideAudit: Delete Current Override` from the
+    Command Palette.
 
   - From within a report that displays the names of overrides, you can open the
     context menu over the name of an override and select the
@@ -241,7 +245,7 @@ Like most commands, this operation available in a variety of ways:
     overrides to ensure that everything works as you expect it to.
 
 
-## Reverting Overrides
+### Reverting Overrides
 
 In some cases, your override may reach a point where you do not want to delete
 it outright, but you would like to make a different set of changes, for example
@@ -250,7 +254,7 @@ modification again to the new file. OverrideAudit allows you to easily revert
 the content of the file back to the base, allowing you to make new edits.
 
   - From within an Edit or Diff of an override, you can select the
-    `OverrideAudit: Revert this Override` command from the context menu or
+    [OverrideAudit: Revert this Override](commands.md#revert-override) command from the context menu or
     `OverrideAudit: Revert Current Override` from the Command Palette.
 
   - From within a report that displays the names of overrides, you can open the

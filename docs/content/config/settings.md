@@ -54,9 +54,9 @@ Some OverrideAudit commands may ignore this setting.
 - **`Boolean`**
 - ***Default:*** `true`
 
-When `reuse_views` is enabled (the default), this controls whether a reused
-view is cleared of its contents prior to executing the command or if the new
-output is appended to the end of the existing view.
+When [reuse_views](#reuse_views) is enabled (the default), this controls
+whether a reused view is cleared of its contents prior to executing the command
+or if the new output is appended to the end of the existing view.
 
 Some OverrideAudit commands may ignore this setting.
 
@@ -107,9 +107,11 @@ The possible values of this setting are:
 - **`Number`**
 - ***Default:*** `3`
 
-When displaying a diff for an override, this specifies how many unchanged lines
-before and after each difference are displayed to provide better context for
-the changes.
+While displaying a diff for an override (both a
+[single diff](../usage/commands.md#diff-single-override) as well as a
+[bulk diff](../usage/commands.md#bulk-diff-report-all-packages)), this specifies
+how many unchanged lines before and after each difference are displayed to
+provide better context for the changes.
 
 ---
 
@@ -125,8 +127,9 @@ display.
 This applies both to a
 [bulk diff](../usage/commands.md#bulk-diff-report-all-packages) as well as a
 [single file diff](../usage/commands.md#diff-single-override), but note that
-for a single file diff this option will only have an effect if `diff_unchanged`
-is set to `"diff"`, as otherwise no diff is displayed.
+for a single file diff this option will only have an effect if
+[diff_unchanged](#diff_unchanged) is set to `"diff"`, as otherwise no diff is
+displayed.
 
 ---
 
@@ -137,7 +140,8 @@ is set to `"diff"`, as otherwise no diff is displayed.
 
 This setting controls whether or not OverrideAudit will make sure any unsaved
 changes are persisted to disk when switching from an edit of an override to a
-diff of it, so that your changes will be reflected in the diff.
+diff of it using [Swap Diff/Edit View](../usage/commands.md#swap-diffedit-view),
+so that your changes will be reflected in the diff.
 
 This option has no effect for a buffer with unsaved changes that represents a
 file that no longer exists on disk (i.e. you have opened the override and then
@@ -151,11 +155,13 @@ saving it again.
 - **`Boolean`**
 - ***Default:*** `true`
 
-When removing files, this setting controls whether OverrideAudit will prompt
-you to confirm the deletion before it happens or not.
+Whenever OverrideAudit removes a file (e.g.
+[Delete Override](../usage/commands.md#delete-override)), this setting controls
+whether you are prompted to confirm the deletion before it is carried out.
 
 OverrideAudit uses the `send2trash` library that ships with Sublime Text to
-perform file deletions.
+perform file deletions, which puts files in your system's recycle bin or trash
+so that you can easily recover them.
 
 ---
 
@@ -164,9 +170,10 @@ perform file deletions.
 - **`Boolean`**
 - ***Default:*** `true`
 
-When freshening expired override files, this setting controls whether
-OverrideAudit will prompt you to confirm the operation before it happens or
-not.
+When freshening an expired override (e.g.
+[Freshen Expired Overrides](../usage/commands.md#freshen-expired-overrides)),
+this setting controls whether you are prompted to confirm the operation before
+it happens or not.
 
 Although this operation is not destructive, freshening an expired override will
 stop OverrideAudit from warning you that it's expired, which might mask
@@ -179,9 +186,9 @@ problems.
 - **`Boolean`**
 - ***Default:*** `true`
 
-When reverting an override file back to it's original unmodified state, this
-setting controls whether OverrideAudit will prompt you to confirm the operation
-before it happens or not.
+When reverting an override file back to it's original unmodified state (e.g.
+[Revert Override](../usage/commands.md#revert-override)), this setting controls
+whether you are prompted to confirm the operation before it happens or not.
 
 This operation is destructive; the current content of the override will be lost
 as a result of this action. Make sure that you have it safely backed up (for
@@ -217,7 +224,7 @@ your *Preferences.sublime-settings* file.
 
 As well as happening when you manually decide to re-enable a package you have
 been ignoring, this is also an indication that
-[Package Control](https://packagecontrol.io){: target="_blank" } has finished
+[Package Control](https://packagecontrol.io){: target="_blank" class="external-link" } has finished
 upgrading a package.
 
 When this option is turned off, checks for expired overrides only happen when
@@ -301,10 +308,10 @@ various version control systems use to be able to track files.
 - ***Default:*** `true`
 
 When editing an overridden package resource, OverrideAudit can set up the
-`incremental diff` feature of Sublime to track the underlying package file being
-overridden. This allows the diff indicators in the gutter to show you changes
-as compared to the underlying file as well as being able to use the
-[native functionality in Sublime](https://www.sublimetext.com/docs/incremental_diff.html){: target="_blank" }
+[incremental diff](https://www.sublimetext.com/docs/incremental_diff.html){: target="_blank" class="external-link" }
+feature of Sublime to track the underlying package file being overridden. This
+allows the diff indicators in the gutter to show you changes as compared to the
+underlying file as well as being able to use the native functionality in Sublime
 to navigate between changes and revert hunks.
 
 When set to `true` (the default), every time you open or save a package override,

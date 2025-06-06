@@ -37,7 +37,7 @@ Sublime by selecting `Preferences > Browse Packages...` from the menu or from
 the `Command Palette`. The name of the package comes from the name of the
 directory the package is stored in.
 
-> The contents of the directory `Packages\User` are considered to be the
+> The contents of the directory `Packages/User` are considered to be the
 > contents of a package named `User`
 
 

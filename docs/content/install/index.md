@@ -12,7 +12,7 @@ external software or packages are required.
 !!! NOTE "Required builds of Sublime Text"
 
     Version 1.x of OverrideAudit supports builds of Sublime Text 3 prior to
-    build 3197 while version 2.x supports Sublime Text builds through to 4136.
+    build 3197 while version 2.x supports Sublime Text builds through to 4199.
 
     These versions of OverrideAudit are no longer actively supported. Package
     Control will automatically install one of those versions if you're using an
@@ -23,7 +23,7 @@ external software or packages are required.
 ## Package Control
 
 The fastest and easiest way to install OverrideAudit is via
-[Package Control](https://packagecontrol.io){: target="_blank" }, the de-facto
+[Package Control](https://packagecontrol.io){: target="_blank" class="external-link" }, the de-facto
 package manager for Sublime Text. Package Control not only installs your
 packages for you, it also ensures that they are kept up to date to make sure
 that you always have the benefit of the latest bug fixes and features for all
@@ -47,7 +47,7 @@ you'll have to do that first. More recent builds of Sublime Text 3 have an
 option in the `Tools` menu named `Install Package Control...` that will install
 Package Control for you, while older versions require you to follow the
 installation instructions
-[here](https://packagecontrol.io/installation){: target="_blank" }.
+[here](https://packagecontrol.io/installation){: target="_blank" class="external-link" }.
 
 !!! NOTE "Can't see menu entry to install Package Control"
 
@@ -81,8 +81,8 @@ installation instructions
 
 If you're unable to use Package Control to install OverrideAudit, it's also
 possible to perform a manual installation by cloning the package source from
-its [GitHub repository](https://github.com/OdatNurd/OverrideAudit) into your
-local `Packages` directory, which you can locate by selecting the
+its [GitHub repository](https://github.com/OdatNurd/OverrideAudit){: target="_blank" class="external-link" }
+into your local `Packages` directory, which you can locate by selecting the
 `Browse Packages` command from the command palette or from the `Preferences`
 menu.
 

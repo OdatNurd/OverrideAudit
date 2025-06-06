@@ -8,7 +8,7 @@ description: Information on Overrides
 One of the great things about Sublime Text is how customizable it is. Along
 with things like customizing your settings and key bindings, you can add almost
 any functionality you might want. Using
-[Package Control](https://packagecontrol.io){: target="_blank" }
+[Package Control](https://packagecontrol.io){: target="_blank" class="external-link" }
 you can find and install a vast array of third party packages to add features
 that make Sublime Text uniquely your own.
 
@@ -31,6 +31,7 @@ when you no longer need them.
 Most importantly, it can help to keep you informed when there are potential
 problems that you should take a look at, to help you from falling into those
 nasty pitfalls.
+
 
 ## What are Overrides
 
@@ -95,7 +96,7 @@ taking the worry out of customizing Sublime to your heart's content so that
 you're free to get on with your work.
 
 
-# Packages
+## Packages
 
 In Sublime Text, a `Package` is simply a named collection of resource files
 that are grouped together to make some kind of modification or extension to
@@ -111,11 +112,11 @@ Regardless of their content, packages in Sublime text can be installed in two
 different ways, `Packed` and `Unpacked`.
 
 
-## Packed Packages
+### Packed Packages
 
 A `Packed` package is a collection of files grouped together into a single
 archive file, which makes them easier to share and install. This is important
-for mechanisms such as [Package Control](https://packagecontrol.io){: target="_blank" },
+for mechanisms such as [Package Control](https://packagecontrol.io){: target="_blank" class="external-link" },
 which help to install new packages and keep them up to date, and is also the
 format in which the packages that ship with Sublime (`Shipped Packages`) are
 distributed.
@@ -138,7 +139,7 @@ the menu or command palette and then going up a level to the parent folder.
 is used as the base for all users on the current computer.
 
 
-## Unpacked Packages
+### Unpacked Packages
 
 Occasionally it is not possible for a package to be installed in a packed
 format. For example, it may contain platform specific libraries or binaries
@@ -157,19 +158,23 @@ Most notably, all of your customized settings and key bindings are stored in an
 unpacked package named `User` inside of this folder.
 
 
-# Override Types
+## Override Types
 
-There are two main types of overrides in Sublime Text, `Simple` and `Complete`,
+There are two main types of overrides in Sublime Text,
+[Simple](index.md#simple-override) and
+[Complete](index.md#complete-override),
 with the Simple override being the most common type of override for most users.
-In the [terminology](index.md) of OverrideAudit, there are also `Expired` and
-`Unknown` overrides, which are specific cases of overrides.
+In the [terminology](index.md) of OverrideAudit, there are also
+[expired](index.md#expired-override) and
+[unknown](index.md#unknown-override) overrides, which are specific cases of
+`simple` overrides.
 
 Regardless of the type of an override, it still shares the same set of
 pitfalls, in that Sublime uses them unconditionally without telling you that it
 is doing so or that you might need to update them.
 
 
-## Simple Override
+### Simple Override
 
 A `Simple` override is the most common type of override, and allows you to
 override the complete contents of a single file within a `Packed` package
@@ -189,7 +194,7 @@ sublime doesn't provide any indication that an override file is being used.
 packages which have been completely overrridden (see below).
 
 
-## Complete Override
+### Complete Override
 
 A `Complete` override is less common and allows you to override the entire
 contents of one of the packages that ship with Sublime all at once. The most
@@ -205,7 +210,7 @@ completely ignore the shipped version and use the overridden version instead.
 Like a `Simple` override, a complete override is transparent to you.
 
 
-## Expired Override
+### Expired Override
 
 As outlined in the different types of overrides above, when an override is in
 place Sublime uses it automatically, with no warnings or indications that it is
@@ -234,7 +239,7 @@ time stamps of the two package files themselves are compared.
     cases.
 
 
-## Unknown Override
+### Unknown Override
 
 A file in an *Unpacked* package is only considered to be an override if an
 identically named file also exists in the *Packed* version of that package; that
