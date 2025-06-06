@@ -6,7 +6,7 @@ description: Installing the OverrideAudit package for Sublime Text
 # Installing OverrideAudit
 
 OverrideAudit supports Sublime Text on Windows, MacOS and Linux. The only
-requirement is Sublime Text with a build number of `4126` or higher; no other
+requirement is Sublime Text with a build number of `4200` or higher; no other
 external software or packages are required.
 
 !!! NOTE "Required builds of Sublime Text"

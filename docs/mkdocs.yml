@@ -18,8 +18,8 @@ nav:
     - "Key Bindings": config/keybinds.md
     - "Settings": config/settings.md
   - "Terminology":
-      "OverrideAudit Terminology": terminology/index.md
-      "What is an Override": terminology/overrides.md
+    - "OverrideAudit Terminology": terminology/index.md
+    - "What is an Override": terminology/overrides.md
   - Usage:
     - "QuickStart": usage/index.md
     - "Workflow": usage/workflow.md

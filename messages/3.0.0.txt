@@ -1,6 +1,7 @@
 Version 3.0.0 (?.?.?.?)
 --------------------------
 
+  * Update the minimum version of Sublime to 4200
   * Update the package to use the newest Python plugin host
   * Fix the hover popup to display more meaningful override counts
   * Fix and Enhance Python version reporting in the hover popup

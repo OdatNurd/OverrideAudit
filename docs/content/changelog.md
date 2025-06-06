@@ -6,10 +6,15 @@ description: The release history for OverrideAudit
 
 ## Version 3
 
-This is the latest version of Override, targeting Sublime Text builds of 4126
-and older (Sublime Text 4).
+This is the latest version of Override, targeting Sublime Text builds of 4200
+and newer (Sublime Text 4).
 
 ### 3.0.0 (????-??-??)
+
+  - Updated the minimum required version of Sublime Text to be `4200` going
+    forward, to take advantage of new features in Sublime and provide a
+    cleaner cut for when the next dev release cycle alters the plugin host
+    structure.
 
   - Update OverrideAudit to officially use the Python 3.8 plugin host rather
     than the legacy plugin host.

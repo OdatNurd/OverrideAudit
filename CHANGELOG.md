@@ -4,6 +4,10 @@ OverrideAudit ChangeLog
 Version 3.0.0 (????-??-??)
 --------------------------
 
+  * Switch the minimum build of Sublime Text required from
+    `4126` to `4200`, since in the next dev cycle the plugin
+    host landscape will change.
+
   * Update OverrideAudit to officially use the Python 3.8
     plugin host rather than the legacy plugin host.
 
