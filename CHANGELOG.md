@@ -1,7 +1,7 @@
 OverrideAudit ChangeLog
 =======================
 
-Version 3.0.0 (????-??-??)
+Version 3.0.0 (2025-06-06)
 --------------------------
 
   * Switch the minimum build of Sublime Text required from

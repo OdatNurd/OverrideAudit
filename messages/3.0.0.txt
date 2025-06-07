@@ -1,4 +1,4 @@
-Version 3.0.0 (?.?.?.?)
+Version 3.0.0 (2025-06-06)
 --------------------------
 
   * Update the minimum version of Sublime to 4200

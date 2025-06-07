@@ -6,10 +6,10 @@ description: The release history for OverrideAudit
 
 ## Version 3
 
-This is the latest version of Override, targeting Sublime Text builds of 4200
-and newer (Sublime Text 4).
+This is the latest version of OverrideAudit, targeting Sublime Text builds of
+4200 and newer (Sublime Text 4).
 
-### 3.0.0 (????-??-??)
+### 3.0.0 (2025-06-06)
 
   - Updated the minimum required version of Sublime Text to be `4200` going
     forward, to take advantage of new features in Sublime and provide a
@@ -148,7 +148,7 @@ This is an updated version of OverrideAudit, targeting Sublime Text 3.2+
     incremental diff indicators would not be set up correctly.
 
 
-### 2.1.0 (2019-9-15)
+### 2.1.0 (2019-09-15)
 
   - Added new commands to create an override and promote a view opened by
     `View Package File` to an override. Both set up the tab so that saving the
@@ -188,7 +188,7 @@ This is an updated version of OverrideAudit, targeting Sublime Text 3.2+
     unpacked packages as a dependencies.
 
 
-### 2.0.0 (2019-3-14)
+### 2.0.0 (2019-03-14)
 
   - The code has been refactored to make it easier to extend and add new
     commands. With the exception of the items outlined in the following points,
@@ -319,6 +319,7 @@ This is an updated version of OverrideAudit, targeting Sublime Text 3.2+
     performing a diff on it.
 
 
-### 1.0.0 (2017-04-3)
+### 1.0.0 (2017-04-03)
 
   - Initial release
+x
