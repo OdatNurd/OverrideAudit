@@ -4,7 +4,7 @@ description: OverrideAudit Bulk Diff Report
 ---
 
 OverrideAudit allows you to easily
-[create a diff of a single override](../usage/commands.md#diff-single-override)
+{{ command('Diff Single Override', 'create a diff of a single override') }}
 in order to determine how you've changed the underlying file. In some cases you
 may have multiple overrides at once for a package, such as when you are working
 on modifications to an existing package.
@@ -19,13 +19,13 @@ the underlying version.
 
 Create a Bulk Diff report by selecting the `Tools > Override Audit > Bulk Diff`
 menu item or via the
-[Override Audit: Bulk Diff](../usage/commands.md#bulk-diff-report-all-packages)
+{{ command('Bulk Diff Report (All Packages)', 'Override Audit: Bulk Diff') }}
 from the command palette. You may also obtain a bulk diff of any package by
 selecting the command from the context menu on any package name in any report.
 
 There are two versions of this command, allowing you to create either a bulk
 diff of all packages that contain overrides, or only for a
-[single package](../usage/commands.md#bulk-diff-report-single-package) depending
+{{ command('Bulk Diff Report (Single Package)', 'single package') }} depending
 on your needs.
 
 When creating a bulk diff from a single package, a quick panel will be

@@ -20,7 +20,7 @@ them such as:
 
 Create a Package Report by selecting the `Tools > OverrideAudit > Package Report`
 menu item or by selecting
-[OverrideAudit: Package Report](../usage/commands.md#package-report) from the
+{{ command('Package Report', 'OverrideAudit: Package Report') }} from the
 command palette.
 
 The result of this is a tabular report listing all of your installed packages

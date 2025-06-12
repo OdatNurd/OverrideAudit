@@ -107,8 +107,8 @@ When working with OverrideAudit, you may determine that you would like to make
 changes to an override that already exists. From any report which is showing
 you the name of an override, you can open the context menu over an override and
 select the
-[OverrideAudit: Edit Override](commands.md#swap-diffedit-view) command to
-automatically open the override for editing.
+{{ command('Swap Diff/Edit View', 'OverrideAudit: Edit Override') }}  command
+to automatically open the override for editing.
 
 If you have a diff view open for an override, you can open the context menu
 anywhere within the file contents or it's editor tab and select the
@@ -135,7 +135,7 @@ There are a variety of ways to generate a diff for an existing override,
 allowing you to quickly get at the information you need with a minimum of
 effort.
 
-  - Selecting [OverideAudit: Diff Single Override](commands.md#diff-single-override)
+  - Selecting {{ command('Diff Single Override', 'OverideAudit: Diff Single Override') }}
     from the Command Palette or `Tools > OverrideAudit > Diff Single Override`
     from the menu will prompt you for an override and then show you a diff of
     it.
@@ -197,12 +197,12 @@ If you are viewing a [Report](../reports/index.md) that displays the names of
 existing overrides, you can also take the following actions:
 
   - Open the context menu on the name of an expired override and select the
-    [OverrideAudit: Freshen Override](commands.md#freshen-expired-overrides)
+    {{ command('Freshen Expired Overrides', 'OverrideAudit: Freshen Package') }}
     command to freshen that single override.
 
   - Open the context menu on the name of a package which contains at least one
     expired override and select the
-    [OverrideAudit: Freshen Package](commands.md#freshen-expired-overrides)
+    {{ command('Freshen Expired Overrides', 'OverrideAudit: Freshen Package') }}
     command to freshen all expired overrides within that package all at once.
 
 
@@ -217,9 +217,9 @@ it.
 Like most commands, this operation available in a variety of ways:
 
   - From within an Edit or Diff of an override, you can select the
-    [OverrideAudit: Delete this Override](commands.md#delete-override) command
-    from the context menu or `OverrideAudit: Delete Current Override` from the
-    Command Palette.
+    {{ command('Delete Override', 'OverrideAudit: Delete this Override') }}
+    command from the context menu or `OverrideAudit: Delete Current Override`
+    from the Command Palette.
 
   - From within a report that displays the names of overrides, you can open the
     context menu over the name of an override and select the
@@ -253,8 +253,9 @@ modification again to the new file. OverrideAudit allows you to easily revert
 the content of the file back to the base, allowing you to make new edits.
 
   - From within an Edit or Diff of an override, you can select the
-    [OverrideAudit: Revert this Override](commands.md#revert-override) command from the context menu or
-    `OverrideAudit: Revert Current Override` from the Command Palette.
+    {{ command('Revert Override', 'OverrideAudit: Revert this Override') }}
+    command from the context menu or `OverrideAudit: Revert Current Override`
+    from the Command Palette.
 
   - From within a report that displays the names of overrides, you can open the
     context menu over the name of an override and select the

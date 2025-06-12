@@ -41,7 +41,7 @@ do not get in the way of any other key bindings you might already be using.
 
 ### Toggle Override/Diff View
 
-- *Command:* [Swap Diff/Edit View](../usage/commands.md#swap-diffedit-view)
+- *Command:* {{ command("Swap Diff/Edit View") }}
 - ++alt+o++ (Windows/Linux)
 - ++command+alt+up++ (MacOS)
 
@@ -61,7 +61,7 @@ looking at, opening the file if it is not already open.
 
 ### Refresh Report
 
-- *Command:* [Refresh Report](../usage/commands.md#refresh-report)
+- *Command:* {{ command("Refresh Report") }}
 - ++f5++ (All Platforms)
 
 While viewing any [report](../reports/index.md), cause the report to refresh; all

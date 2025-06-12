@@ -19,7 +19,7 @@ circumstances. See below for more information.
 
 Create an Override Report by selecting the
 `Tools > OverrideAudit > Override Report` menu item or by selecting
-[OverrideAudit: Override Report](../usage/commands.md#override-report) from the
+{{ command('Override Report', 'OverrideAudit: Override Report') }} from the
 command palette.
 
 There are three versions of this command, allowing you to create either an
@@ -76,14 +76,14 @@ default) the Override report will also show
 [unknown overrides](../terminology/index.md#unknown-override) in the report
 prefixed with a `[?]` marker to call your attention to such files.
 
-The [Ignore Unchanged](../usage/commands.md#override-report-exclude-unchanged)
+The {{ command('Override Report (Exclude Unchanged)', 'Ignore Unchanged') }}
 version of this report is as above, but for each override a comparison is done
 between the override contents and the underlying file; if they are the same,
 they are skipped from the report, so that you only see those overrides that are
 changing something. This is a convenience for package authors who might be
 altering the content of release packages.
 
-The [Expired Only](../usage/commands.md#override-report-only-expired) version of
+The {{ command('Override Report (Only Expired)', 'Expired Only') }} version of
 this report, as its name suggests, shows only those packages that contain
 expired overrides, and similarly shows only the expired overrides, ignoring all
 others. This allows you to focus your attention on only those overrides whose

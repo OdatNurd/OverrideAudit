@@ -88,9 +88,9 @@ overrides.
 - **`String`** (`"diff"`, `"ignore"`, `"open"`)
 - ***Default:*** `"diff"`
 
-When using the [Diff Single Override](../usage/commands.md#diff-single-override)
-command, this setting controls what happens when the selected override has no
-differences from the underlying file.
+When using the {{ command('Diff Single Override') }}  command, this setting
+controls what happens when the selected override has no differences from the
+underlying file.
 
 The possible values of this setting are:
 
@@ -108,8 +108,8 @@ The possible values of this setting are:
 - ***Default:*** `3`
 
 While displaying a diff for an override (both a
-[single diff](../usage/commands.md#diff-single-override) as well as a
-[bulk diff](../usage/commands.md#bulk-diff-report-all-packages)), this specifies
+{{ command('Diff Single Override', 'single diff') }} as well as a
+{{ command('Bulk Diff Report (All Packages)', 'bulk diff') }}, this specifies
 how many unchanged lines before and after each difference are displayed to
 provide better context for the changes.
 
@@ -125,10 +125,10 @@ of both files that participated in the diff even when there are no changes to
 display.
 
 This applies both to a
-[bulk diff](../usage/commands.md#bulk-diff-report-all-packages) as well as a
-[single file diff](../usage/commands.md#diff-single-override), but note that
+{{ command('Bulk Diff Report (All Packages)', 'bulk diff') }} as well as a
+{{ command('Diff Single Override', 'single diff') }}, but note that
 for a single file diff this option will only have an effect if
-[diff_unchanged](#diff_unchanged) is set to `"diff"`, as otherwise no diff is
+{{ setting('diff_unchanged') }}  is set to `"diff"`, as otherwise no diff is
 displayed.
 
 ---
@@ -140,8 +140,8 @@ displayed.
 
 This setting controls whether or not OverrideAudit will make sure any unsaved
 changes are persisted to disk when switching from an edit of an override to a
-diff of it using [Swap Diff/Edit View](../usage/commands.md#swap-diffedit-view),
-so that your changes will be reflected in the diff.
+diff of it using {{ command('Swap Diff/Edit View') }}, so that your changes
+will be reflected in the diff.
 
 This option has no effect for a buffer with unsaved changes that represents a
 file that no longer exists on disk (i.e. you have opened the override and then
@@ -155,9 +155,9 @@ saving it again.
 - **`Boolean`**
 - ***Default:*** `true`
 
-Whenever OverrideAudit removes a file (e.g.
-[Delete Override](../usage/commands.md#delete-override)), this setting controls
-whether you are prompted to confirm the deletion before it is carried out.
+Whenever OverrideAudit removes a file (e.g. {{ command('Delete Override') }},
+this setting controls whether you are prompted to confirm the deletion before
+it is carried out.
 
 OverrideAudit uses the `send2trash` library that ships with Sublime Text to
 perform file deletions, which puts files in your system's recycle bin or trash
@@ -171,9 +171,8 @@ so that you can easily recover them.
 - ***Default:*** `true`
 
 When freshening an expired override (e.g.
-[Freshen Expired Overrides](../usage/commands.md#freshen-expired-overrides)),
-this setting controls whether you are prompted to confirm the operation before
-it happens or not.
+{{ command('Freshen Expired Overrides') }}, this setting controls whether you
+are prompted to confirm the operation before it happens or not.
 
 Although this operation is not destructive, freshening an expired override will
 stop OverrideAudit from warning you that it's expired, which might mask
@@ -187,8 +186,8 @@ problems.
 - ***Default:*** `true`
 
 When reverting an override file back to it's original unmodified state (e.g.
-[Revert Override](../usage/commands.md#revert-override)), this setting controls
-whether you are prompted to confirm the operation before it happens or not.
+{{ command('Revert Override') }}, this setting controls whether you are
+prompted to confirm the operation before it happens or not.
 
 This operation is destructive; the current content of the override will be lost
 as a result of this action. Make sure that you have it safely backed up (for

@@ -62,11 +62,9 @@ in Sublime Text, a [simple](index.md#simple-override) override and a
 override. By far the most common type for most users is a simple override.
 
 The easiest way to create a simple override is by using OverrideAudit's
-[Create Override](../usage/commands.md#create-override) command to select the
-resource you want to override. If you've used` View Package File` from the
-Command Palette, you can use the
-[Override Current Resource](../usage/commands.md#override-current-resource)
-command instead.
+{{ command('Create Override') }} command to select the resource you want to
+override. If you've used` View Package File` from the Command Palette, you can
+use the {{ command('Override Current Resource') }} command instead.
 
 
 ## Common Pitfalls

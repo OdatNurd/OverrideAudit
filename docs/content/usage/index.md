@@ -50,10 +50,10 @@ Another useful report type in OverrideAudit is the
 package basis what overrides you currently have defined.
 
 There are three versions of this report; one of them shows
-[all overrides](commands.md#override-report) that exist, one that shows you only
-[expired overrides](commands.md#override-report-only-expired), and one that
-shows you all overrides,
-[filtering out unchanged files](commands.md#override-report-exclude-unchanged).
+{{ command('Override Report', 'all overrides') }} that exist, one that shows you
+only {{ command('Override Report (Only Expired)', 'expired overrides') }} and
+one that shows you all overrides,
+{{ command('Override Report (Exclude Unchanged)', 'filtering out unchanged files') }}.
 
 This allows you to focus on only those overrides that may need your immediate
 attention in a variety of situations. The `Expired Overrides` report is what
