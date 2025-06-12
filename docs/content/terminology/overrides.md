@@ -266,8 +266,8 @@ unforeseen consequences on the operation of the package.
 
 !!! NOTE
 
-    The [ignore_unknown_overrides](../config/settings.md#ignore_unknown_overrides)
-    setting controls whether unknown overrides will be displayed by the
+    The {{ setting("ignore_unknown_overrides") }} setting controls whether
+    unknown overrides will be displayed by the
     [Override Report](../reports/override.md) and
     [Bulk Diff Report](../reports/bulkdiff.md) or not.
 

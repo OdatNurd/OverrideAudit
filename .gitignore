@@ -8,3 +8,6 @@
 .venv/
 .cache/
 site/
+
+# Exclude Python cache
+__pycache__

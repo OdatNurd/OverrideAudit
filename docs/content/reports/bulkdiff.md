@@ -72,9 +72,9 @@ report shows you a diff of that particular override against the version of the
 file that it is overriding, allowing you to see what's different.
 
 When the
-[ignore_unknown_overrides](../config/settings.md#ignore_unknown_overrides)
-setting is turned on (it is enabled by default) a Bulk Diff report will also
-show [unknown overrides](../terminology/index.md#unknown-override) in the
+{{ setting("ignore_unknown_overrides") }} setting is turned on (it is enabled
+by default) a Bulk Diff report will also show
+[unknown overrides](../terminology/index.md#unknown-override) in the
 report prefixed with a `[?]` marker to call your attention to such files. These
 files will not contain any diff information (there's nothing to diff against)
 but this provides a reminder to you that they exist, since other overridden

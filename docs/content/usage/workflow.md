@@ -160,15 +160,14 @@ effort.
 
     For more extensive override changes, or when you have a preference to view
     a diff in a favorite tool, OverrideAudit can be configured to use that tool
-    via the [external_diff](../config/settings.md#external_diff) setting. This
-    enables the `OverrideAudit: Open Diff Externally` command in the context
-    menu and command palette while you are viewing a diff.
+    via the {{ setting("external_diff") }} setting. This enables the
+    `OverrideAudit: Open Diff Externally` command in the context menu and
+    command palette while you are viewing a diff.
 
 
 !!! NOTE "Taking advantage of Sublime Text's internal Diff function"
 
-    The [mini_diff_underlying](../config/settings.md#mini_diff_underlying)
-    setting can be used to have
+    The {{ setting("mini_diff_underlying") }} setting can be used to have
     OverrideAudit set up the Sublime Text
     [incremental diff](https://www.sublimetext.com/docs/incremental_diff.html){: target="_blank" class="external-link" }
     functionality to show file differences based on the unpacked version of the

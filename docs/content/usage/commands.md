@@ -39,7 +39,7 @@ to only those files which are not currently overridden.
 
 In use the command opens up the content of the underlying package file in a new
 buffer and (if
-[mini_diff_underlying](../config/settings.md#mini_diff_underlying) is enabled)
+{{ setting("mini_diff_underlying") }} is enabled)
 will also set up the
 [incremental diff](https://www.sublimetext.com/docs/incremental_diff.html){: target="_blank" class="external-link" }
 functionality in Sublime Text to track changes to the file based on the Packed
@@ -332,9 +332,9 @@ This command is available from within all OverrideAudit report views (
 menu or main menu, and allows you to quickly re-run the same report.
 
 When a report is refreshed, OverrideAudit ignores the current values of the
-[reuse_views](../config/settings.md#reuse_views) and
-[clear_existing](../config/settings.md#clear_existing) options and operates as
-if they are both set to true so that the existing report will be replaced.
+{{ setting("reuse_views") }} and {{ setting("clear_existing") }} options and
+operates as if they are both set to true so that the existing report will be
+replaced.
 
 This command is also available as a context menu entry from within a report
 view or its associated editor tab and via the keyboard.
@@ -370,9 +370,8 @@ any [Override Report](../reports/override.md),
 you're editing it. In these cases the command is directly applied to the
 override file without prompting you first.
 
-The option [diff_unchanged](../config/settings.md#diff_unchanged) allows you to
-specify the result of performing a diff when the override is identical to the
-underlying file.
+The option {{ setting("diff_unchanged") }} allows you to specify the result of
+performing a diff when the override is identical to the underlying file.
 
 
 ---
@@ -418,16 +417,14 @@ file view; see [key bindings](../config/keybinds.md).
 Regardless of how you trigger the command, any existing edit or diff view for
 this override will be switched to directly. In the case of a diff view, the
 diff will be recalculated, allowing any saved changes to be immediately
-reflected. The configuration option
-[save_on_diff](../config/settings.md#save_on_diff) can be enabled to ensure
-that unsaved changes in the file are persisted first, if desired.
+reflected. The configuration option {{ setting("save_on_diff") }} can be
+enabled to ensure that unsaved changes in the file are persisted first, if
+desired.
 
-This command ignores the current values of the
-[reuse_views](../config/settings.md#reuse_views),
-[clear_existing](../config/settings.md#clear_existing) and
-[diff_unchanged](../config/settings.md#diff_unchanged) settings and operates as
-if they are set to `true`, `true` and `"diff"` respectively in order to ensure
-that you don't end up with a large number of duplicate views.
+This command ignores the current values of the {{ setting("reuse_views") }},
+{{ setting("clear_existing") }} and {{ setting("diff_unchanged") }} settings
+and operates as if they are set to `true`, `true` and `"diff"` respectively in
+order to ensure that you don't end up with a large number of duplicate views.
 
 
 ---
@@ -443,7 +440,7 @@ that you don't end up with a large number of duplicate views.
 :   `OverrideAudit: Open Diff Externally` (*while viewing an override diff*)
 
 This command is only available while the current file is a diff of an override
-and requires that the [external_diff](../config/settings.md#external_diff)
+and requires that the {{ setting("external_diff") }}
 setting be set as well.
 
 Like other contextual commands, this command does not appear in the top level
@@ -497,8 +494,7 @@ When an override is deleted, any existing edit sessions of the override will
 remain open, and Sublime will indicate that they have unsaved changes because
 the file is missing.
 
-The configuration setting
-[confirm_deletion](../config/settings.md#confirm_deletion) can be set to
+The configuration setting {{ setting("confirm_deletion") }} can be set to
 `false` if you want to be able to delete overrides without being prompted
 first.
 
@@ -542,9 +538,8 @@ put the content of a changed file back to it's release state quickly and
 easily, since packages are generally held in source control and the modified
 file can be easily put back later as needed.
 
-The configuration setting
-[confirm_revert](../config/settings.md#confirm_revert) can be set to `false` if
-you want to be able to revert overrides without being prompted first.
+The configuration setting {{ setting("confirm_revert") }} can be set to `false`
+if you want to be able to revert overrides without being prompted first.
 
 
 ---
@@ -575,6 +570,5 @@ that it contains all in one operation, which may be handy in cases where
 package files have been updated in the `sublime-package` file without their
 content changing.
 
-The configuration setting
-[confirm_freshen](../config/settings.md#confirm_freshen) can be set to `false`
+The configuration setting {{ setting("confirm_freshen") }}can be set to `false`
 if you want to be able to freshen overrides without being prompted first.

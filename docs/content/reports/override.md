@@ -71,9 +71,9 @@ on the `JavaScript` package and the `HTML.sublime-syntax` override file are
 examples of expired overrides.
 
 When the
-[ignore_unknown_overrides](../config/settings.md#ignore_unknown_overrides)
-setting is turned on (it is enabled by default) the Override report will also
-show [unknown overrides](../terminology/index.md#unknown-override) in the report
+{{ setting("ignore_unknown_overrides") }} setting is turned on (it is enabled by
+default) the Override report will also show
+[unknown overrides](../terminology/index.md#unknown-override) in the report
 prefixed with a `[?]` marker to call your attention to such files.
 
 The [Ignore Unchanged](../usage/commands.md#override-report-exclude-unchanged)
@@ -96,11 +96,10 @@ invalid.
     whenever Sublime Text starts and the version number is different than it
     was on the last run (i.e. Sublime has been updated).
 
-    Additionally, the
-    [report_on_unignore](../config/settings.md#report_on_unignore) setting
-    (which defaults to `true`) also causes this report to be generated in cases
-    where a package is removed from the list of ignored packages, such as when
-    it has just been upgraded.
+    Additionally, the {{ setting("report_on_unignore") }} setting (which
+    defaults to `true`) also causes this report to be generated in cases where
+    a package is removed from the list of ignored packages, such as when it has
+    just been upgraded.
 
     In both cases, the report will not appear unless there is actually at least
     one expired override to report, so as not to get in your way.

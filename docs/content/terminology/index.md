@@ -139,9 +139,8 @@ from the Shipped version of the package.
 
 The [Override Report](../reports/override.md) and
 [Bulk Diff Report](../reports/bulkdiff.md) can display overrides of this type
-in that report via the
-[ignore_unknown_overrides](../config/settings.md#ignore_unknown_overrides)
-setting (the default is to enable this feature) to give you an indication of
-when this is happening. This can act as a reminder that new files have been
-added to the package or that overrides exist which may no longer be needed
-because the source package has removed the file.
+in that report via the {{ setting("ignore_unknown_overrides") }} setting (the
+default is to enable this feature) to give you an indication of when this is
+happening. This can act as a reminder that new files have been added to the
+package or that overrides exist which may no longer be needed because the
+source package has removed the file.

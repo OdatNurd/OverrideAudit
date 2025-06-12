@@ -50,9 +50,9 @@ a `diff` of the current override against the underlying file, opening such a
 tab if it does not already exist, and refreshing its content if modifications
 have been made to the file.
 
-The [save_on_diff](settings.md#save_on_diff) setting (which is disabled by
-default) can use used to automatically save any changes in your override before
-switching to the diff.
+The {{ setting("save_on_diff") }} setting (which is disabled by default) can
+use used to automatically save any changes in your override before switching to
+the diff.
 
 This command also works in the opposite direction; while viewing an override
 diff, this will jump to the tab that contains the override whose diff you're

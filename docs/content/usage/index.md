@@ -101,14 +101,13 @@ you the contents of the override, context menu items are available to allow you
 switch to the diff as well.
 
 If you have a preferred external tool for performing diffs between files, you
-can use the [external_diff](../config/settings.md#external_diff) setting to
-tell OverrideAudit about it. In this case, the content menu in the diff will
-also contain an option to open that diff in the configured external tool.
+can use the {{ setting("external_diff") }} setting to tell OverrideAudit about
+it. In this case, the content menu in the diff will also contain an option to
+open that diff in the configured external tool.
 
-Using the [mini_diff_underlying](../config/settings.md#mini_diff_underlying)
-setting, while editing an override the diff indications in the Sublime Text
-gutter can be used to see diffs inline as well, without having to open
-dedicated diff view.
+Using the {{ setting("mini_diff_underlying") }} setting, while editing an
+override the diff indications in the Sublime Text gutter can be used to see
+diffs inline as well, without having to open dedicated diff view.
 
 
 ## Next Steps

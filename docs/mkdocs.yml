@@ -104,6 +104,10 @@ plugins:
       fallback_to_build_date: true
   - glightbox:
       auto_caption: true
+  - macros:
+      on_error_fail: true
+      on_undefined: strict
+      module_name: macros
   - minify:
       minify_html: true
   - search
