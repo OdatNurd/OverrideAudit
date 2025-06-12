@@ -40,7 +40,7 @@ and operates identically regardless of platform.
 ```
 The MIT License (MIT)
 
-Copyright 2017-2025 Terence Martin
+Copyright 2017-{{ current_year }} Terence Martin
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in

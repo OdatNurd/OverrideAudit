@@ -3,10 +3,12 @@ site_author: Terence Martin (OdatNurd)
 site_url: 'https://overrideaudit.odatnurd.net'
 repo_url: 'https://github.com/OdatNurd/OverrideAudit'
 edit_uri: !ENV [EDIT_URI, '']
-copyright: '&copy 2025 <a href="https://odatnurd.net">OdatNurd</a>'
+copyright: '&copy {{ current_year }} <a href="https://odatnurd.net">OdatNurd</a>'
 
 docs_dir: content
 site_dir: site
+hooks:
+  - extensions/hooks.py
 
 nav:
   - Home:
@@ -107,7 +109,7 @@ plugins:
   - macros:
       on_error_fail: true
       on_undefined: strict
-      module_name: macros
+      module_name: extensions/macros
   - minify:
       minify_html: true
   - search

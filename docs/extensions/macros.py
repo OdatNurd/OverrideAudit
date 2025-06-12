@@ -32,6 +32,15 @@ def define_env(env: MacrosPlugin):
     This function is invoked by mkdocs to populate a series of macros and other
     enhancements to mkdocs page generation.
     """
+
+    # Custom variable that expands to the current year at the point where the
+    # documentation is generated.
+    #
+    # NOTE: Despite what it looks like, this variable *DOES NOT* expand in the
+    #       page footer; see the code in hooks.py for how that one is handled.
+    env.variables['current_year'] = str(datetime.now().year)
+
+
     @env.macro
     def setting(setting: str) -> str:
         """
