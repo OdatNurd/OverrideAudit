@@ -6,7 +6,7 @@ description: Controlling OverrideAudit with custom key buindings
 ## Opening Key Bindings
 
 In order to view the key bindings that ship directly with OverrideAudit, you can
-use the `Preferences > Settings > OverrideAudit > Key Bindings` menu item or
+use the `Preferences > Package Settings > OverrideAudit > Key Bindings` menu item or
 the `Preferences: OverrideAudit Key Bindings` command from the Command Palette.
 
 !!! NOTE "Differences in Menu layout on MacOS"
