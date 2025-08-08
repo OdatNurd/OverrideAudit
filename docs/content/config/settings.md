@@ -6,7 +6,7 @@ description: Available configuration settings for OverrideAudit
 ## Opening Settings
 
 In order to view OverrideAudit's settings, you can use the
-`Preferences > Settings > OverrideAudit >Settings` menu item or the
+`Preferences > Package Settings > OverrideAudit > Settings` menu item or the
 `Preferences: OverrideAudit Settings` command from the Command Palette.
 
 !!! NOTE "Differences in Menu layout on MacOS"
