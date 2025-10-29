@@ -6,7 +6,8 @@ import zipfile
 import codecs
 from datetime import datetime
 import difflib
-from collections import MutableSet, OrderedDict
+from collections import OrderedDict
+from collections.abc import MutableSet
 from glob import glob, iglob
 import fnmatch
 
