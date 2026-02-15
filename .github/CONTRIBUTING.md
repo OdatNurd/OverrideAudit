@@ -26,7 +26,7 @@ only what you experienced but (if possible) a reproducible set of steps to
 follow to cause the problem to occur. Being able to reproduce the problem is
 the best way to ensure that it gets resolved as quickly as possible.
 
-Since there are subtle behind the scenes differences between different versions
+Since there are subtle behind-the-scenes differences between different versions
 of Sublime Text, you should also indicate what build number of Sublime you're
 running along with the operating system that you're running it under and an
 indication of whether or not the file system on your operating system is case
@@ -45,12 +45,12 @@ meant to be all encompassing. If you have an idea for something that could
 enhance existing functionality or be added to make OverrideAudit even more
 useful, please let us know.
 
-When filing a feature request try to provide a succinct description of what you
+When filing a feature request, try to provide a succinct description of what you
 think the functionality should do. Depending on the feature you may also want
 to provide a step by step list of the actions in Sublime/OverrideAudit that
-would lead to your requested feature being used, but this is not neccesary.
+would lead to your requested feature being used, but this is not necessary.
 
-We're commited to ensuring that OverrideAudit works for everyone regardless of
+We're committed to ensuring that OverrideAudit works for everyone regardless of
 the operating system they're running on, so when requesting a feature you
 don't need to specify the environment you're running everything in (but we
 won't get mad if you do).
