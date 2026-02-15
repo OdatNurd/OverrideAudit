@@ -40,6 +40,7 @@ Version 3.0.0 (2025-06-06)
 
 
 Version 2.2.7 (2024-02-21)
+--------------------------
 
   * Fix the documentation link in the command palette, which
     was missed in the previous version.
